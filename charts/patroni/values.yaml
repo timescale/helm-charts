@@ -22,47 +22,8 @@ kubernetes:
     enable: true
   configmaps:
     enable: false
-etcd:
-  enable: false
-  deployChart: false
-  # If not deploying etcd chart, fill-in value for etcd service
-  # <service>.<namespace>.svc.cluster.local
-  host:
-  # Leave blank to use vendored etcd chart
-  discovery:
-zookeeper:
-  enable: false
-  deployChart: false
-  # If not deploying etcd chart, fill-in list of ZooKeeper members in format:
-  # 'host1:port1','host2:port2','etc...'
-  hosts:
-consul:
-  enable: false
-  deployChart: false
-  # Leave blank to use vendored consul chart
-  hosts:
 
 # Extra custom environment variables.
-env: {}
-
-walE:
-  # Specifies whether Wal-E should be enabled
-  enable: false
-  # Cron schedule for doing base backups
-  scheduleCronJob: 00 01 * * *
-  # Amount of base backups to retain
-  retainBackups: 2
-  # Path to the S3 or GCS bucket used for WAL-E base backups
-  s3Bucket:
-  gcsBucket:
-  # Name of the secret that holds the credentials to the bucket
-  kubernetesSecret:
-  # Maximum size of the WAL segments accumulated after the base backup to
-  # consider WAL-E restore instead of pg_basebackup
-  backupThresholdMegabytes: 1024
-  # Maximum ratio (in percents) of the accumulated WAL files to the base backup
-  # to consider WAL-E restore instead of pg_basebackup
-  backupThresholdPercentage: 30
 
 persistentVolume:
   enabled: true
