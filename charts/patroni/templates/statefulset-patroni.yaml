@@ -26,6 +26,7 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/patroni_entrypoint.sh"]
         env:
         - name: PGPASSWORD_SUPERUSER
           valueFrom:

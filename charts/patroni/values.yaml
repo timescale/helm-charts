@@ -1,10 +1,10 @@
-replicaCount: 5
+replicaCount: 3
 
 image:
   # Image was built from
   # https://github.com/zalando/spilo/tree/master/postgres-appliance
-  repository: registry.opensource.zalan.do/acid/spilo-10
-  tag: 1.4-p16
+  repository: timescaledev/timescaledb-patroni
+  tag: 77647063-pg11-custom
   pullPolicy: IfNotPresent
 
 # Credentials used by Patroni
@@ -24,6 +24,11 @@ kubernetes:
     enable: false
 
 # Extra custom environment variables.
+env:
+  SPILO_CONFIGURATION: |
+    postgresql:
+      parameters:
+        shared_preload_libraries: timescaledb,pg_stat_statements
 
 persistentVolume:
   enabled: true
