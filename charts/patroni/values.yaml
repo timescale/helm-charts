@@ -26,9 +26,14 @@ kubernetes:
 # Extra custom environment variables.
 env:
   SPILO_CONFIGURATION: |
+    dcs:
+      synchronous_mode: True
+      synchronous_mode_strict: True
     postgresql:
       parameters:
         shared_preload_libraries: timescaledb,pg_stat_statements
+        synchronous_standby_names: "*"
+        synchronous_commit: "on"
 
 persistentVolume:
   enabled: true
