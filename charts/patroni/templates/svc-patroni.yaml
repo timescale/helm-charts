@@ -7,8 +7,11 @@ metadata:
     chart: {{ template "patroni.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "4000"
 spec:
   type: LoadBalancer
+
   ports:
   - name: postgresql
     port: 5432
