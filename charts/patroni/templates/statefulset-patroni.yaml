@@ -22,6 +22,10 @@ spec:
         release: {{ .Release.Name }}
     spec:
       serviceAccountName: {{ template "patroni.serviceAccountName" . }}
+      securityContext:
+        # The postgres user inside the Patroni image has uid=1000.
+        # This configuration ensures the permissions of the mounts are suitable
+        fsGroup: 1000
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
