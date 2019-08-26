@@ -45,9 +45,14 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `credentials.superuser`           | Password of the superuser                   | `tea`                                               |
 | `credentials.admin`               | Password of the admin                       | `cola`                                              |
 | `credentials.standby`             | Password of the replication user            | `pinacolada`                                        |
+| `backup.enable`                   | Schedule backups to occur                   | `false`                                             |
+| `backup.s3Bucket`                 | The S3 bucket in which to store backups     |                                                     |
+| `backup.accessKeyId`              | The Access Key ID to authenticate the IAM user for the backup |                                   |
+| `backup.secretAccessKey`          | The Key Secret to authenticate the IAM user |                                                     |
 | `kubernetes.dcs.enable`           | Using Kubernetes as DCS                     | `true`                                              |
 | `kubernetes.configmaps.enable`    | Using Kubernetes configmaps instead of endpoints | `false`                                        |
 | `env`                             | Extra custom environment variables          | `{}`                                                |
+| `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | Some defaults to ensure to load TimescaleDB         |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
@@ -114,6 +119,27 @@ my-release-timescaledb-1   1/1     Running   0          8m40s   replica
 my-release-timescaledb-2   1/1     Running   0          8m5s    replica
 ```
 
+## Create backups to S3
+The backup is disabled by default, the following items are required for you to enable creating backups to S3:
+
+- an S3 bucket available for your backups
+- an [IAM user](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html)
+- a [S3 Bucket Policy](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/add-bucket-policy.html) that allows the IAM user read and write access to (parts of) the S3 bucket
+- access key that allows you to login as the IAM user
+
+If you (re)deploy your database with this configuration snippet in the values file, the backup should start working.
+
+```yaml
+# Filename: myvalues.yaml
+backup:
+  enable: True
+  s3Bucket: this_bucket_may_not_exist
+  accessKeyId: 9E1R2CUZBXJVYSBYRWTB
+  secretAccessKey: 5CrhvJD08bp9emxI+D48GXfDdtl823nlSRRv7dmB
+```
+```console
+helm upgrade --install example -f myvalues.yaml
+```
 
 ## Cleanup
 
@@ -122,7 +148,7 @@ To remove the spawned pods you can run a simple `helm delete <release-name>`.
 Helm will however preserve created persistent volume claims. To also remove the persistent
 volumes, execute the commands below.
 
-```
+```console
 release=my-release
 helm delete my-release
 kubectl delete pvc -l release=my-release
