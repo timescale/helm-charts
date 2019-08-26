@@ -27,17 +27,28 @@ kubernetes:
   configmaps:
     enable: false
 
+backup:
+  enable: false
+  s3Bucket: my_example_s3_bucket_for_backups
+  # These secrets should contain an IAM access key ID and a secret access key:
+  # https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+  # They correspond to repo1-s3-key and repo1-s3-key-secret of this manual
+  # https://pgbackrest.org/configuration.html#section-repository/option-repo-s3-key
+  accessKeyId: examplekeyid
+  secretAccessKey: examplesecret+D48GXfDdtl823nlSRRv7dmB
+
 # Extra custom environment variables.
-env:
-  SPILO_CONFIGURATION: |
-    dcs:
-      synchronous_mode: True
-      synchronous_mode_strict: True
-    postgresql:
-      parameters:
-        shared_preload_libraries: timescaledb,pg_stat_statements
-        synchronous_standby_names: "*"
-        synchronous_commit: "on"
+env: {}
+
+patroni:
+  postgresql:
+    parameters:
+      shared_preload_libraries: timescaledb,pg_stat_statements
+      # Adding the directory where the pgdata is volume is mounted to the socket dirs
+      # allows other pods in the container to connect using the socket. The pgBackRest sidecar
+      # for example needs this
+      unix_socket_directories: "/var/run/postgresql,/home/postgres/pgdata"
+      archive_command: "pgbackrest --stanza=poddb archive-push %p"
 
 persistentVolume:
   enabled: true

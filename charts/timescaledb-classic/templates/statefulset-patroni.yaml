@@ -59,6 +59,17 @@ spec:
           value: "true"
         {{- end }}
         {{- end }}
+        - name: SPILO_CONFIGURATION
+          value: |
+{{ if .Values.backup.enable -}}
+{{ toYaml .Values.patroni | indent 12 }}
+{{- else -}}
+{{/*
+If the backup is not enabled, we need to make very sure that the archiver is not going to fill
+up the disk. TODO have a better way of expressing this.
+*/}}
+{{- toYaml (merge (dict "postgresql" (dict "parameters" (dict "archive_command" "/bin/true"))) .Values.patroni) | indent 12 -}}
+{{- end }}
         - name: SCOPE
           value: {{ template "timescaledb.fullname" . }}
         - name: PGROOT
@@ -86,6 +97,41 @@ spec:
           readOnly: true
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+
+{{- if .Values.backup.enable }}
+      - name: pgbackrest
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/patroni_entrypoint.sh"]
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+        - name: storage-volume
+          mountPath: "{{ .Values.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.persistentVolume.subPath }}"
+        env:
+          - name: PGB_REPO1_S3_REGION
+            value: us-east-2
+          - name: K8S_SIDECAR
+            value: pgbackrest
+          - name: PGBACKREST_CONFIG
+            value: /home/postgres/pgdata/backup/pgbackrest.conf
+          - name: PGB_REPO1_PATH
+            value: "/{{ template "timescaledb.fullname" . }}/"
+          - name: PGB_REPO1_S3_BUCKET
+            value: "{{ .Values.backup.s3Bucket }}"
+          - name: PGB_REPO1_S3_KEY
+            valueFrom:
+              secretKeyRef:
+                name: "{{ template "timescaledb.fullname" . }}-pgbackrest"
+                key: PGB_REPO1_S3_KEY
+          - name: PGB_REPO1_S3_KEY_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: "{{ template "timescaledb.fullname" . }}-pgbackrest"
+                key: PGB_REPO1_S3_KEY_SECRET
+{{ end }}
+
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
