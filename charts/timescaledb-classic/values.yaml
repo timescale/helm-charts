@@ -1,13 +1,17 @@
 replicaCount: 3
 
+# To prevent very long names, we override the name, otherwise it would default to
+# timescaledb-classic (the name of the chart)
+nameOverride: timescaledb
+
 image:
   # Image was built from
-  # https://github.com/zalando/spilo/tree/master/postgres-appliance
-  repository: timescaledev/timescaledb-patroni
-  tag: 77647063-pg11-custom
+  # https://github.com/timescale/timescaledb-docker-ha
+  repository: timescaledev/timescaledb-ha
+  tag: 78603166-pg11-custom
   pullPolicy: IfNotPresent
 
-# Credentials used by Patroni
+# Credentials used by PostgreSQL and Patroni
 # https://github.com/zalando/patroni/blob/master/docs/SETTINGS.rst#postgresql
 # https://github.com/zalando/spilo/blob/master/ENVIRONMENT.rst
 credentials:
@@ -77,7 +81,7 @@ affinityTemplate: |
         topologyKey: "kubernetes.io/hostname"
         labelSelector:
           matchLabels:
-            app:  {{ template "patroni.name" . }}
+            app:  {{ template "timescaledb.name" . }}
             release: {{ .Release.Name | quote }}
 affinity: {}
 

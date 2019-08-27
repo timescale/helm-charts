@@ -1,57 +1,57 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: {{ template "patroni.fullname" . }}
+  name: {{ template "timescaledb.fullname" . }}
   labels:
-    app: {{ template "patroni.fullname" . }}
-    chart: {{ template "patroni.chart" . }}
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  serviceName: {{ template "patroni.fullname" . }}
+  serviceName: {{ template "timescaledb.fullname" . }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "patroni.fullname" . }}
+      app: {{ template "timescaledb.fullname" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
-      name: {{ template "patroni.fullname" . }}
+      name: {{ template "timescaledb.fullname" . }}
       labels:
-        app: {{ template "patroni.fullname" . }}
+        app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ template "patroni.serviceAccountName" . }}
+      serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
-        # The postgres user inside the Patroni image has uid=1000.
+        # The postgres user inside the TimescaleDB image has uid=1000.
         # This configuration ensures the permissions of the mounts are suitable
         fsGroup: 1000
       containers:
-      - name: {{ .Chart.Name }}
+      - name: timescaledb
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/patroni_entrypoint.sh"]
+        command: ["/timescaledb_entrypoint.sh"]
         env:
         - name: PGPASSWORD_SUPERUSER
           valueFrom:
             secretKeyRef:
-              name: {{ template "patroni.fullname" . }}
+              name: {{ template "timescaledb.fullname" . }}
               key: password-superuser
         - name: PGPASSWORD_ADMIN
           valueFrom:
             secretKeyRef:
-              name: {{ template "patroni.fullname" . }}
+              name: {{ template "timescaledb.fullname" . }}
               key: password-admin
         - name: PGPASSWORD_STANDBY
           valueFrom:
             secretKeyRef:
-              name: {{ template "patroni.fullname" . }}
+              name: {{ template "timescaledb.fullname" . }}
               key: password-standby
         {{- if .Values.kubernetes.dcs.enable }}
         - name: DCS_ENABLE_KUBERNETES_API
           value: "true"
         - name: KUBERNETES_LABELS
-          value: {{ (printf "{ \"app\": \"%s\", \"release\": \"%s\" }" (include "patroni.fullname" .) .Release.Name) | quote }}
+          value: {{ (printf "{ \"app\": \"%s\", \"release\": \"%s\" }" (include "timescaledb.fullname" .) .Release.Name) | quote }}
         - name: KUBERNETES_SCOPE_LABEL
           value: "app"
         {{- if .Values.kubernetes.configmaps.enable }}
@@ -60,7 +60,7 @@ spec:
         {{- end }}
         {{- end }}
         - name: SCOPE
-          value: {{ template "patroni.fullname" . }}
+          value: {{ template "timescaledb.fullname" . }}
         - name: PGROOT
           value: "{{ .Values.persistentVolume.mountPath }}/pgroot"
         - name: POD_NAMESPACE
@@ -107,7 +107,7 @@ spec:
       volumes:
       - name: patroni-config
         secret:
-          secretName: {{ template "patroni.fullname" . }}
+          secretName: {{ template "timescaledb.fullname" . }}
       {{- if not .Values.persistentVolume.enabled }}
       - name: storage-volume
         emptyDir: {}
@@ -121,7 +121,7 @@ spec:
 {{ toYaml .Values.persistentVolume.annotations | indent 8 }}
         {{- end }}
         labels:
-          app: {{ template "patroni.fullname" . }}
+          app: {{ template "timescaledb.fullname" . }}
           release: {{ .Release.Name }}
           heritage: {{ .Release.Service }}
       spec:
