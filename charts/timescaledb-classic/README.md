@@ -12,7 +12,7 @@ High Availability (HA) configuration on Kubernetes. This chart will do the follo
 > When deploying on AWS EKS, the pods will be scheduled on nodes which run in different Availability Zones (AZs).
 As well, an AWS Elastic Load Balancer (ELB) is configured to handle routing incoming traffic to the Master pod.
 
-![diagram](./diagram.png){:height="500px"}
+![diagram](./diagram.png)
 
 
 ## Installing
