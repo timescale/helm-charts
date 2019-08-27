@@ -1,0 +1,10 @@
+
+========================================================================
+NOTICES
+========================================================================
+
+Certain files in this code base have been modified and/or copied,
+either partially or wholely, from source code from the Helm
+Cloud Native Computing Foundation project.
+
+https://github.com/helm/charts/tree/master/incubator/patroni
