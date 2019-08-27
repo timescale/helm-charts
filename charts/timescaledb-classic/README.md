@@ -1,6 +1,6 @@
-# Patroni Helm Chart
+# TimescaleDB Helm Chart
 
-This directory contains a Kubernetes chart to deploy a five node [Patroni](https://github.com/zalando/patroni/) cluster using a [Spilo](https://github.com/zalando/spilo) and a StatefulSet.
+This directory contains a Kubernetes chart to deploy a five node [TimescaleDB](https://github.com/timescale/timescaledb/) cluster using a [Docker Image](https://github.com/timescale/timescaledb-docker-ha) and a StatefulSet.
 
 ## Prerequisites Details
 * Kubernetes 1.5+
@@ -18,22 +18,20 @@ This directory contains a Kubernetes chart to deploy a five node [Patroni](https
 ## Chart Details
 This chart will do the following:
 
-* Implement a HA scalable PostgreSQL 10 cluster using a Kubernetes StatefulSet.
+* Implement a HA scalable TimescaleDB using a Kubernetes StatefulSet.
 
 ## Installing the Chart
 
 To install the chart with the release name `my-release`:
 
 ```console
-$ helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-$ helm dependency update
-$ helm install --name my-release incubator/patroni
+$ helm install --name my-release .
 ```
 
 To install the chart with randomly generated passwords:
 
 ```console
-$ helm install --name my-release incubator/patroni \
+$ helm install --name my-release . \
   --set credentials.superuser="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32)",credentials.admin="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32)",credentials.standby="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32)"
 ```
 
@@ -48,14 +46,14 @@ $ kubectl run -i --tty --rm psql --image=postgres --restart=Never -- bash -il
 Then, from inside the pod, connect to PostgreSQL:
 
 ```console
-$ psql -U admin -h my-release-patroni.default.svc.cluster.local postgres
+$ psql -U admin -h my-release-timescaledb.default.svc.cluster.local postgres
 <admin password from values.yaml>
 postgres=>
 ```
 
 ## Configuration
 
-The following table lists the configurable parameters of the patroni chart and their default values.
+The following table lists the configurable parameters of the TimescaleDB chart and their default values.
 
 |       Parameter                   |           Description                       |                         Default                     |
 |-----------------------------------|---------------------------------------------|-----------------------------------------------------|
@@ -110,7 +108,7 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```console
-$ helm install --name my-release -f values.yaml incubator/patroni
+$ helm install --name my-release -f values.yaml .
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
@@ -129,19 +127,21 @@ $ kubectl delete pvc -l release=$release
 ```
 
 ## Internals
+TimescaleDB is built on top of PostgreSQL. To ensure HA, [Patroni](https://github.com/zalando/patroni)
+is used and for Backup & Recovery [pgBackRest](https://github.com/pgbackrest/pgbackrest) is included.
 
 Patroni is responsible for electing a PostgreSQL master pod by leveraging the
 DCS of your choice. After election it adds a `spilo-role=master` label to the
 elected master and set the label to `spilo-role=replica` for all replicas.
-Simultaneously it will update the `<release-name>-patroni` endpoint to let the
+Simultaneously it will update the `<release-name>-timescaledb` endpoint to let the
 service route traffic to the elected master.
 
 ```console
 $ kubectl get pods -l spilo-role -L spilo-role
-NAME                   READY     STATUS    RESTARTS   AGE       SPILO-ROLE
-my-release-patroni-0   1/1       Running   0          9m        replica
-my-release-patroni-1   1/1       Running   0          9m        master
-my-release-patroni-2   1/1       Running   0          8m        replica
-my-release-patroni-3   1/1       Running   0          8m        replica
-my-release-patroni-4   1/1       Running   0          8m        replica
+NAME                       READY   STATUS    RESTARTS   AGE     SPILO-ROLE
+my-release-timescaledb-0   1/1     Running   0          5m1s    master
+my-release-timescaledb-1   1/1     Running   0          4m20s   replica
+my-release-timescaledb-2   1/1     Running   0          3m34s   replica
+my-release-timescaledb-3   1/1     Running   0          84s     replica
+my-release-timescaledb-4   1/1     Running   0          44s     replica
 ```

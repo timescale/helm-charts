@@ -5,9 +5,9 @@ cluster.
 
 # Recipes
 
-## Install a HA cluster without any custom configuration
+## Install a classic HA cluster without any custom configuration
 ```
-helm install --name example charts/patroni/
+helm install --name example charts/timescaledb-classic/
 ```
 
 This will spin up a few pods that are providing a HA TimescaleDB cluster. An example listing of what has been installed
@@ -15,22 +15,18 @@ looks like this:
 
 ```
 $ kubectl get all -l release=example
-NAME                    READY   STATUS              RESTARTS   AGE
-pod/example-patroni-0   1/1     Running             0          79s
-pod/example-patroni-1   1/1     Running             0          53s
-pod/example-patroni-2   0/1     ContainerCreating   0          23s
+NAME                        READY   STATUS              RESTARTS   AGE
+pod/example-timescaledb-0   1/1     Running             0          79s
+pod/example-timescaledb-1   1/1     Running             0          53s
+pod/example-timescaledb-2   0/1     ContainerCreating   0          23s
 
 
-NAME                             TYPE           CLUSTER-IP      EXTERNAL-IP                PORT(S)          AGE
-service/example-patroni          LoadBalancer   10.100.157.80   verylongname.example.com   5432:32641/TCP   79s
-service/example-patroni-config   ClusterIP      None            <none>                     <none>           53s
+NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP                PORT(S)          AGE
+service/example-timescaledb          LoadBalancer   10.100.157.80   verylongname.example.com   5432:32641/TCP   79s
+service/example-timescaledb-config   ClusterIP      None            <none>                     <none>           53s
 
-
-
-
-NAME                               READY   AGE
-statefulset.apps/example-patroni   2/3     80s
-
+NAME                                   READY   AGE
+statefulset.apps/example-timescaledb   2/3     80s
 ```
 
 ## Initial connection to the HA Cluster

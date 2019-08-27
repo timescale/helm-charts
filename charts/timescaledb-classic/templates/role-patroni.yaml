@@ -2,10 +2,10 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
-  name: {{ template "patroni.fullname" . }}
+  name: {{ template "timescaledb.fullname" . }}
   labels:
-    app: {{ template "patroni.fullname" . }}
-    chart: {{ template "patroni.chart" . }}
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 rules:
