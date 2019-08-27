@@ -57,36 +57,18 @@ The following table lists the configurable parameters of the TimescaleDB chart a
 
 |       Parameter                   |           Description                       |                         Default                     |
 |-----------------------------------|---------------------------------------------|-----------------------------------------------------|
-| `nameOverride`                    | Override the name of the chart              | `nil`                                               |
+| `nameOverride`                    | Override the name of the chart              | `timescaledb`                                       |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
-| `replicaCount`                    | Amount of pods to spawn                     | `5`                                                 |
-| `image.repository`                | The image to pull                           | `registry.opensource.zalan.do/acid/spilo-10`        |
-| `image.tag`                       | The version of the image to pull            | `1.4-p16`                                           |
+| `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
+| `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
+| `image.tag`                       | The version of the image to pull            | `78603166-pg11`                                     |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `credentials.superuser`           | Password of the superuser                   | `tea`                                               |
 | `credentials.admin`               | Password of the admin                       | `cola`                                              |
 | `credentials.standby`             | Password of the replication user            | `pinacolada`                                        |
 | `kubernetes.dcs.enable`           | Using Kubernetes as DCS                     | `true`                                              |
 | `kubernetes.configmaps.enable`    | Using Kubernetes configmaps instead of endpoints | `false`                                        |
-| `etcd.enable`                     | Using etcd as DCS                           | `false`                                             |
-| `etcd.deployChart`                | Deploy etcd chart                           | `false`                                             |
-| `etcd.host`                       | Host name of etcd cluster                   | `nil`                                               |
-| `etcd.discovery`                  | Domain name of etcd cluster                 | `nil`                                               |
-| `zookeeper.enable`                | Using ZooKeeper as DCS                      | `false`                                             |
-| `zookeeper.deployChart`           | Deploy ZooKeeper chart                      | `false`                                             |
-| `zookeeper.hosts`                 | List of ZooKeeper cluster members           | `host1:port1,host2:port,etc...`                     |
-| `consul.enable`                   | Using Consul as DCS                         | `false`                                             |
-| `consul.deployChart`              | Deploy Consul chart                         | `false`                                             |
-| `consul.host`                     | Host name of consul cluster                 | `nil`                                               |
 | `env`                             | Extra custom environment variables          | `{}`                                                |
-| `walE.enable`                     | Use of Wal-E tool for base backup/restore   | `false`                                             |
-| `walE.scheduleCronJob`            | Schedule of Wal-E backups                   | `00 01 * * *`                                       |
-| `walE.retainBackups`              | Number of base backups to retain            | `2`                                                 |
-| `walE.s3Bucket:`                  | Amazon S3 bucket used for wal-e backups     | `nil`                                               |
-| `walE.gcsBucket`                  | GCS storage used for Wal-E backups          | `nil`                                               |
-| `walE.kubernetesSecret`           | K8s secret name for provider bucket         | `nil`                                               |
-| `walE.backupThresholdMegabytes`   | Maximum size of the WAL segments accumulated after the base backup to consider WAL-E restore instead of pg_basebackup | `1024` |
-| `walE.backupThresholdPercentage`  | Maximum ratio (in percents) of the accumulated WAL files to the base backup to consider WAL-E restore instead of pg_basebackup | `30` |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
