@@ -36,6 +36,16 @@ backup:
   # https://pgbackrest.org/configuration.html#section-repository/option-repo-s3-key
   accessKeyId: examplekeyid
   secretAccessKey: examplesecret+D48GXfDdtl823nlSRRv7dmB
+  jobs:
+      # name: needs to adhere to the kubernetes restrictions
+      # type: can be full, incr or diff, see https://pgbackrest.org/user-guide.html
+      # schedule: https://en.wikipedia.org/wiki/Cron#CRON_expression
+    - name: full-weekly
+      type: full
+      schedule: "12 02 7 * *"
+    - name: incremental-daily
+      type: incr
+      schedule: "12 02 1-6 * *"
 
 # Extra custom environment variables.
 env: {}
