@@ -1,19 +1,26 @@
-# TimescaleDB Classic
+# TimescaleDB Single
 
 This directory contains a Helm chart to deploy a three
 node [TimescaleDB](https://github.com/timescale/timescaledb/) cluster in a
 High Availability (HA) configuration on Kubernetes. This chart will do the following:
 
-- Create three (by default) pods using a Kubernetes [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
-- Each pod is created using the [TimescaleDB HA Docker image](https://github.com/timescale/timescaledb-docker-ha).
-- Each pod runs a TimescaleDB instance and Patroni agent.
+- Creates three (by default) pods using a Kubernetes [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
+- Each pod has a container created using the [TimescaleDB HA Docker image](https://github.com/timescale/timescaledb-docker-ha).
+- Each the container runs a TimescaleDB instance and Patroni agent.
 - Each TimescaleDB instance is configured for replication (1 Master + 2 Replicas).
 
-> When deploying on AWS EKS, the pods will be scheduled on nodes which run in different Availability Zones (AZs).
-As well, an AWS Elastic Load Balancer (ELB) is configured to handle routing incoming traffic to the Master pod.
+<img src="./timescaledb-single.png" width="500" />
 
-![diagram](./diagram.png)
+When deploying on AWS EKS:
+- The pods will be scheduled on nodes which run in different Availability Zones (AZs).
+- An AWS Elastic Load Balancer (ELB) is configured to handle routing incoming traffic to the Master pod.
 
+When configured for Backups to S3:
+- Each pod will also include a container running [pgBackRest](https://pgbackrest.org/).
+- By default, two [CronJobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) are created to handle full weekly and incremental daily backups.
+- The backups are stored to an S3 bucket. 
+
+<img src="./timescaledb-single-backups.png" width="500" />
 
 ## Installing
 
@@ -88,7 +95,7 @@ To list the Kubernetes resources created:
 kubectl get all -l release=my-release
 ```
 
-```
+```console
 NAME                        READY   STATUS              RESTARTS   AGE
 pod/example-timescaledb-0   1/1     Running             0          79s
 pod/example-timescaledb-1   1/1     Running             0          53s
@@ -112,8 +119,11 @@ a PostgreSQL master pod. After election, Patroni adds a `spilo-role=master` labe
 to `spilo-role=replica` for all replicas. Simultaneously it will
 update the `<release-name>-timescaledb` endpoint to let the service route traffic to the elected master.
 
+```
+kubectl get pods -l spilo-role -L spilo-role
+```
+
 ```console
-$ kubectl get pods -l spilo-role -L spilo-role
 NAME                       READY   STATUS    RESTARTS   AGE     SPILO-ROLE
 my-release-timescaledb-0   1/1     Running   0          9m10s   master
 my-release-timescaledb-1   1/1     Running   0          8m40s   replica
@@ -138,7 +148,7 @@ backup:
   accessKeyId: 9E1R2CUZBXJVYSBYRWTB
   secretAccessKey: 5CrhvJD08bp9emxI+D48GXfDdtl823nlSRRv7dmB
 ```
-```console
+```
 helm upgrade --install example -f myvalues.yaml
 ```
 
@@ -166,8 +176,7 @@ To remove the spawned pods you can run a simple `helm delete <release-name>`.
 Helm will however preserve created persistent volume claims. To also remove the persistent
 volumes, execute the commands below.
 
-```console
-release=my-release
+```
 helm delete my-release
 kubectl delete pvc -l release=my-release
 ```
@@ -187,9 +196,8 @@ can connect via `psql` using the following:
 ```bash
 psql -h verylongname.example.com -U postgres
 ```
-```
-Password for user postgres: 
-
+```console
+Password for user postgres:
 postgres=#
 ```
 
