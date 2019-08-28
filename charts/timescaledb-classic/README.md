@@ -9,7 +9,7 @@ High Availability (HA) configuration on Kubernetes. This chart will do the follo
 - Each the container runs a TimescaleDB instance and Patroni agent.
 - Each TimescaleDB instance is configured for replication (1 Master + 2 Replicas).
 
-<img src="./timescaledb-single.png" width="500" />
+<img src="./timescaledb-single.png" width="640" />
 
 When deploying on AWS EKS:
 - The pods will be scheduled on nodes which run in different Availability Zones (AZs).
@@ -20,7 +20,7 @@ When configured for Backups to S3:
 - By default, two [CronJobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) are created to handle full weekly and incremental daily backups.
 - The backups are stored to an S3 bucket. 
 
-<img src="./timescaledb-single-backups.png" width="500" />
+<img src="./timescaledb-single-backups.png" width="640" />
 
 ## Installing
 
