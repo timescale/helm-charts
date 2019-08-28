@@ -1,0 +1,53 @@
+{{- if .Values.backup.enable }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "timescaledb.fullname" . }}-backup
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  ports:
+  - port: 8081
+    protocol: TCP
+  selector:
+    app: {{ template "timescaledb.fullname" . }}
+    spilo-role: master
+...
+{{- range .Values.backup.jobs }}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "timescaledb.fullname" $ }}-{{ .name }}
+  labels:
+    app: {{ template "timescaledb.fullname" $ }}
+    chart: {{ template "timescaledb.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+    backup-type: {{ .type }}
+spec:
+  schedule: {{ quote .schedule }}
+  concurrencyPolicy: Forbid
+  ttlSecondsAfterFinished: 3600
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: {{ template "timescaledb.fullname" $ }}-{{ .type }}
+            image: alpine
+            command: ["wget"]
+            args:
+               - -q  # quiet
+               - -O- # output to stdout
+               - -S  # save headers
+               - '--post-data={"type": {{ quote .type }} }'
+               - "http://{{ template "timescaledb.fullname" $ }}-backup.{{ $.Release.Namespace }}.svc.cluster.local:8081/backups/"
+          restartPolicy: Never
+...
+{{- end }}
+{{ end }}

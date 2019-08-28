@@ -49,6 +49,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `backup.s3Bucket`                 | The S3 bucket in which to store backups     |                                                     |
 | `backup.accessKeyId`              | The Access Key ID to authenticate the IAM user for the backup |                                   |
 | `backup.secretAccessKey`          | The Key Secret to authenticate the IAM user |                                                     |
+| `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
 | `kubernetes.dcs.enable`           | Using Kubernetes as DCS                     | `true`                                              |
 | `kubernetes.configmaps.enable`    | Using Kubernetes configmaps instead of endpoints | `false`                                        |
 | `env`                             | Extra custom environment variables          | `{}`                                                |
@@ -140,6 +141,23 @@ backup:
 ```console
 helm upgrade --install example -f myvalues.yaml
 ```
+
+### Control the backup schedule
+If you want to alter the backup jobs, or their schedule, you can override the `backup.jobs` in your configuration, for example:
+
+```yaml
+backup:
+  jobs:
+    - name: full-daily
+      type: full
+      schedule: "18 0 * * *"
+    - name: incremental-hourly
+      type: incr
+      schedule: "18 1-23 * * *"
+```
+- *name*: Needs to adhere to the [Kubernetes name conventions](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)
+- *type*: choose from `full`, `incr` or `diff`, as explained in the [pgBackRest documentation](https://pgbackrest.org/user-guide.html)
+- *schedule*: A schedule, specified in [cron format](https://en.wikipedia.org/wiki/Cron)
 
 ## Cleanup
 
