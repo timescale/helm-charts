@@ -1,7 +1,7 @@
 replicaCount: 3
 
 # To prevent very long names, we override the name, otherwise it would default to
-# timescaledb-classic (the name of the chart)
+# timescaledb-single (the name of the chart)
 nameOverride: timescaledb
 
 image:
