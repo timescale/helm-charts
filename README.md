@@ -5,9 +5,7 @@ This repository contains Helm charts to help with the deployment of [TimescaleDB
 This project is currently in active development. This is an alpha version.
 
 Supported Versions:
-
 - Kubernetes: [AWS EKS](https://aws.amazon.com/eks/), [MicroK8s](https://microk8s.io/), [minikube](https://github.com/kubernetes/minikube/releases)
-- TimescaleDB: [1.4.1](http://docs.timescale.com)
 
 # Recipes
 
