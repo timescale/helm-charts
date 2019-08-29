@@ -13,7 +13,7 @@ Supported Versions:
 
 | Recipe| Description |
 |---|---|
-| [TimescaleDB Classic](charts/timescaledb-classic) | TimescaleDB Classic allows you to deploy a highly-available TimescaleDB database configuration. |
+| [TimescaleDB Single](charts/timescaledb-single) | TimescaleDB Single allows you to deploy a highly-available TimescaleDB database configuration. |
 
 # Additional documentation
 
