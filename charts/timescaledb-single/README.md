@@ -5,8 +5,9 @@ node [TimescaleDB](https://github.com/timescale/timescaledb/) cluster in a
 High Availability (HA) configuration on Kubernetes. This chart will do the following:
 
 - Creates three (by default) pods using a Kubernetes [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
-- Each pod has a container created using the [TimescaleDB HA Docker image](https://github.com/timescale/timescaledb-docker-ha).
-- Each the container runs a TimescaleDB instance and Patroni agent.
+- Each pod has a container created using the [TimescaleDB Docker image](https://github.com/timescale/timescaledb-docker-ha).
+  - TimescaleDB 1.4 (1.4.1) and PG 11 (11.5)
+- Each the container runs a TimescaleDB instance and [Patroni](https://patroni.readthedocs.io/en/latest/) agent.
 - Each TimescaleDB instance is configured for replication (1 Master + 2 Replicas).
 
 <img src="./timescaledb-single.png" width="640" />
@@ -21,6 +22,7 @@ When configured for Backups to S3:
 - The backups are stored to an S3 bucket. 
 
 <img src="./timescaledb-single-backups.png" width="640" />
+
 
 ## Installing
 
