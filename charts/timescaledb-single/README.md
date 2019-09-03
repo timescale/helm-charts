@@ -149,7 +149,7 @@ backup:
   secretAccessKey: 5CrhvJD08bp9emxI+D48GXfDdtl823nlSRRv7dmB
 ```
 ```
-helm upgrade --install example -f myvalues.yaml
+helm upgrade --install example -f myvalues.yaml .
 ```
 
 ### Control the backup schedule
