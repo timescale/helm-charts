@@ -8,7 +8,7 @@ image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescaledev/timescaledb-ha
-  tag: 78603166-pg11-custom
+  tag: v0.2.0-pg11
   pullPolicy: IfNotPresent
 
 # Credentials used by PostgreSQL and Patroni
