@@ -34,8 +34,22 @@ spec:
   concurrencyPolicy: Forbid
   ttlSecondsAfterFinished: 3600
   jobTemplate:
+    metadata:
+      labels:
+        app: {{ template "timescaledb.fullname" $ }}
+        chart: {{ template "timescaledb.chart" $ }}
+        release: {{ $.Release.Name }}
+        heritage: {{ $.Release.Service }}
+        backup-type: {{ .type }}
     spec:
       template:
+        metadata:
+          labels:
+            app: {{ template "timescaledb.fullname" $ }}
+            chart: {{ template "timescaledb.chart" $ }}
+            release: {{ $.Release.Name }}
+            heritage: {{ $.Release.Service }}
+            backup-type: {{ .type }}
         spec:
           containers:
           - name: {{ template "timescaledb.fullname" $ }}-{{ .type }}
