@@ -130,7 +130,7 @@ backup:
 - *type*: choose from `full`, `incr` or `diff`, as explained in the [pgBackRest documentation](https://pgbackrest.org/user-guide.html)
 - *schedule*: A schedule, specified in [cron format](https://en.wikipedia.org/wiki/Cron)
 
-### Testing restore/recovery
+### Testing restore/recovery from inside the Kubernetes cluster
 Every new pod that gets created needs to copy the PostgreSQL instance data. It will attempt do do this using the backup stored in the S3 bucket if available.
 Once the restore is done, it will connect to the `master` and use streaming replication to catch up the last bits.
 
@@ -192,6 +192,67 @@ kubectl get pvc -l release=my-release
 kubectl delete pvc/storage-volume-my-release-timescaledb-3
 ```
 
+### Test restore/recovery from outside the Kubernetes cluster
+
+> **WARNING** During the restore/recovery in this scenario you most likely will run into some issues,
+> related to ownership of files, or paths that are configured incorrectly for your system.
+> You should refer to the [PostgreSQL documentation](https://www.postgresql.org/docs/current/recovery-config.html)
+> and [pgBackRest documentation](https://pgbackrest.org/user-guide.html#quickstart/perform-restore)
+> to troubleshoot those issues.
+
+In the event that you need to restore the database in an environment outside your Kubernetes cluster,
+you should follow the following process:
+
+- Create a configuration for pgBackRest
+- Restore the database
+- Review/reconfigure `recovery.conf` for your purpose
+- Verify a successful restore
+
+As the database backup is created using the `postgres` user, and `pgBackRest` will try to (re)set ownerships
+of files it is probably best if you execute this process as a `postgres` user on a Linux system.
+
+#### Create a pgBackRest Configuration file
+Assuming we are going to do the restore in the /restore mountpoint, which is owned by `postgres`,
+we could create the file `/restore/pgbackrest.conf`:
+```ini
+[global]
+repo1-type=s3
+repo1-s3-bucket=this_bucket_may_not_exist
+repo1-path=/my-release-timescaledb/
+repo1-s3-endpoint=s3.amazonaws.com
+repo1-s3-key=9E1R2CUZBXJVYSBYRWTB
+repo1-s3-key-secret=5CrhvJD08bp9emxI+D48GXfDdtl823nlSRRv7dmB
+repo1-s3-region=us-east-2
+
+[poddb]
+pg1-path=/restore/data
+pg1-port=5432
+pg1-socket-path=/tmp/
+
+recovery-option=standby_mode=on
+recovery-option=recovery_target_timeline=latest
+recovery-option=recovery_target_action=shutdown
+```
+
+#### Restore the database using pgBackRest
+```console
+export PGBACKREST_CONFIG="/restore/pgbackrest.conf"
+pgbackrest restore --stanza=poddb
+```
+
+#### Verify a successful restore
+You should be able to start the restored database using the correct binaries. This example uses PostgreSQL 11 binaries on a Debian based system
+```console
+/usr/lib/postgresql/11/bin/pg_ctl -D /restore/data --port=5430 start
+psql -p 5430 -c 'SHOW cluster_name'
+```
+If the restore/recovery/starting was successful the output should be similar to the following:
+```
+      cluster_name
+------------------------
+ my-release-timescaledb
+(1 row)
+```
 ### Verify Backup jobs
 
 The backups are triggered by [CronJobs](https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/).
