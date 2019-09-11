@@ -33,6 +33,8 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+        - name: PGDATA
+          value: "{{ .Values.persistentVolume.mountPath }}/data"
         - name: POSTGRESQL_CUSTOM_PARAMETERS
           value: |
             {{- range $key, $value := .Values.postgresql.parameters }}
@@ -43,15 +45,27 @@ spec:
             secretKeyRef:
               name: {{ template "timescaledb.fullname" . }}
               key: password-superuser
+        {{- if .Values.env }}
+        {{- range $key, $val := .Values.env }}
+        - name: {{  $key | quote | upper }}
+          value: {{ $val | quote }}
+        {{- end }}
+        {{- end }}
         command:
           - sh
           - '-c'
+          # By calling the original entrypoint with the first argument being postgres
+          # we ensure we do everything that is required to init a PostgreSQL instance.
+          # By supplying --version however, we ensure the instance isn't started, but merely
+          # a version number is displayed, allowing us to do some more initialization
           - |
+            set -e
             /docker-entrypoint.sh postgres --version;
-            echo "*:*:*:*:${POSTGRES_PASSWORD}" > "${PGDATA}/../.pgpass"
-            chmod 0600 "${PGDATA}/../.pgpass"
-            echo "cluster_name = '$(hostname)'" >> "${PGDATA}/postgresql.conf"
-            echo "${POSTGRESQL_CUSTOM_PARAMETERS}" >> "${PGDATA}/postgresql.conf"
+            grep -qxF "include 'postgresql_helm_customizations.conf'" "${PGDATA}/postgresql.conf" \
+                || echo "include 'postgresql_helm_customizations.conf'" >> "${PGDATA}/postgresql.conf"
+            echo "Writing custom PostgreSQL Parameters to ${PGDATA}/postgresql_helm_customizations.conf"
+            echo "cluster_name = '$(hostname)'" > "${PGDATA}/postgresql_helm_customizations.conf"
+            echo "${POSTGRESQL_CUSTOM_PARAMETERS}" | sort >> "${PGDATA}/postgresql_helm_customizations.conf"
         volumeMounts:
         - name: storage-volume
           mountPath: "{{ .Values.persistentVolume.mountPath }}"
@@ -62,6 +76,8 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["/docker-entrypoint.sh", "postgres"]
         env:
+        - name: PGDATA
+          value: "{{ .Values.persistentVolume.mountPath }}/data"
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
