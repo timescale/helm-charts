@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ template "timescaledb.fullname" . }}
+  name: {{ template "timescaledb.fullname" . }}-access
   labels:
     app: {{ template "timescaledb.fullname" . }}
     chart: {{ template "timescaledb.chart" . }}
@@ -10,5 +10,19 @@ metadata:
     heritage: {{ .Release.Service }}
 type: Opaque
 data:
-  password-superuser: {{ .Values.credentials.superuser | b64enc }}
+  password-superuser: {{ .Values.credentials.accessNode.superuser | b64enc }}
+...
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "timescaledb.fullname" . }}-data
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+type: Opaque
+data:
+  password-superuser: {{ .Values.credentials.dataNode.superuser | b64enc }}
 ...
