@@ -33,8 +33,6 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
-        - name: PGDATA
-          value: "{{ .Values.persistentVolume.mountPath }}/data"
         - name: POSTGRESQL_CUSTOM_PARAMETERS
           value: |
             {{- range $key, $value := .Values.postgresql.parameters }}
@@ -60,7 +58,8 @@ spec:
           # a version number is displayed, allowing us to do some more initialization
           - |
             set -e
-            /docker-entrypoint.sh postgres --version;
+            install -o postgres -g postgres -m 0700 -d "${PGDATA}" "${PGDATA}/../conf.d"
+            /docker-entrypoint.sh postgres --version
             grep -qxF "include 'postgresql_helm_customizations.conf'" "${PGDATA}/postgresql.conf" \
                 || echo "include 'postgresql_helm_customizations.conf'" >> "${PGDATA}/postgresql.conf"
             echo "Writing custom PostgreSQL Parameters to ${PGDATA}/postgresql_helm_customizations.conf"
@@ -74,10 +73,12 @@ spec:
       - name: timescaledb
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/docker-entrypoint.sh", "postgres"]
+        # We start postgres with a fully cleared environment
+        command:
+          - sh
+          - '-c'
+          - exec env -i PGDATA="${PGDATA}" PATH="${PATH}" /docker-entrypoint.sh postgres
         env:
-        - name: PGDATA
-          value: "{{ .Values.persistentVolume.mountPath }}/data"
         - name: POD_NAMESPACE
           valueFrom:
             fieldRef:
