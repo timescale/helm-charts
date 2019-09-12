@@ -1,0 +1,110 @@
+dataNodes: 3
+
+# To prevent very long names, we override the name, otherwise it would default to
+# timescaledb-multinode (the name of the chart)
+nameOverride: timescaledb
+
+image:
+  # Image was built from
+  # https://github.com/timescale/timescaledb-docker-ha
+  repository: timescaledev/timescaledb
+  tag: v0.2.2-pg11-multinode
+  pullPolicy: IfNotPresent
+
+# Credentials used by PostgreSQL
+credentials:
+  accessNode:
+    superuser: tea
+  dataNode:
+    superuser: coffee
+
+# Extra custom environment variables.
+env:
+  LC_ALL: C.UTF-8
+  LANG: C.UTF-8
+  # This should be a subdirectory of the persistentVolume (if any), as PostgreSQL will need to
+  # fully manage permissions. Also, using /var/lib/postgresql/data is discouraged, as this is
+  # a Docker Volume in many Docker images, which means the data is not actually persisted.
+  PGDATA: /var/lib/postgresql/pgdata
+
+persistentVolume:
+  enabled: true
+  size: 2G
+  ## database data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  subPath: ""
+  mountPath: "/var/lib/postgresql"
+  annotations: {}
+  accessModes:
+    - ReadWriteOnce
+
+resources: {}
+  # If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+postgresql:
+  databases:
+    - postgres
+    - example
+  parameters:
+    max_connections: 100
+    max_prepared_transactions: 150
+    # This is rather small, but as this Helm Chart may be used to spin up
+    # 1 access node and 4 data nodes on a multinode minikube/microk8s this is set
+    # to a conservative value
+    shared_buffers: 300MB
+    work_mem: 16MB
+    timescaledb.passfile: '../.pgpass'
+    log_connections: 'on'
+    log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
+    log_min_duration_statement: '1s'
+    log_statement: ddl
+    log_checkpoints: 'on'
+    log_lock_waits: 'on'
+
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+nodeSelector: {}
+
+# https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinityTemplate: |
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        topologyKey: "kubernetes.io/hostname"
+        labelSelector:
+          matchLabels:
+            app:  {{ template "timescaledb.name" . }}
+            release: {{ .Release.Name | quote }}
+affinity: {}
+
+## Use an alternate scheduler, e.g. "stork".
+## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+##
+# schedulerName:
+
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+  # The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
