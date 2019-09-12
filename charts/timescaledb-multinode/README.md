@@ -3,9 +3,11 @@
 This directory contains a Helm chart to deploy a multinode [TimescaleDB](https://github.com/timescale/timescaledb/) cluster.
 This chart will do the following:
 
-- Creates a single TimescaleDB Access Node using a Kubernetes [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
-- Creates multiple pods (by default 3) containing Data Nodes using another Kubernetes StatefulSet
-- Each pod has a container created using a Docker image which includes the TimescaleDB multinode sources.
+- Creates a single TimescaleDB **Access Node** using a Kubernetes [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
+- Creates multiple pods (by default 3) containing **Data Nodes** using another Kubernetes StatefulSet
+- Each pod has a container created using a Docker image which includes the TimescaleDB multinode sources
+
+<img src="./timescaledb-multi.png" width="640" />
 
 When deploying on AWS EKS:
 - An AWS Elastic Load Balancer (ELB) is configured to handle routing incoming traffic to the Access Node.
