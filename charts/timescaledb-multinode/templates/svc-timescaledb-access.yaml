@@ -20,23 +20,3 @@ spec:
     app: {{ template "timescaledb.fullname" . }}
     timescaleNodeType: access
 ...
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ template "timescaledb.fullname" . }}-data
-  labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-spec:
-  clusterIP: None
-  ports:
-  - name: postgresql
-    port: 5432
-    protocol: TCP
-  selector:
-    app: {{ template "timescaledb.fullname" . }}
-    timescaleNodeType: data
-...

@@ -61,7 +61,7 @@ https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-INTERPOLATION
         - name: PGPASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "timescaledb.fullname" $ }}-access
+              name: {{ template "timescaledb.accessname" $ }}
               key: password-superuser
       restartPolicy: OnFailure
   backoffLimit: 2
