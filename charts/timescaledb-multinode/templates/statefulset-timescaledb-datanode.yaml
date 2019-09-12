@@ -43,7 +43,7 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}
+              name: {{ template "timescaledb.fullname" . }}-data
               key: password-superuser
         {{- if .Values.env }}
         {{- range $key, $val := .Values.env }}
@@ -78,11 +78,6 @@ spec:
         env:
         - name: PGDATA
           value: "{{ .Values.persistentVolume.mountPath }}/data"
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}
-              key: password-superuser
         - name: POD_NAMESPACE
           valueFrom:
             fieldRef:

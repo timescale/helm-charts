@@ -43,7 +43,12 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}
+              name: {{ template "timescaledb.fullname" . }}-access
+              key: password-superuser
+        - name: POSTGRES_PASSWORD_DATA_NODE
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.fullname" . }}-data
               key: password-superuser
         command:
           - sh

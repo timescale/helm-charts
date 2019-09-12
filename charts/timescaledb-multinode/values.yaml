@@ -62,7 +62,7 @@ postgresql:
     max_connections: 100
     max_prepared_transactions: 150
     # This is rather small, but as this Helm Chart may be used to spin up
-    # 1 access node and 4 data nodes on a multinode minikube/microk8s this is set
+    # 1 access node and 4 data nodes on a single minikube/microk8s this is set
     # to a conservative value
     shared_buffers: 300MB
     work_mem: 16MB
