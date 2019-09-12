@@ -1,79 +1,72 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "timescaledb.fullname" . }}
+  name: {{ template "timescaledb.fullname" . }}-data
   labels:
     app: {{ template "timescaledb.fullname" . }}
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  serviceName: {{ template "timescaledb.fullname" . }}
-  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ template "timescaledb.fullname" . }}-data
+  replicas: {{ .Values.dataNodes }}
   selector:
     matchLabels:
       app: {{ template "timescaledb.fullname" . }}
       release: {{ .Release.Name }}
+      timescaleNodeType: data
   template:
     metadata:
-      name: {{ template "timescaledb.fullname" . }}
+      name: {{ template "timescaledb.fullname" . }}-data
       labels:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
+        timescaleNodeType: data
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
         # The postgres user inside the TimescaleDB image has uid=1000.
         # This configuration ensures the permissions of the mounts are suitable
         fsGroup: 1000
-      containers:
-      - name: timescaledb
+      initContainers:
+      - name: initdb
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/timescaledb_entrypoint.sh"]
         env:
-        - name: PGPASSWORD_SUPERUSER
+        - name: POSTGRESQL_CUSTOM_PARAMETERS
+          value: |
+            {{- range $key, $value := .Values.postgresql.parameters }}
+            {{ printf "%s = '%s'" $key ($value | toString) }}
+            {{- end }}
+        - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ template "timescaledb.fullname" . }}
               key: password-superuser
-        - name: PGPASSWORD_ADMIN
+        command:
+          - sh
+          - '-c'
+          - |
+            /docker-entrypoint.sh postgres --version;
+            echo "*:*:*:*:${POSTGRES_PASSWORD}" > "${PGDATA}/../.pgpass"
+            chmod 0600 "${PGDATA}/../.pgpass"
+            echo "cluster_name = '$(hostname)'" >> "${PGDATA}/postgresql.conf"
+            echo "${POSTGRESQL_CUSTOM_PARAMETERS}" >> "${PGDATA}/postgresql.conf"
+        volumeMounts:
+        - name: storage-volume
+          mountPath: "{{ .Values.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.persistentVolume.subPath }}"
+      containers:
+      - name: timescaledb
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/docker-entrypoint.sh", "postgres"]
+        env:
+        - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ template "timescaledb.fullname" . }}
-              key: password-admin
-        - name: PGPASSWORD_STANDBY
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}
-              key: password-standby
-        {{- if .Values.kubernetes.dcs.enable }}
-        - name: DCS_ENABLE_KUBERNETES_API
-          value: "true"
-        - name: KUBERNETES_LABELS
-          value: {{ (printf "{ \"app\": \"%s\", \"release\": \"%s\" }" (include "timescaledb.fullname" .) .Release.Name) | quote }}
-        - name: KUBERNETES_SCOPE_LABEL
-          value: "app"
-        {{- if .Values.kubernetes.configmaps.enable }}
-        - name: KUBERNETES_USE_CONFIGMAPS
-          value: "true"
-        {{- end }}
-        {{- end }}
-        - name: SPILO_CONFIGURATION
-          value: |
-{{ if .Values.backup.enable -}}
-{{ toYaml .Values.patroni | indent 12 }}
-{{- else -}}
-{{/*
-If the backup is not enabled, we need to make very sure that the archiver is not going to fill
-up the disk. TODO have a better way of expressing this.
-*/}}
-{{- toYaml (merge (dict "postgresql" (dict "parameters" (dict "archive_command" "/bin/true"))) .Values.patroni) | indent 12 -}}
-{{- end }}
-        - name: SCOPE
-          value: {{ template "timescaledb.fullname" . }}
-        - name: PGROOT
-          value: "{{ .Values.persistentVolume.mountPath }}/pgroot"
+              key: password-superuser
         - name: POD_NAMESPACE
           valueFrom:
             fieldRef:
@@ -86,52 +79,13 @@ up the disk. TODO have a better way of expressing this.
         {{- end }}
         {{- end }}
         ports:
-        - containerPort: 8008
         - containerPort: 5432
         volumeMounts:
         - name: storage-volume
           mountPath: "{{ .Values.persistentVolume.mountPath }}"
           subPath: "{{ .Values.persistentVolume.subPath }}"
-        - mountPath: /etc/patroni
-          name: patroni-config
-          readOnly: true
         resources:
 {{ toYaml .Values.resources | indent 10 }}
-
-{{- if .Values.backup.enable }}
-      - name: pgbackrest
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/patroni_entrypoint.sh"]
-        ports:
-        - containerPort: 8081
-        volumeMounts:
-        - name: storage-volume
-          mountPath: "{{ .Values.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.persistentVolume.subPath }}"
-        env:
-          - name: PGB_REPO1_S3_REGION
-            value: us-east-2
-          - name: K8S_SIDECAR
-            value: pgbackrest
-          - name: PGBACKREST_CONFIG
-            value: /home/postgres/pgdata/backup/pgbackrest.conf
-          - name: PGB_REPO1_PATH
-            value: "/{{ template "timescaledb.fullname" . }}/"
-          - name: PGB_REPO1_S3_BUCKET
-            value: "{{ .Values.backup.s3Bucket }}"
-          - name: PGB_REPO1_S3_KEY
-            valueFrom:
-              secretKeyRef:
-                name: "{{ template "timescaledb.fullname" . }}-pgbackrest"
-                key: PGB_REPO1_S3_KEY
-          - name: PGB_REPO1_S3_KEY_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: "{{ template "timescaledb.fullname" . }}-pgbackrest"
-                key: PGB_REPO1_S3_KEY_SECRET
-{{ end }}
-
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -150,10 +104,6 @@ up the disk. TODO have a better way of expressing this.
       affinity:
 {{ tpl .Values.affinityTemplate . | indent 8 }}
     {{- end }}
-      volumes:
-      - name: patroni-config
-        secret:
-          secretName: {{ template "timescaledb.fullname" . }}
       {{- if not .Values.persistentVolume.enabled }}
       - name: storage-volume
         emptyDir: {}
