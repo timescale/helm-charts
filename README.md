@@ -9,9 +9,10 @@ Supported Versions:
 
 # Recipes
 
-| Recipe| Description |
-|---|---|
-| [TimescaleDB Single](charts/timescaledb-single) | TimescaleDB Single allows you to deploy a highly-available TimescaleDB database configuration. |
+| Recipe| TimescaleDB | Description |
+|---|---|---|
+| [TimescaleDB Single](charts/timescaledb-single) | Based on 1.x | TimescaleDB Single allows you to deploy a highly-available TimescaleDB database configuration. |
+| [TimescaleDB Multinode](charts/timescaledb-multinode) | In Development | TimescaleDB Multinode allows you to deploy a multi-node, distributed version of TimescaleDB. |
 
 # Additional documentation
 
