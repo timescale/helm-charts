@@ -21,7 +21,7 @@ spec:
         chart: {{ template "timescaledb.chart" $ }}
         release: {{ $.Release.Name }}
         heritage: {{ $.Release.Service }}
-        dataNode: {{ template "timescaledb.fullname" $ }}-data-{{ $pod }}
+        dataNode: {{ template "timescaledb.dataname" $ }}-{{ $pod }}
     spec:
       containers:
       - name: attachdn-{{ $index }}
@@ -54,9 +54,9 @@ https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-INTERPOLATION
         - name: ACCESS_SVC_CONNSTR
           value: host={{ template "timescaledb.fullname" $ }} user=postgres connect_timeout=3 sslmode=disable
         - name: DATA_NODE_DNS
-          value: {{ template "timescaledb.fullname" $ }}-data-{{ $pod }}.{{ template "timescaledb.fullname" $ }}-data
+          value: {{ template "timescaledb.dataname" $ }}-{{ $pod }}.{{ template "timescaledb.dataname" $ }}
         - name: DATA_NODE_NAME
-          value: {{ template "timescaledb.fullname" $ }}-data-{{ $pod }}
+          value: {{ template "timescaledb.dataname" $ }}-{{ $pod }}
         - name: SQLCOMMAND
           value: |
             \c :"dbname"
@@ -65,7 +65,7 @@ https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-INTERPOLATION
         - name: PGPASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "timescaledb.fullname" $ }}-access
+              name: {{ template "timescaledb.accessname" $ }}
               key: password-superuser
       restartPolicy: OnFailure
   backoffLimit: 2

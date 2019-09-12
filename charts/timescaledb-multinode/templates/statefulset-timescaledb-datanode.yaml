@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "timescaledb.fullname" . }}-data
+  name: {{ template "timescaledb.dataname" . }}
   labels:
     app: {{ template "timescaledb.fullname" . }}
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  serviceName: {{ template "timescaledb.fullname" . }}-data
+  serviceName: {{ template "timescaledb.dataname" . }}
   replicas: {{ .Values.dataNodes }}
   selector:
     matchLabels:
@@ -17,7 +17,7 @@ spec:
       timescaleNodeType: data
   template:
     metadata:
-      name: {{ template "timescaledb.fullname" . }}-data
+      name: {{ template "timescaledb.dataname" . }}
       labels:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
@@ -41,7 +41,7 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}-data
+              name: {{ template "timescaledb.dataname" . }}
               key: password-superuser
         {{- if .Values.env }}
         {{- range $key, $val := .Values.env }}
