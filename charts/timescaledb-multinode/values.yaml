@@ -29,7 +29,7 @@ env:
 
 persistentVolume:
   enabled: true
-  size: 2G
+  size: 5G
   ## database data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -73,6 +73,11 @@ postgresql:
     log_statement: ddl
     log_checkpoints: 'on'
     log_lock_waits: 'on'
+    # These values are set as the default data volume size
+    # is small as well.
+    min_wal_size: 256MB
+    max_wal_size: 512MB
+    temp_file_limit: 1GB
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
 nodeSelector: {}
