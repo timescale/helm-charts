@@ -1,0 +1,186 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "timescaledb.fullname" . }}
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  serviceName: {{ template "timescaledb.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "timescaledb.fullname" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ template "timescaledb.fullname" . }}
+      labels:
+        app: {{ template "timescaledb.fullname" . }}
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
+      securityContext:
+        # The postgres user inside the TimescaleDB image has uid=1000.
+        # This configuration ensures the permissions of the mounts are suitable
+        fsGroup: 1000
+      containers:
+      - name: timescaledb
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/timescaledb_entrypoint.sh"]
+        env:
+        - name: PGPASSWORD_SUPERUSER
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.fullname" . }}
+              key: password-superuser
+        - name: PGPASSWORD_ADMIN
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.fullname" . }}
+              key: password-admin
+        - name: PGPASSWORD_STANDBY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.fullname" . }}
+              key: password-standby
+        {{- if .Values.kubernetes.dcs.enable }}
+        - name: DCS_ENABLE_KUBERNETES_API
+          value: "true"
+        - name: KUBERNETES_LABELS
+          value: {{ (printf "{ \"app\": \"%s\", \"release\": \"%s\" }" (include "timescaledb.fullname" .) .Release.Name) | quote }}
+        - name: KUBERNETES_SCOPE_LABEL
+          value: "app"
+        {{- if .Values.kubernetes.configmaps.enable }}
+        - name: KUBERNETES_USE_CONFIGMAPS
+          value: "true"
+        {{- end }}
+        {{- end }}
+        - name: SPILO_CONFIGURATION
+          value: |
+{{ if .Values.backup.enable -}}
+{{ toYaml .Values.patroni | indent 12 }}
+{{- else -}}
+{{/*
+If the backup is not enabled, we need to make very sure that the archiver is not going to fill
+up the disk. TODO have a better way of expressing this.
+*/}}
+{{- toYaml (merge (dict "postgresql" (dict "parameters" (dict "archive_command" "/bin/true"))) .Values.patroni) | indent 12 -}}
+{{- end }}
+        - name: SCOPE
+          value: {{ template "timescaledb.fullname" . }}
+        - name: PGROOT
+          value: "{{ .Values.persistentVolume.mountPath }}/pgroot"
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        {{- if .Values.env }}
+        {{- range $key, $val := .Values.env }}
+        - name: {{  $key | quote | upper }}
+          value: {{ $val | quote }}
+        {{- end }}
+        {{- end }}
+        ports:
+        - containerPort: 8008
+        - containerPort: 5432
+        volumeMounts:
+        - name: storage-volume
+          mountPath: "{{ .Values.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.persistentVolume.subPath }}"
+        - mountPath: /etc/patroni
+          name: patroni-config
+          readOnly: true
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+
+{{- if .Values.backup.enable }}
+      - name: pgbackrest
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/patroni_entrypoint.sh"]
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+        - name: storage-volume
+          mountPath: "{{ .Values.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.persistentVolume.subPath }}"
+        env:
+          - name: PGB_REPO1_S3_REGION
+            value: us-east-2
+          - name: K8S_SIDECAR
+            value: pgbackrest
+          - name: PGBACKREST_CONFIG
+            value: /home/postgres/pgdata/backup/pgbackrest.conf
+          - name: PGB_REPO1_PATH
+            value: "/{{ template "timescaledb.fullname" . }}/"
+          - name: PGB_REPO1_S3_BUCKET
+            value: "{{ .Values.backup.s3Bucket }}"
+          - name: PGB_REPO1_S3_KEY
+            valueFrom:
+              secretKeyRef:
+                name: "{{ template "timescaledb.fullname" . }}-pgbackrest"
+                key: PGB_REPO1_S3_KEY
+          - name: PGB_REPO1_S3_KEY_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: "{{ template "timescaledb.fullname" . }}-pgbackrest"
+                key: PGB_REPO1_S3_KEY_SECRET
+{{ end }}
+
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- if .Values.schedulerName }}
+      schedulerName: {{ .Values.schedulerName }}
+    {{- end }}
+    {{- if .Values.affinity }}
+      affinity:
+{{ .Values.affinity | toYaml | indent 8 }}
+    {{- else if .Values.affinityTemplate }}
+      affinity:
+{{ tpl .Values.affinityTemplate . | indent 8 }}
+    {{- end }}
+      volumes:
+      - name: patroni-config
+        secret:
+          secretName: {{ template "timescaledb.fullname" . }}
+      {{- if not .Values.persistentVolume.enabled }}
+      - name: storage-volume
+        emptyDir: {}
+      {{- end }}
+  {{- if .Values.persistentVolume.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: storage-volume
+        annotations:
+        {{- if .Values.persistentVolume.annotations }}
+{{ toYaml .Values.persistentVolume.annotations | indent 8 }}
+        {{- end }}
+        labels:
+          app: {{ template "timescaledb.fullname" . }}
+          release: {{ .Release.Name }}
+          heritage: {{ .Release.Service }}
+      spec:
+        accessModes:
+{{ toYaml .Values.persistentVolume.accessModes | indent 8 }}
+        resources:
+          requests:
+            storage: "{{ .Values.persistentVolume.size }}"
+      {{- if .Values.persistentVolume.storageClass }}
+      {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+        storageClassName: ""
+      {{- else }}
+        storageClassName: "{{ .Values.persistentVolume.storageClass }}"
+      {{- end }}
+      {{- end }}
+  {{- end }}
