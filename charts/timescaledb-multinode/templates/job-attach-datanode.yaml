@@ -1,0 +1,74 @@
+{{- range $pod, $e := until ( .Values.dataNodes | int) }}
+{{- range $index, $dbname := $.Values.postgresql.databases }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "attachdn-%s-db%s-data%s" $.Release.Name ($index | toString) ($pod | toString) | trunc 63 }}
+  labels:
+    app: {{ template "timescaledb.fullname" $ }}
+    chart: {{ template "timescaledb.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+  annotations:
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: {{ template "timescaledb.fullname" $ }}
+        chart: {{ template "timescaledb.chart" $ }}
+        release: {{ $.Release.Name }}
+        heritage: {{ $.Release.Service }}
+        dataNode: {{ template "timescaledb.fullname" $ }}-data-{{ $pod }}
+    spec:
+      containers:
+      - name: attachdn-{{ $index }}
+        image: postgres:11-alpine # A relatively small official image that can run psql
+        command:
+          - sh
+          - -c
+          # We wait for the data node to allow connections
+          # We wait for the access node to allow connections to DBNAME
+          - >
+              while ! pg_isready -U postgres -h "${DATA_NODE_DNS}"; do sleep 1; done;
+              while ! psql -d "${ACCESS_SVC_CONNSTR}" --set dbname="${DBNAME}" --set ON_ERROR_STOP=1 --command '\c :"dbname"'; do sleep 1; done;
+              echo "${SQLCOMMAND}" | psql -d "${ACCESS_SVC_CONNSTR}" --file=- --echo-queries --set ON_ERROR_STOP=1 \
+                --set dbname="${DBNAME}" \
+                --set data_node_name="${DATA_NODE_NAME}" \
+                --set data_node_dns="${DATA_NODE_DNS}"
+        env:
+{{- /*
+Some parameter juggling is required to ensure we don't have SQL injection;
+which is not necessarily a major security leak at this stage, but we want
+to be able to support database names like 'test db' or, 'CamelCase'.
+
+The template quote function ensures bash will be able to interpret the variable.
+The --set dbname= and subsequent :'dbname' psql_variable ensures no SQL injection can occur.
+
+https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-INTERPOLATION
+*/}}
+        - name: DBNAME
+          value: {{ $dbname | quote }}
+        - name: ACCESS_SVC_CONNSTR
+          value: host={{ template "timescaledb.fullname" $ }} user=postgres connect_timeout=3 sslmode=disable
+        - name: DATA_NODE_DNS
+          value: {{ template "timescaledb.fullname" $ }}-data-{{ $pod }}.{{ template "timescaledb.fullname" $ }}-data
+        - name: DATA_NODE_NAME
+          value: {{ template "timescaledb.fullname" $ }}-data-{{ $pod }}
+        - name: SQLCOMMAND
+          value: |
+            \c :"dbname"
+            SELECT *
+              FROM add_data_node(:'data_node_name'::name, host => :'data_node_dns', if_not_exists => true)
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.fullname" $ }}-access
+              key: password-superuser
+      restartPolicy: OnFailure
+  backoffLimit: 2
+...
+{{ end }}
+{{ end }}

@@ -1,0 +1,69 @@
+{{- range $index, $dbname := .Values.postgresql.databases }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "createdb-%s-db%s" $.Release.Name ($index | toString) | trunc 63 }}
+  labels:
+    app: {{ template "timescaledb.fullname" $ }}
+    chart: {{ template "timescaledb.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+  annotations:
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: {{ template "timescaledb.fullname" $ }}
+        chart: {{ template "timescaledb.chart" $ }}
+        release: {{ $.Release.Name }}
+        heritage: {{ $.Release.Service }}
+    spec:
+      containers:
+      - name: createdb-{{ $index }}
+        image: postgres:11-alpine # A relatively small official image that can run psql
+        command:
+          - sh
+          - -c
+          - >
+              while ! pg_isready -U postgres -h {{ template "timescaledb.fullname" $ }}; do sleep 1; done;
+              echo "${SQLCOMMAND}" | psql --file=- --echo-queries -d "${ACCESS_SVC_CONNSTR}" \
+                --set ON_ERROR_STOP=1 \
+                --set dbname="${DBNAME}"
+        env:
+{{- /*
+Some parameter juggling is required to ensure we don't have SQL injection;
+which is not necessarily a major security leak at this stage, but we want
+to be able to support database names like 'test db' or, 'CamelCase'.
+
+The template quote function ensures bash will be able to interpret the variable.
+The --set dbname= and subsequent :'dbname' psql_variable ensures no SQL injection can occur.
+
+https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-INTERPOLATION
+*/}}
+        - name: DBNAME
+          value: {{ $dbname | quote }}
+        - name: ACCESS_SVC_CONNSTR
+          value: host={{ template "timescaledb.fullname" $ }} user=postgres connect_timeout=3 sslmode=disable
+        - name: SQLCOMMAND
+          value: |
+            SELECT format('CREATE DATABASE %I', :'dbname')
+            WHERE NOT EXISTS (
+               SELECT
+                 FROM pg_database
+                WHERE datname=:'dbname'
+            )
+            \gexec
+            \c :"dbname"
+            CREATE EXTENSION IF NOT EXISTS timescaledb;
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.fullname" $ }}-access
+              key: password-superuser
+      restartPolicy: OnFailure
+  backoffLimit: 2
+...
+{{ end }}
