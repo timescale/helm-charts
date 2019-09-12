@@ -31,7 +31,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `persistentVolume.accessModes`    | Persistent Volume access modes              | `[ReadWriteOnce]`                                   |
 | `persistentVolume.annotations`    | Annotations for Persistent Volume Claim`    | `{}`                                                |
 | `persistentVolume.mountPath`      | Persistent Volume mount root path           | `/var/lib/postgresql`                               |
-| `persistentVolume.size`           | Persistent Volume size                      | `2Gi`                                               |
+| `persistentVolume.size`           | Persistent Volume size                      | `5Gi`                                               |
 | `persistentVolume.storageClass`   | Persistent Volume Storage Class             | `volume.alpha.kubernetes.io/storage-class: default` |
 | `persistentVolume.subPath`        | Subdirectory of Persistent Volume to mount  | `""`                                                |
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
