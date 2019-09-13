@@ -77,14 +77,9 @@ to create distributed hypertables and start using multinode TimescaleDB.
 To access the database from inside the cluster, spin up another Pod to run `psql`:
 
 ```
-kubectl run -i --tty --rm psql --image=postgres --restart=Never -- bash -il
+kubectl run -i --tty --rm psql --image=postgres --restart=Never -- psql -U postgres -h my-release-timescaledb.default.svc.cluster.local  postgres
 ```
-
-Then, from inside the pod, connect to PostgreSQL:
-
-```console
-$ psql -U admin -h my-release-timescaledb.default.svc.cluster.local postgres
-```
+provide the password `tea` followed by "Enter" when you see the message `If you don't see a command prompt, try pressing enter.` (Yes, this is a bit quirky. To avoid it, first launch a shell and then run the `psql` client.)
 
 ## Cleanup
 
