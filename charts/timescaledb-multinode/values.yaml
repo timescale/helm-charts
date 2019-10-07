@@ -18,66 +18,108 @@ credentials:
   dataNode:
     superuser: coffee
 
+# To allow finegrained control over PostgreSQL parameters and Kubernetes resources
+# we create some templates that can be referenced in the topology.
+# The templates are anchored and can then be referenced using their alias.
+NodeTemplates:
+  - &defaultAccessNodeTemplate
+    replicaCount: 1
+    # https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+    resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+    postgresql:
+      parameters:
+        max_connections: 100
+        max_prepared_transactions: 150
+        shared_buffers: 300MB
+        work_mem: 16MB
+        timescaledb.passfile: '../.pgpass'
+        log_connections: 'on'
+        log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
+        log_min_duration_statement: '1s'
+        log_statement: ddl
+        log_checkpoints: 'on'
+        log_lock_waits: 'on'
+        # These values are set as the default data volume size
+        # is small as well.
+        min_wal_size: 256MB
+        max_wal_size: 512MB
+        temp_file_limit: 1GB
+    volumes:
+      pgdata:
+        annotations: {}
+        size: 1G
+      pgwal:
+        annotations: {}
+        size: 1G
+  - &defaultDataNodeTemplate
+    replicaCount: 1
+    # https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+    resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+    postgresql:
+      parameters:
+        max_connections: 100
+        max_prepared_transactions: 150
+        shared_buffers: 300MB
+        work_mem: 16MB
+        timescaledb.passfile: '../.pgpass'
+        log_connections: 'on'
+        log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
+        log_min_duration_statement: '1s'
+        log_statement: ddl
+        log_checkpoints: 'on'
+        log_lock_waits: 'on'
+        # These values are set as the default data volume size
+        # is small as well.
+        min_wal_size: 256MB
+        max_wal_size: 512MB
+        temp_file_limit: 1GB
+    volumes:
+      pgdata:
+        annotations: {}
+        size: 5G
+
+# The template aliases can be found under the key NodeTemplates
+# As node configuration can be very large documents in and of themselves, and
+# may require a lot of repetition, there are some default configurations that can
+# be found in the NodeTemplates section of this Yaml document.
+#
+# The << syntax is documented here: https://yaml.org/type/merge.html, as a summary,
+# by using <<: *alias we copy the profile, but we are free to override any subkey if needed.
+topology:
+  accessNodes:
+    - <<: *defaultAccessNodeTemplate
+  dataNodes:
+    - <<: *defaultDataNodeTemplate
+    - <<: *defaultDataNodeTemplate
+    - <<: *defaultDataNodeTemplate
+    ## An example of a Node configuration using the defaultProfileDataNode with specific
+    ## overrides
+    # - <<: *defaultProfileDataNode
+    #   replicaCount: 2
+    #   volumes:
+    #     pgdata:
+    #       annotations: {}
+    #       size: 15G
+
 # Extra custom environment variables.
 env:
   LC_ALL: C.UTF-8
   LANG: C.UTF-8
-  # This should be a subdirectory of the persistentVolume (if any), as PostgreSQL will need to
-  # fully manage permissions. Also, using /var/lib/postgresql/data is discouraged, as this is
+  # Using /var/lib/postgresql/data is discouraged, as this is
   # a Docker Volume in many Docker images, which means the data is not actually persisted.
   PGDATA: /var/lib/postgresql/pgdata
-
-persistentVolume:
-  enabled: true
-  size: 5G
-  ## database data Persistent Volume Storage Class
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
-  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-  ##   GKE, AWS & OpenStack)
-  ##
-  # storageClass: "-"
-  subPath: ""
-  mountPath: "/var/lib/postgresql"
-  annotations: {}
-  accessModes:
-    - ReadWriteOnce
-
-resources: {}
-  # If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-postgresql:
-  databases:
-    - postgres
-    - example
-  parameters:
-    max_connections: 100
-    max_prepared_transactions: 150
-    # This is rather small, but as this Helm Chart may be used to spin up
-    # 1 access node and 4 data nodes on a single minikube/microk8s this is set
-    # to a conservative value
-    shared_buffers: 300MB
-    work_mem: 16MB
-    timescaledb.passfile: '../.pgpass'
-    log_connections: 'on'
-    log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
-    log_min_duration_statement: '1s'
-    log_statement: ddl
-    log_checkpoints: 'on'
-    log_lock_waits: 'on'
-    # These values are set as the default data volume size
-    # is small as well.
-    min_wal_size: 256MB
-    max_wal_size: 512MB
-    temp_file_limit: 1GB
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
 nodeSelector: {}
