@@ -130,11 +130,6 @@ helm delete my-release --purge
 Some items, (pvc's for example) are not immediately removed.
 To also purge these items, have a look at the [Administrator Guide](admin-guide.md#cleanup)
 
-## Support
-Currently we have the following support channels for this Helm chart:
-- Slack: https://slack.timescale.com/
-- Email: support@timescale.com
-
 ## Further reading
 
 - [Administrator Guide](admin-guide.md)

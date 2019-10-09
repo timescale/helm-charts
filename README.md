@@ -21,3 +21,17 @@ Supported Versions:
 - [Writing data](https://docs.timescale.com/using-timescaledb/writing-data)
 - [Querying and data analytics](https://docs.timescale.com/using-timescaledb/reading-data)
 - [Tutorials and sample data](https://docs.timescale.com/tutorials)
+
+## Get Help
+- [Slack Channel](https://slack.timescale.com/)
+- [GitHub Issues](https://github.com/timescale/timescaledb-kubernetes/issues)
+
+## License
+
+TimescaleDB Kubernetes resources in this repository are released under the [Apache 2.0 license](LICENSE)
+
+## Contributing
+
+If you wish to make contributions to this project, refer to [Contributor Instructions](CONTRIBUTING.md) for more information.
+
+- 
