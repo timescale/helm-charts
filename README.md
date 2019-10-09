@@ -1,8 +1,7 @@
 # TimescaleDB Kubernetes
 
-This repository contains Helm charts to help with the deployment of [TimescaleDB](https://github.com/timescale/timescaledb/) on Kubernetes.
-
-This project is currently in active development. This is an alpha version.
+This repository contains Helm charts to help with the deployment of [TimescaleDB](https://github.com/timescale/timescaledb/) on
+Kubernetes. This project is currently in active development.
 
 Supported Versions:
 - Kubernetes: [AWS EKS](https://aws.amazon.com/eks/), [MicroK8s](https://microk8s.io/), [minikube](https://github.com/kubernetes/minikube/releases)
@@ -33,5 +32,3 @@ TimescaleDB Kubernetes resources in this repository are released under the [Apac
 ## Contributing
 
 If you wish to make contributions to this project, refer to [Contributor Instructions](CONTRIBUTING.md) for more information.
-
-- 
