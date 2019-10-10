@@ -17,18 +17,16 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
 | `image.tag`                       | The version of the image to pull            | `78603166-pg11`                                     |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
-| `credentials.superuser`           | Password of the superuser                   | `tea`                                               |
-| `credentials.admin`               | Password of the admin                       | `cola`                                              |
-| `credentials.standby`             | Password of the replication user            | `pinacolada`                                        |
+| `credentials`                     | A mapping of usernames/passwords            | A postgres, standby, admin and monitoring user      |
+| `tls.cert`                        | The public key of the SSL certificate for PostgreSQL | empty (a self-signed certificate will be generated) |
+| `tls.key`                         | The private key of the SSL Certificate for PostgreSQL | empty                                     |
 | `backup.enable`                   | Schedule backups to occur                   | `false`                                             |
 | `backup.s3Bucket`                 | The S3 bucket in which to store backups     |                                                     |
 | `backup.accessKeyId`              | The Access Key ID to authenticate the IAM user for the backup |                                   |
 | `backup.secretAccessKey`          | The Key Secret to authenticate the IAM user |                                                     |
 | `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
-| `kubernetes.dcs.enable`           | Using Kubernetes as DCS                     | `true`                                              |
-| `kubernetes.configmaps.enable`    | Using Kubernetes configmaps instead of endpoints | `false`                                        |
 | `env`                             | Extra custom environment variables          | `{}`                                                |
-| `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | Some defaults to ensure to load TimescaleDB         |
+| `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
@@ -169,10 +167,10 @@ After testing the restore/recovery you may want to reduce the `replicaCount` bac
 To verify that we're not going to be causing a failover, we need to ensure the `master` is not running on the pod with
 the highest number:
 ```console
-kubectl get pod -l release=my-release -L spilo-role
+kubectl get pod -l release=my-release -L role
 ```
 ```
-NAME                       READY   STATUS    RESTARTS   AGE     SPILO-ROLE
+NAME                       READY   STATUS    RESTARTS   AGE     ROLE
 my-release-timescaledb-0   2/2     Running   0          19m     master
 my-release-timescaledb-1   2/2     Running   0          18m     replica
 my-release-timescaledb-2   2/2     Running   0          2m10s   replica
@@ -294,7 +292,7 @@ As the CronJobs are only triggers they should complete within seconds. That is w
 To verify the actual backups we can use the `pgbackrest` command in any TimescaleDB pod belonging to that deployment,
 for example:
 ```console
-kubectl exec -ti $(kubectl get pod -l release=my-release,spilo-role=master) pgbackrest info
+kubectl exec -ti $(kubectl get pod -l release=my-release,role=master) pgbackrest info
 ```
 ```
 Defaulting container name to timescaledb.
@@ -332,17 +330,17 @@ stanza: poddb
 
 ### List Resources
 All the resources that are deployed can be listed by providing the filter `-l release=my-release`.
-By adding the `spilo-role` label in the output, we get some more insight into the deployment, as Patroni adds a `spilo-role=master` label to the elected master and set the label
-to `spilo-role=replica` for all replicas.
+By adding the `role` label in the output, we get some more insight into the deployment, as Patroni adds a `role=master` label to the elected master and set the label
+to `role=replica` for all replicas.
 
 The `<release-name>-timescaledb` endpoint is always pointing to the Patroni elected master.
 
 ```console
-kubectl get all -l release=my-release -L spilo-role
+kubectl get all -l release=my-release -L role
 ```
 The output should be similar to the below output:
 ```console
-NAME                        READY   STATUS              RESTARTS   AGE   SPILO-ROLE
+NAME                        READY   STATUS              RESTARTS   AGE   ROLE
 pod/example-timescaledb-0   1/1     Running             0          79s   master
 pod/example-timescaledb-1   1/1     Running             0          53s   replica
 pod/example-timescaledb-2   1/1     Running             0          23s   replica
@@ -361,5 +359,5 @@ statefulset.apps/my-release-timescaledb   3/3     80s
 The logs for the current `master` of TimescaleDB can be accessed as follows:
 
 ```console
-kubectl logs $(kubectl get pod -l release=my-release,spilo-role=master) timescaledb
+kubectl logs $(kubectl get pod -l release=my-release,role=master) timescaledb
 ```

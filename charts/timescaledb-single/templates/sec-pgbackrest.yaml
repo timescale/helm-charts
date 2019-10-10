@@ -1,0 +1,17 @@
+{{- if .Values.backup.enable }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "timescaledb.fullname" . }}-pgbackrest
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+type: Opaque
+data:
+  PGB_REPO1_S3_KEY: {{ .Values.backup.accessKeyId | b64enc }}
+  PGB_REPO1_S3_KEY_SECRET: {{ .Values.backup.secretAccessKey | b64enc }}
+...
+{{ end }}
