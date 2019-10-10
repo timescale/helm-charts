@@ -12,13 +12,15 @@ metadata:
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    cluster-name: {{ template "clusterName" . }}
 spec:
   ports:
   - port: 8081
     protocol: TCP
   selector:
     app: {{ template "timescaledb.fullname" . }}
-    spilo-role: master
+    role: master
+    cluster-name: {{ template "clusterName" . }}
 ...
 {{- range .Values.backup.jobs }}
 ---
@@ -32,6 +34,7 @@ metadata:
     release: {{ $.Release.Name }}
     heritage: {{ $.Release.Service }}
     backup-type: {{ .type }}
+    cluster-name: {{ template "clusterName" $ }}
 spec:
   schedule: {{ quote .schedule }}
   concurrencyPolicy: Forbid
@@ -44,6 +47,7 @@ spec:
         release: {{ $.Release.Name }}
         heritage: {{ $.Release.Service }}
         backup-type: {{ .type }}
+        cluster-name: {{ template "clusterName" $ }}
     spec:
       template:
         metadata:
@@ -53,6 +57,7 @@ spec:
             release: {{ $.Release.Name }}
             heritage: {{ $.Release.Service }}
             backup-type: {{ .type }}
+            cluster-name: {{ template "clusterName" $ }}
         spec:
           containers:
           - name: {{ template "timescaledb.fullname" $ }}-{{ .type }}

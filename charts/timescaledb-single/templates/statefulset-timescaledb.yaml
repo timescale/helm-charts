@@ -10,6 +10,7 @@ metadata:
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    cluster-name: {{ template "clusterName" . }}
 spec:
   serviceName: {{ template "timescaledb.fullname" . }}
   replicas: {{ .Values.replicaCount }}
@@ -23,6 +24,7 @@ spec:
       labels:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
+        cluster-name: {{ template "clusterName" . }}
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
@@ -33,60 +35,62 @@ spec:
       - name: timescaledb
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/timescaledb_entrypoint.sh"]
+        command:
+          - patroni
+          - /etc/patroni/patroni.yaml
         env:
-        - name: PGPASSWORD_SUPERUSER
+        # We use mixed case environment variables for Patroni User management,
+        # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.
+        # Where possible, we want to have lowercase usernames in PostgreSQL as more complex postgres usernames
+        # requiring quoting to be done in certain contexts, which many tools do not do correctly, or even at all.
+        # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#bootstrap-configuration
+        - name: PATRONI_admin_OPTIONS
+          value: createrole,createdb
+{{- range $key, $_ := $.Values.credentials }}
+        - name: PATRONI_{{ $key }}_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}
-              key: password-superuser
-        - name: PGPASSWORD_ADMIN
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}
-              key: password-admin
-        - name: PGPASSWORD_STANDBY
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}
-              key: password-standby
-        {{- if .Values.kubernetes.dcs.enable }}
-        - name: DCS_ENABLE_KUBERNETES_API
-          value: "true"
-        - name: KUBERNETES_LABELS
-          value: {{ (printf "{ \"app\": \"%s\", \"release\": \"%s\" }" (include "timescaledb.fullname" .) .Release.Name) | quote }}
-        - name: KUBERNETES_SCOPE_LABEL
-          value: "app"
-        {{- if .Values.kubernetes.configmaps.enable }}
-        - name: KUBERNETES_USE_CONFIGMAPS
-          value: "true"
-        {{- end }}
-        {{- end }}
-        - name: SPILO_CONFIGURATION
-          value: |
-{{ if .Values.backup.enable -}}
-{{ toYaml .Values.patroni | indent 12 }}
-{{- else -}}
-{{/*
-If the backup is not enabled, we need to make very sure that the archiver is not going to fill
-up the disk. TODO have a better way of expressing this.
-*/}}
-{{- toYaml (merge (dict "postgresql" (dict "parameters" (dict "archive_command" "/bin/true"))) .Values.patroni) | indent 12 -}}
+              name: {{ template "timescaledb.fullname" $ }}-passwords
+              key: {{ $key | quote }}
 {{- end }}
-        - name: SCOPE
-          value: {{ template "timescaledb.fullname" . }}
-        - name: PGROOT
-          value: "{{ .Values.persistentVolume.mountPath }}/pgroot"
-        - name: POD_NAMESPACE
+        - name: PATRONI_REPLICATION_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.fullname" . }}-passwords
+              key: standby
+        - name: PATRONI_SUPERUSER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.fullname" . }}-passwords
+              key: postgres
+        - name: PATRONI_REPLICATION_USERNAME
+          value: standby
+        # To specify the PostgreSQL and Rest API connect addresses we need
+        # the PATRONI_KUBERNETES_POD_IP to be available as a bash variable, so we can compose an
+        # IP:PORT address later on
+        - name: PATRONI_KUBERNETES_POD_IP
           valueFrom:
             fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.namespace
-        {{- if .Values.env }}
-        {{- range $key, $val := .Values.env }}
+              fieldPath: status.podIP
+        - name: PATRONI_POSTGRESQL_CONNECT_ADDRESS
+          value: "$(PATRONI_KUBERNETES_POD_IP):5432"
+        - name: PATRONI_RESTAPI_CONNECT_ADDRESS
+          value: "$(PATRONI_KUBERNETES_POD_IP):8008"
+        - name: PATRONI_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: PATRONI_POSTGRESQL_DATA_DIR
+          value: {{ $.Values.persistentVolume.mountPath }}/data
+        - name: PATRONI_KUBERNETES_NAMESPACE
+          value: {{ $.Release.Namespace }}
+        - name: PATRONI_KUBERNETES_LABELS
+          value: {{ printf "{app: %s, cluster-name: %s, release: %s}" (include "timescaledb.fullname" .) (include "clusterName" .) .Release.Name  | quote }}
+        - name: PATRONI_SCOPE
+          value: {{ template "clusterName" . }}
+        {{- range $key, $val := (.Values.env | default dict) }}
         - name: {{  $key | quote | upper }}
           value: {{ $val | quote }}
-        {{- end }}
         {{- end }}
         ports:
         - containerPort: 8008
@@ -97,6 +101,9 @@ up the disk. TODO have a better way of expressing this.
           subPath: "{{ .Values.persistentVolume.subPath }}"
         - mountPath: /etc/patroni
           name: patroni-config
+          readOnly: true
+        - mountPath: /etc/certificate
+          name: certificate
           readOnly: true
         resources:
 {{ toYaml .Values.resources | indent 10 }}
@@ -118,9 +125,9 @@ up the disk. TODO have a better way of expressing this.
           - name: K8S_SIDECAR
             value: pgbackrest
           - name: PGBACKREST_CONFIG
-            value: /home/postgres/pgdata/backup/pgbackrest.conf
+            value: {{ printf "%s/backup.pgbackrest.conf" .Values.persistentVolume.mountPath | quote }}
           - name: PGB_REPO1_PATH
-            value: "/{{ template "timescaledb.fullname" . }}/"
+            value: "/{{ template "clusterName" . }}/"
           - name: PGB_REPO1_S3_BUCKET
             value: "{{ .Values.backup.s3Bucket }}"
           - name: PGB_REPO1_S3_KEY
@@ -155,8 +162,12 @@ up the disk. TODO have a better way of expressing this.
     {{- end }}
       volumes:
       - name: patroni-config
+        configMap:
+          name: {{ template "timescaledb.fullname" . }}-patroni
+      - name: certificate
         secret:
-          secretName: {{ template "timescaledb.fullname" . }}
+          secretName: {{ template "timescaledb.fullname" . }}-certificate
+          defaultMode: 416 # 0640 permissions
       {{- if not .Values.persistentVolume.enabled }}
       - name: storage-volume
         emptyDir: {}
@@ -173,6 +184,7 @@ up the disk. TODO have a better way of expressing this.
           app: {{ template "timescaledb.fullname" . }}
           release: {{ .Release.Name }}
           heritage: {{ .Release.Service }}
+          cluster-name: {{ template "clusterName" . }}
       spec:
         accessModes:
 {{ toYaml .Values.persistentVolume.accessModes | indent 8 }}
