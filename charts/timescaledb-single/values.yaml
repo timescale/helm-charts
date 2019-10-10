@@ -7,6 +7,11 @@ replicaCount: 3
 # timescaledb-single (the name of the chart)
 nameOverride: timescaledb
 
+# The default Patroni name of the cluster ("scope") is derived from the namespace and the name of the release,
+# but you can override this behaviour here
+# https://patroni.readthedocs.io/en/latest/SETTINGS.html#global-universal
+clusterName:
+
 image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
@@ -16,19 +21,23 @@ image:
 
 # Credentials used by PostgreSQL and Patroni
 # https://github.com/zalando/patroni/blob/master/docs/SETTINGS.rst#postgresql
-# https://github.com/zalando/spilo/blob/master/ENVIRONMENT.rst
 credentials:
-  superuser: tea
+  postgres: tea
   admin: cola
+  monitoring: coffee
   standby: pinacolada
 
-# Distribution Configuration stores
-# Please note that only one of the following stores should be enabled.
-kubernetes:
-  dcs:
-    enable: true
-  configmaps:
-    enable: false
+# To set your own certificate (instead of autogenerating one), you can add
+# the certificate and key here
+tls:
+  cert: |
+#    -----BEGIN CERTIFICATE-----
+#    ABC
+#    -----END CERTIFICATE-----
+  key: |
+#    -----BEGIN PRIVATE KEY-----
+#    ABC
+#    -----END PRIVATE KEY-----
 
 backup:
   enable: false
@@ -53,15 +62,87 @@ backup:
 # Extra custom environment variables.
 env: {}
 
+# This configuration will be passed on to Patroni directly, there are a few things that are
+# injected/changed, these are:
+#   - archive_command will be set to /bin/true if backup is disabled
+#   - any context sensitive parameter (scope, namespace, name) will be overridden by the Kubernetes context
+# https://patroni.readthedocs.io/en/latest/SETTINGS.html#settings
 patroni:
+  log:
+    level: INFO
+  bootstrap:
+    dcs:
+      loop_wait: 10
+      maximum_lag_on_failover: 33554432
+      postgresql:
+        parameters:
+          archive_command: "pgbackrest --stanza=poddb archive-push %p"
+          archive_mode: 'on'
+          archive_timeout: 1800s
+          autovacuum_analyze_scale_factor: 0.02
+          autovacuum_max_workers: 10
+          autovacuum_vacuum_scale_factor: 0.05
+          checkpoint_completion_target: 0.99
+          hot_standby: 'on'
+          log_autovacuum_min_duration: 0
+          log_checkpoints: 'on'
+          log_connections: 'on'
+          log_disconnections: 'on'
+          log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
+          log_lock_waits: 'on'
+          log_min_duration_statement: '1s'
+          log_statement: ddl
+          max_connections: 100
+          max_prepared_transactions: 150
+          # These values are set small as the default data volume size
+          # is small as well.
+          max_wal_size: 80MB
+          min_wal_size: 80MB
+          shared_buffers: 300MB
+          shared_preload_libraries: timescaledb,pg_stat_statements
+          ssl: 'on'
+          ssl_cert_file: '/etc/certificate/tls.crt'
+          ssl_key_file: '/etc/certificate/tls.key'
+          tcp_keepalives_idle: 900
+          tcp_keepalives_interval: 100
+          temp_file_limit: 1GB
+          timescaledb.passfile: '../.pgpass'
+          # Adding the directory where the pgdata is volume is mounted to the socket dirs
+          # allows other pods in the container to connect using the socket. The pgBackRest sidecar
+          # for example needs this
+          unix_socket_directories: "/var/run/postgresql,/home/postgres/pgdata"
+          wal_level: hot_standby
+          wal_log_hints: 'on'
+          work_mem: 16MB
+        use_pg_rewind: true
+        use_slots: true
+      retry_timeout: 10
+      ttl: 30
+    initdb:
+    - encoding: UTF8
+    - locale: C.UTF-8
+  kubernetes:
+    role_label: role
+    scope_label: cluster-name
+    use_endpoints: true
   postgresql:
-    parameters:
-      shared_preload_libraries: timescaledb,pg_stat_statements
-      # Adding the directory where the pgdata is volume is mounted to the socket dirs
-      # allows other pods in the container to connect using the socket. The pgBackRest sidecar
-      # for example needs this
-      unix_socket_directories: "/var/run/postgresql,/home/postgres/pgdata"
-      archive_command: "pgbackrest --stanza=poddb archive-push %p"
+    callbacks: {}
+    authentication:
+      replication:
+        username: standby
+      superuser:
+        username: postgres
+    listen: 0.0.0.0:5432
+    pg_hba:
+    - hostnossl all,replication all                all                reject
+    - local     all             all                                   peer
+    - hostssl   all             all                127.0.0.1/32       md5
+    - hostssl   all             all                ::1/128            md5
+    - hostssl   replication     standby            all                md5
+    - hostssl   all             all                all                md5
+    use_unix_socket: true
+  restapi:
+    listen: 0.0.0.0:8008
 
 persistentVolume:
   enabled: true

@@ -1,22 +1,6 @@
 # This file and its contents are licensed under the Apache License 2.0.
 # Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ template "timescaledb.fullname" . }}
-  labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-type: Opaque
-data:
-  password-superuser: {{ .Values.credentials.superuser | b64enc }}
-  password-admin: {{ .Values.credentials.admin | b64enc }}
-  password-standby: {{ .Values.credentials.standby | b64enc }}
-...
 {{- if .Values.backup.enable }}
 ---
 apiVersion: v1
