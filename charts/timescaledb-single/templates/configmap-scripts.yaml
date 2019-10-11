@@ -1,0 +1,36 @@
+{{- /*
+This ConfigMap contains scripts, like bootstrap scripts for the backup and archive scripts for
+archive_command
+*/ -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "timescaledb.fullname" . }}-scripts
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    cluster-name: {{ template "clusterName" . }}
+data:
+  pgbackrest_bootstrap.sh: |
+    #!/bin/bash
+
+    function log {
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - bootstrap - $1"
+    }
+
+    while ! pg_isready -q; do
+        log "Waiting for PostgreSQL to become available"
+        sleep 3
+    done
+
+    pgbackrest check || {
+        log "Creating pgBackrest stanza"
+        pgbackrest --stanza=poddb stanza-create --log-level-stderr=info || exit 1
+    }
+
+    log "Starting pgBackrest api to listen for backup requests"
+    exec python3 /scripts/pgbackrest-rest.py --stanza=poddb --loglevel=debug
+...

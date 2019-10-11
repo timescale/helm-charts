@@ -41,13 +41,22 @@ tls:
 
 backup:
   enable: false
-  s3Bucket: my_example_s3_bucket_for_backups
-  # These secrets should contain an IAM access key ID and a secret access key:
-  # https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
-  # They correspond to repo1-s3-key and repo1-s3-key-secret of this manual
-  # https://pgbackrest.org/configuration.html#section-repository/option-repo-s3-key
-  accessKeyId: examplekeyid
-  secretAccessKey: examplesecret+D48GXfDdtl823nlSRRv7dmB
+  pgBackRest:
+    # https://pgbackrest.org/configuration.html
+    process-max: 4
+    start-fast: "y"
+    compress-level: 3
+    repo1-retention-diff: 2
+    repo1-retention-full: 2
+    repo1-s3-region: us-east-2
+    repo1-s3-bucket: my_example_s3_bucket_for_backups
+    repo1-s3-endpoint: s3.amazonaws.com
+    repo1-type: s3
+    repo1-cipher-type: "none"
+    # These secrets should contain an IAM access key ID and a secret access key:
+    # https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+    repo1-s3-key: examplekeyid
+    repo1-s3-key-secret: examplesecret+D48GXfDdtl823nlSRRv7dmB
   jobs:
       # name: needs to adhere to the kubernetes restrictions
       # type: can be full, incr or diff, see https://pgbackrest.org/user-guide.html
