@@ -34,7 +34,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
           - patroni
-          - /etc/patroni/patroni
+          - /etc/patroni/patroni.yaml
         env:
         # We use mixed case environment variables for Patroni User management,
         # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.
@@ -89,6 +89,8 @@ spec:
         - name: {{  $key | quote | upper }}
           value: {{ $val | quote }}
         {{- end }}
+        - name: PGBACKREST_CONFIG
+          value: /etc/pgbackrest/pgbackrest.conf
         ports:
         - containerPort: 8008
         - containerPort: 5432
@@ -99,9 +101,17 @@ spec:
         - mountPath: /etc/patroni
           name: patroni-config
           readOnly: true
+        - mountPath: /etc/timescaledb/scripts
+          name: timescaledb-scripts
+          readOnly: true
         - mountPath: /etc/certificate
           name: certificate
           readOnly: true
+{{- if .Values.backup.enable }}
+        - mountPath: /etc/pgbackrest
+          name: pgbackrest
+          readOnly: true
+{{ end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
 
@@ -109,34 +119,27 @@ spec:
       - name: pgbackrest
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/patroni_entrypoint.sh"]
+        command:
+          - /scripts/bootstrap_pgbackrest.sh
         ports:
         - containerPort: 8081
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.persistentVolume.subPath }}"
+          mountPath: {{ .Values.persistentVolume.mountPath | quote }}
+          subPath: {{ .Values.persistentVolume.subPath | quote }}
+        - mountPath: /etc/pgbackrest
+          name: pgbackrest
+          readOnly: true
+        - mountPath: /etc/timescaledb/scripts
+          name: timescaledb-scripts
+          readOnly: true
         env:
-          - name: PGB_REPO1_S3_REGION
-            value: us-east-2
           - name: K8S_SIDECAR
             value: pgbackrest
+          - name: PGBACKREST_STANZA
+            value: poddb
           - name: PGBACKREST_CONFIG
-            value: {{ printf "%s/backup.pgbackrest.conf" .Values.persistentVolume.mountPath | quote }}
-          - name: PGB_REPO1_PATH
-            value: "/{{ template "clusterName" . }}/"
-          - name: PGB_REPO1_S3_BUCKET
-            value: "{{ .Values.backup.s3Bucket }}"
-          - name: PGB_REPO1_S3_KEY
-            valueFrom:
-              secretKeyRef:
-                name: "{{ template "timescaledb.fullname" . }}-pgbackrest"
-                key: PGB_REPO1_S3_KEY
-          - name: PGB_REPO1_S3_KEY_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: "{{ template "timescaledb.fullname" . }}-pgbackrest"
-                key: PGB_REPO1_S3_KEY_SECRET
+            value: /etc/pgbackrest/pgbackrest.conf
 {{ end }}
 
     {{- with .Values.nodeSelector }}
@@ -161,6 +164,14 @@ spec:
       - name: patroni-config
         configMap:
           name: {{ template "timescaledb.fullname" . }}-patroni
+      - name: timescaledb-scripts
+        configMap:
+          name: {{ template "timescaledb.fullname" . }}-scripts
+          defaultMode: 488 # 0750 permissions
+      - name: pgbackrest
+        secret:
+          secretName: {{ template "timescaledb.fullname" . }}-pgbackrest
+          defaultMode: 416 # 0640 permissions
       - name: certificate
         secret:
           secretName: {{ template "timescaledb.fullname" . }}-certificate

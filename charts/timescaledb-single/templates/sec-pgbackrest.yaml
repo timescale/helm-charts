@@ -10,8 +10,25 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 type: Opaque
-data:
-  PGB_REPO1_S3_KEY: {{ .Values.backup.accessKeyId | b64enc }}
-  PGB_REPO1_S3_KEY_SECRET: {{ .Values.backup.secretAccessKey | b64enc }}
+stringData:
+  pgbackrest.conf: |
+    [global]
+    repo1-path=/{{ template "clusterName" $ }}/
+{{- range $key, $val := .Values.backup.pgBackRest }}
+    {{ $key }}={{ $val }}
+{{- end }}
+
+    [poddb]
+    pg1-port=5432
+    pg1-host-user=postgres
+    pg1-path={{ printf "%s/data" $.Values.persistentVolume.mountPath }}
+    pg1-socket-path={{ $.Values.persistentVolume.mountPath }}
+
+    recovery-option=standby_mode=on
+    recovery-option=recovery_target_timeline=latest
+    recovery-option=recovery_target_action=shutdown
+
+    [global:archive-push]
+    compress-level=3
 ...
 {{ end }}

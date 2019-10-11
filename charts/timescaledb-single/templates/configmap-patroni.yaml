@@ -13,7 +13,7 @@ metadata:
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
 data:
-  patroni: |
+  patroni.yaml: |
 {{ if not .Values.backup.enable -}}
 {{- /*
 If no backup is configured, archive_command will fail. A failing archive_command on a cluster
