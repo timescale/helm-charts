@@ -13,7 +13,7 @@ metadata:
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
 data:
-  patroni: |
+  patroni.yaml: |
 {{ if not .Values.backup.enable -}}
 {{- /*
 If no backup is configured, archive_command will fail. A failing archive_command on a cluster
@@ -24,4 +24,7 @@ Therefore, if the backup is disabled, we switch the archive_command to the alway
 {{- $_ := set .Values "patroni" (merge (dict "postgresql" (dict "parameters" (dict "archive_command" "/bin/true"))) .Values.patroni) }}
 {{- end -}}
 {{ .Values.patroni | toYaml | indent 4 }}
+{{ if .Values.backup.enable -}}
+
+{{- end -}}
 ...
