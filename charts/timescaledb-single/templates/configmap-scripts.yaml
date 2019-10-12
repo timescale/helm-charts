@@ -17,6 +17,14 @@ metadata:
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
 data:
+  pgbackrest_archive.sh: |
+    #!/bin/bash
+    PGBACKREST_BACKUP_ENABLED={{ .Values.backup.enable | int }}
+
+    [ "${PGBACKREST_BACKUP_ENABLED}" == "0" ] && exit 0
+
+    exec pgbackrest --stanza=poddb archive-push $1
+
   pgbackrest_bootstrap.sh: |
     #!/bin/bash
 
