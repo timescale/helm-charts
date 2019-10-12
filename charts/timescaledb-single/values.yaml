@@ -83,7 +83,7 @@ patroni:
       maximum_lag_on_failover: 33554432
       postgresql:
         parameters:
-          archive_command: "pgbackrest --stanza=poddb archive-push %p"
+          archive_command: "/etc/timescaledb/scripts/pgbackrest_archive.sh %p"
           archive_mode: 'on'
           archive_timeout: 1800s
           autovacuum_analyze_scale_factor: 0.02

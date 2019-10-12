@@ -14,14 +14,5 @@ metadata:
     cluster-name: {{ template "clusterName" . }}
 data:
   patroni.yaml: |
-{{ if not .Values.backup.enable -}}
-{{- /*
-If no backup is configured, archive_command will fail. A failing archive_command on a cluster
-is going to cause WAL to be kept around forever, meaning we'll fill up Volumes we have quite quickly.
-
-Therefore, if the backup is disabled, we switch the archive_command to the always succeeding /bin/true command
-*/ -}}
-{{- $_ := set .Values "patroni" (merge (dict "postgresql" (dict "parameters" (dict "archive_command" "/bin/true"))) .Values.patroni) }}
-{{- end -}}
 {{ .Values.patroni | toYaml | indent 4 }}
 ...
