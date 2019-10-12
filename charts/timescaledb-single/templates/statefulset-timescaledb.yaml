@@ -81,7 +81,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: PATRONI_POSTGRESQL_DATA_DIR
-          value: {{ $.Values.persistentVolume.mountPath }}/data
+          value: {{ include "data_directory" . | quote }}
         - name: PATRONI_KUBERNETES_NAMESPACE
           value: {{ $.Release.Namespace }}
         - name: PATRONI_KUBERNETES_LABELS
@@ -99,9 +99,9 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.persistentVolume.subPath }}"
         - mountPath: /etc/patroni
+          mountPath: {{ .Values.persistentVolume.mountPath | quote }}
+          subPath: {{ .Values.persistentVolume.subPath | quote }}
           name: patroni-config
           readOnly: true
         - mountPath: /etc/timescaledb/scripts
@@ -138,7 +138,7 @@ spec:
           readOnly: true
         env:
           - name: PGHOST
-            value: {{ .Values.persistentVolume.mountPath | quote }}
+            value: {{ template "socket_directory" . }}
           - name: PGBACKREST_STANZA
             value: poddb
           - name: PGBACKREST_CONFIG
