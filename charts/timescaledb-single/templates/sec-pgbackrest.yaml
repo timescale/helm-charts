@@ -16,7 +16,7 @@ type: Opaque
 stringData:
   pgbackrest.conf: |
     [global]
-    repo1-path=/{{ template "clusterName" $ }}/
+    repo1-path=/{{ template "clusterName" . }}/
 {{- range $key, $val := .Values.backup.pgBackRest }}
     {{ $key }}={{ $val }}
 {{- end }}
@@ -24,8 +24,8 @@ stringData:
     [poddb]
     pg1-port=5432
     pg1-host-user=postgres
-    pg1-path={{ printf "%s/data" $.Values.persistentVolume.mountPath }}
-    pg1-socket-path={{ $.Values.persistentVolume.mountPath }}
+    pg1-path={{ template "data_directory" . }}
+    pg1-socket-path={{ template "socket_directory" . }}
 
     recovery-option=standby_mode=on
     recovery-option=recovery_target_timeline=latest

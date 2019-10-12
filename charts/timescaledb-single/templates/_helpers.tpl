@@ -49,3 +49,11 @@ Create the name of the service account to use.
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{- define "socket_directory" -}}
+{{ .Values.persistentVolume.mountPath }}
+{{- end -}}
+
+{{- define "data_directory" -}}
+{{ printf "%s/data" .Values.persistentVolume.mountPath }}
+{{- end -}}
