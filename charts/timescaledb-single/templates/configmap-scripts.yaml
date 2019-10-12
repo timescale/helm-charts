@@ -32,4 +32,42 @@ data:
 
     log "Starting pgBackrest api to listen for backup requests"
     exec python3 /scripts/pgbackrest-rest.py --stanza=poddb --loglevel=debug
+  post_init.sh: |
+    #!/bin/bash
+
+    function log {
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - post_init - $1"
+    }
+
+    log "$@"
+
+    log "Adding timescaledb extension to template1 and postgres databases"
+    psql -d "$URL" <<__SQL__
+    \c template1
+    -- As we're still only initializing, we cannot have synchronous_commit enabled just yet.
+    SET synchronous_commit to 'off';
+    CREATE EXTENSION timescaledb;
+
+    \connect postgres
+
+    SET synchronous_commit to 'off';
+    CREATE EXTENSION timescaledb;
+    __SQL__
+
+    log "Waiting for pgBackRest API to become responsive"
+    while sleep 1; do
+        if [ $SECONDS -gt 10 ]; then
+            log "pgBackRest API did not respond within $SECONDS seconds, will not trigger a backup"
+            exit 0
+        fi
+        timeout 1 bash -c "echo > /dev/tcp/localhost/8081" 2>/dev/null && break
+    done
+
+    {{ if .Values.backup.enable -}}
+    log "Triggering backup"
+    curl -i -X POST http://localhost:8081/backups
+    {{- end }}
+
+    # We always exit 0 this script, otherwise the database initialization fails.
+    exit 0
 ...
