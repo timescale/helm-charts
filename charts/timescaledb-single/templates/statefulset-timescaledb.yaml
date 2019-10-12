@@ -34,7 +34,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
           - patroni
-          - /etc/patroni/patroni.yaml
+          - /etc/timescaledb/patroni.yaml
         env:
         # We use mixed case environment variables for Patroni User management,
         # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.
@@ -96,9 +96,10 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - name: storage-volume
-        - mountPath: /etc/patroni
           mountPath: {{ .Values.persistentVolume.mountPath | quote }}
           subPath: {{ .Values.persistentVolume.subPath | quote }}
+        - mountPath: /etc/timescaledb/patroni.yaml
+          subPath: patroni.yaml
           name: patroni-config
           readOnly: true
         - mountPath: /etc/timescaledb/scripts
