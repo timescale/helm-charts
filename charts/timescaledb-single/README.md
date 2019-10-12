@@ -45,7 +45,7 @@ random_password () { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32; }
 helm install --name my-release . \
     --set credentials.postgres="$(random_password)" \
     --set credentials.admin="$(random_password)" \
-    --set credentials.stanbdy="$(random_password)"
+    --set credentials.standby="$(random_password)"
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,

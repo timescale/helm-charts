@@ -22,9 +22,10 @@ image:
 # Credentials used by PostgreSQL and Patroni
 # https://github.com/zalando/patroni/blob/master/docs/SETTINGS.rst#postgresql
 credentials:
-  postgres: tea
   admin: cola
-  monitoring: coffee
+  # the postgres and standby users are vital for Patroni, and therefore should not be
+  # removed altogether.
+  postgres: tea
   standby: pinacolada
 
 # To set your own certificate (instead of autogenerating one), you can add
