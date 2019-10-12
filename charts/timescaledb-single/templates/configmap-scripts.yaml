@@ -17,6 +17,10 @@ metadata:
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
 data:
+  # If no backup is configured, archive_command would normally fail. A failing archive_command on a cluster
+  # is going to cause WAL to be kept around forever, meaning we'll fill up Volumes we have quite quickly.
+  #
+  # Therefore, if the backup is disabled, we always return exitcode 0 when archiving
   pgbackrest_archive.sh: |
     #!/bin/bash
     PGBACKREST_BACKUP_ENABLED={{ .Values.backup.enable | int }}
@@ -24,9 +28,9 @@ data:
     [ "${PGBACKREST_BACKUP_ENABLED}" == "0" ] && exit 0
 
     exec pgbackrest --stanza=poddb archive-push $1
-
   pgbackrest_bootstrap.sh: |
     #!/bin/bash
+    set -e
 
     function log {
         echo "$(date '+%Y-%m-%d %H:%M:%S') - bootstrap - $1"
