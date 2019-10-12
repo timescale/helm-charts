@@ -80,6 +80,7 @@ patroni:
   log:
     level: INFO
   bootstrap:
+    post_init: /etc/timescaledb/scripts/post_init.sh
     dcs:
       loop_wait: 10
       maximum_lag_on_failover: 33554432
