@@ -1,3 +1,6 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
 {{- /*
 This ConfigMap contains scripts, like bootstrap scripts for the backup and archive scripts for
 archive_command
@@ -33,4 +36,40 @@ data:
 
     log "Starting pgBackrest api to listen for backup requests"
     exec python3 /scripts/pgbackrest-rest.py --stanza=poddb --loglevel=debug
+  post_init.sh: |
+    #!/bin/bash
+    PGBACKREST_BACKUP_ENABLED={{ .Values.backup.enable | int }}
+
+    function log {
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - post_init - $1"
+    }
+
+    log "Creating extension TimescaleDB in template1 and postgres databases"
+    psql -d "$URL" <<__SQL__
+      \connect template1
+      -- As we're still only initializing, we cannot have synchronous_commit enabled just yet.
+      SET synchronous_commit to 'off';
+      CREATE EXTENSION timescaledb;
+
+      \connect postgres
+      SET synchronous_commit to 'off';
+      CREATE EXTENSION timescaledb;
+    __SQL__
+
+    if [ "${PGBACKREST_BACKUP_ENABLED}" == "1" ]; then
+      log "Waiting for pgBackRest API to become responsive"
+      while sleep 1; do
+          if [ $SECONDS -gt 10 ]; then
+              log "pgBackRest API did not respond within $SECONDS seconds, will not trigger a backup"
+              exit 0
+          fi
+          timeout 1 bash -c "echo > /dev/tcp/localhost/8081" 2>/dev/null && break
+      done
+
+      log "Triggering pgBackRest backup"
+      curl -i -X POST http://localhost:8081/backups
+    fi
+
+    # We always exit 0 this script, otherwise the database initialization fails.
+    exit 0
 ...
