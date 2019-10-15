@@ -118,10 +118,7 @@ patroni:
           tcp_keepalives_interval: 100
           temp_file_limit: 1GB
           timescaledb.passfile: '../.pgpass'
-          # Adding the directory where the pgdata is volume is mounted to the socket dirs
-          # allows other pods in the container to connect using the socket. The pgBackRest sidecar
-          # for example needs this
-          unix_socket_directories: "/var/run/postgresql,/home/postgres/pgdata"
+          unix_socket_directories: "/var/run/postgresql"
           wal_level: hot_standby
           wal_log_hints: 'on'
           work_mem: 16MB
