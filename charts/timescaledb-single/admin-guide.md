@@ -22,13 +22,11 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
 | `image.tag`                       | The version of the image to pull            | `78603166-pg11`                                     |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
-| `credentials`                     | A mapping of usernames/passwords            | A postgres, standby, admin and monitoring user      |
+| `credentials`                     | A mapping of usernames/passwords            | A postgres, standby and admin user                  |
 | `tls.cert`                        | The public key of the SSL certificate for PostgreSQL | empty (a self-signed certificate will be generated) |
 | `tls.key`                         | The private key of the SSL Certificate for PostgreSQL | empty                                     |
 | `backup.enable`                   | Schedule backups to occur                   | `false`                                             |
-| `backup.s3Bucket`                 | The S3 bucket in which to store backups     |                                                     |
-| `backup.accessKeyId`              | The Access Key ID to authenticate the IAM user for the backup |                                   |
-| `backup.secretAccessKey`          | The Key Secret to authenticate the IAM user |                                                     |
+| `backup.pgBackRest`               | [pgBackRest configuration](https://github.com/timescale/timescaledb-kubernetes/blob/master/charts/timescaledb-single/values.yaml)     | Working defaults |
 | `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
 | `env`                             | Extra custom environment variables          | `{}`                                                |
 | `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
@@ -108,9 +106,10 @@ If you (re)deploy your database with this configuration snippet in the values fi
 # Filename: myvalues.yaml
 backup:
   enable: True
-  s3Bucket: this_bucket_may_not_exist
-  accessKeyId: 9E1R2CUZBXJVYSBYRWTB
-  secretAccessKey: 5CrhvJD08bp9emxI+D48GXfDdtl823nlSRRv7dmB
+    pgBackRest:
+      repo1-s3-bucket: this_bucket_may_not_exist
+      repo1-s3-key: 9E1R2CUZBXJVYSBYRWTB
+      repo1-s3-key-secret: 5CrhvJD08bp9emxI+D48GXfDdtl823nlSRRv7dmB
 ```
 ```
 helm upgrade --install example -f myvalues.yaml .
