@@ -34,7 +34,7 @@ When configured for Backups to S3:
 To install the chart with the release name `my-release`:
 
 ```console
-helm install --name my-release .
+helm install --name my-release charts/timescaledb-single
 ```
 
 You can override parameters using the `--set key=value[,key=value]` argument to `helm install`,
@@ -42,7 +42,7 @@ e.g., to install the chart with randomly generated passwords:
 
 ```console
 random_password () { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32; }
-helm install --name my-release . \
+helm install --name my-release charts/timescaledb-single \
     --set credentials.postgres="$(random_password)" \
     --set credentials.admin="$(random_password)" \
     --set credentials.standby="$(random_password)"
@@ -50,7 +50,7 @@ helm install --name my-release . \
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 ```console
-helm install --name my-release -f myvalues.yaml .
+helm install --name my-release -f myvalues.yaml charts/timescaledb-single
 ```
 
 For details about what parameters you can set, have a look at the [Administrator Guide](admin-guide.md#configure)
@@ -59,15 +59,17 @@ For details about what parameters you can set, have a look at the [Administrator
 
 To connect to the TimescaleDB instance, we first need to know to which host we need to connect. Use `kubectl` to get that information:
 ```console
-kubectl get service/my-release-timescaledb
+kubectl get service/my-release
 ```
 ```
-NAME                             TYPE           CLUSTER-IP      EXTERNAL-IP                PORT(S)          AGE
-service/my-release-timescaledb   LoadBalancer   10.100.157.80   verylongname.example.com   5432:32641/TCP   79s
+NAME         TYPE           CLUSTER-IP       EXTERNAL-IP                 PORT(S)          AGE
+my-release   LoadBalancer   10.100.149.189    verylongname.example.com   5432:31294/TCP   27s
 ```
 
 Using the External IP for the service (which will route through the LoadBalancer to the Master), you
 can connect via `psql` using the following (default example superuser password is `tea`)
+
+> NOTICE: You may have to wait a few minutes before you can resolve the DNS record
 
 ```console
 psql -h verylongname.example.com -U postgres
@@ -95,16 +97,11 @@ and start using TimescaleDB.
 
 ### Connecting from inside the Cluster
 
-To access the database from inside the cluster, spin up another Pod to run `psql`:
+To access the database from inside the cluster, you can run `psql` inside the Pod containing the primary:
 
 ```
-kubectl run -i --tty --rm psql --image=postgres --restart=Never -- bash -il
-```
-
-Then, from inside the pod, connect to PostgreSQL:
-
-```console
-$ psql -U admin -h my-release-timescaledb.default.svc.cluster.local postgres
+RELEASE=my-release
+kubectl exec -ti $(kubectl get pod -o name -l role=master,release=$RELEASE) psql
 ```
 
 ## Create backups to S3

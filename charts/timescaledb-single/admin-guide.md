@@ -49,7 +49,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 ### Examples
 - Override value using commandline parameters
     ```console
-    helm upgrade --install my-release . --set image.tag=v0.1.0-pg11 --set image.pullPolicy=Always
+    helm upgrade --install my-release charts/timescaledb-single --set image.tag=pg11.5-ts1.4.2 --set image.pullPolicy=Always
     ```
 - Override values using `myvalues.yaml`
     ```yaml
@@ -63,7 +63,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
           checkpoint_completion_target: 32MB
     ```
     ```console
-    helm upgrade --install my-release . -f myvalues.yaml
+    helm upgrade --install my-release charts/timescaledb-single -f myvalues.yaml
     ```
 
 ## Cleanup
@@ -76,8 +76,8 @@ To fully purge a deployment in Kubernetes, you should do the following:
 ```console
 # Delete the Helm deployment
 helm delete my-release
-# Delete pvc and the headless Patroni service
-kubectl delete $(kubectl get pvc,service -l release=my-release -o name)
+# Delete pvc and the headless Patroni service and the endpoint
+kubectl delete $(kubectl get pvc,service,ep -l release=my-release -o name)
 ```
 
 ### Optional: Delete the s3 backups
@@ -112,7 +112,7 @@ backup:
       repo1-s3-key-secret: 5CrhvJD08bp9emxI+D48GXfDdtl823nlSRRv7dmB
 ```
 ```
-helm upgrade --install example -f myvalues.yaml .
+helm upgrade --install example -f myvalues.yaml charts/timescaledb-single
 ```
 
 ### Control the backup schedule
@@ -142,7 +142,7 @@ Assuming that you have deployed a 3-pod TimescaleDB, we can trigger the restore 
 This should create a new pod, which we can inspect to verify that the restore was done correctly.
 
 ```console
-helm upgrade my-release -f myvalues.yaml . --set replicaCount=4
+helm upgrade my-release -f myvalues.yaml charts/timescaledb-single --set replicaCount=4
 # Wait a short while for the Pod to be scheduled and available
 kubectl logs pod/my-release-timescaledb-3 -c timescaledb
 ```
@@ -184,7 +184,7 @@ my-release-timescaledb-3   2/2     Running   0          96s     replica
 If we reduce the `replicaCount` back to the original in this example, the `my-release-timescaledb-3` would be removed.
 
 ```
-helm upgrade my-release -f myvalues.yaml . --set replicaCount=3
+helm upgrade my-release -f myvalues.yaml charts/timescaledb-single --set replicaCount=3
 ```
 
 You could also delete the `pvc` that was used by this pod:
@@ -340,22 +340,32 @@ to `role=replica` for all replicas.
 The `<release-name>-timescaledb` endpoint is always pointing to the Patroni elected master.
 
 ```console
-kubectl get all -l release=my-release -L role
+kubectl get all,ep,pvc -l release=my-release -L role
 ```
 The output should be similar to the below output:
 ```console
-NAME                        READY   STATUS              RESTARTS   AGE   ROLE
-pod/example-timescaledb-0   1/1     Running             0          79s   master
-pod/example-timescaledb-1   1/1     Running             0          53s   replica
-pod/example-timescaledb-2   1/1     Running             0          23s   replica
+NAME                           READY   STATUS    RESTARTS   AGE     ROLE
+pod/my-release-timescaledb-0   1/1     Running   0          3m57s   replica
+pod/my-release-timescaledb-1   1/1     Running   0          3m37s   master
+pod/my-release-timescaledb-2   1/1     Running   0          3m26s   replica
 
+NAME                        TYPE           CLUSTER-IP      EXTERNAL-IP                PORT(S)          AGE     ROLE
+service/my-release          LoadBalancer   10.100.13.250   verylongname.example.com   5432:31595/TCP   3m59s
+service/my-release-config   ClusterIP      None            <none>                     <none>           20m
 
-NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP                PORT(S)          AGE
-service/my-release-timescaledb          LoadBalancer   10.100.157.80   verylongname.example.com   5432:32641/TCP   79s
-service/my-release-timescaledb-config   ClusterIP      None            <none>                     <none>           53s
+NAME                                      READY   AGE   ROLE
+statefulset.apps/my-release-timescaledb   3/3     4m
 
-NAME                                   READY   AGE
-statefulset.apps/my-release-timescaledb   3/3     80s
+NAME                               ENDPOINTS             AGE     ROLE
+endpoints/my-release               192.168.66.154:5432   3m38s
+endpoints/my-release-config        <none>                20m
+endpoints/my-release-timescaledb   <none>                4m
+
+NAME                                                            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE     ROLE
+persistentvolumeclaim/storage-volume-my-release-timescaledb-0   Bound    pvc-5ea02576-ef44-11e9-83cf-0648583d35f4   1Gi        RWO            gp2            20m     
+persistentvolumeclaim/storage-volume-my-release-timescaledb-1   Bound    pvc-69abba64-ef44-11e9-83cf-0648583d35f4   1Gi        RWO            gp2            20m     
+persistentvolumeclaim/storage-volume-my-release-timescaledb-2   Bound    pvc-757503a5-ef44-11e9-83cf-0648583d35f4   1Gi        RWO            gp2            19m     
+persistentvolumeclaim/storage-volume-my-release-timescaledb-3   Bound    pvc-44c31a41-ef46-11e9-83cf-0648583d35f4   1Gi        RWO            gp2            6m51s   
 ```
 
 ### Investigate TimescaleDB logs
@@ -363,5 +373,6 @@ statefulset.apps/my-release-timescaledb   3/3     80s
 The logs for the current `master` of TimescaleDB can be accessed as follows:
 
 ```console
-kubectl logs $(kubectl get pod -l release=my-release,role=master) timescaledb
+RELEASE=my-release
+kubectl logs $(kubectl get pod -o name -l release=$RELEASE,role=master) -c timescaledb
 ```
