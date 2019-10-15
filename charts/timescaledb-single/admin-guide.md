@@ -36,12 +36,15 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname  |
 | `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
-| `persistentVolume.accessModes`    | Persistent Volume access modes              | `[ReadWriteOnce]`                                   |
-| `persistentVolume.annotations`    | Annotations for Persistent Volume Claim`    | `{}`                                                |
-| `persistentVolume.mountPath`      | Persistent Volume mount root path           | `/home/postgres/pgdata`                             |
-| `persistentVolume.size`           | Persistent Volume size                      | `2Gi`                                               |
-| `persistentVolume.storageClass`   | Persistent Volume Storage Class             | `volume.alpha.kubernetes.io/storage-class: default` |
-| `persistentVolume.subPath`        | Subdirectory of Persistent Volume to mount  | `""`                                                |
+| `persistentVolumes.data.enabled`  | If enabled, use a Persistent Data Volume    | `true`                                              |
+| `persistentVolumes.data.mountPath`| Persistent Data Volume mount root path      | `/var/lib/postgresql/`                              |
+| `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume     | `false` (WAL will be stored inside the Data Volume) |
+| `persistentVolumes.wal.mountPath` | Persistent Wal Volume mount root path       | `/var/lib/postgresql/wal/`                          |
+| `persistentVolumes.<name>.accessModes` | Persistent Volume access modes         | `[ReadWriteOnce]`                                   |
+| `persistentVolumes.<name>.annotations` | Annotations for Persistent Volume Claim| `{}`                                                |
+| `persistentVolumes.<name>.size`   | Persistent Volume size                      | `2Gi`                                               |
+| `persistentVolumes.<name>.storageClass`| Persistent Volume Storage Class        | `volume.alpha.kubernetes.io/storage-class: default` |
+| `persistentVolumes.<name>.subPath`| Subdirectory of Persistent Volume to mount  | `""`                                                |
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |

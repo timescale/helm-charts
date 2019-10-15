@@ -129,6 +129,7 @@ patroni:
     initdb:
     - encoding: UTF8
     - locale: C.UTF-8
+    - waldir: "/var/lib/postgresql/wal/pg_wal"
   kubernetes:
     role_label: role
     scope_label: cluster-name
@@ -138,6 +139,8 @@ patroni:
       port: 5432
       targetPort: 5432
   postgresql:
+    basebackup:
+    - waldir: "/var/lib/postgresql/wal/pg_wal"
     callbacks: {}
     authentication:
       replication:
@@ -157,9 +160,13 @@ patroni:
     listen: 0.0.0.0:8008
 
 persistentVolumes:
+  # For sanity reasons, the actual PGDATA and wal directory will be subdirectories of the Volume mounts,
+  # this allows Patroni/a human/an automated operator to move directories during bootstrap, which cannot
+  # be done if we did not use subdirectories
+  # https://www.postgresql.org/docs/current/creating-cluster.html#CREATING-CLUSTER-MOUNT-POINTS
   data:
-    enabled: true
-    size: 1G
+    enabled: True
+    size: 2G
     ## database data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -169,7 +176,20 @@ persistentVolumes:
     ##
     # storageClass: "-"
     subPath: ""
-    mountPath: "/home/postgres/pgdata"
+    mountPath: "/var/lib/postgresql"
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
+  # WAL will be a subdirectory of the data volume, which means enabling a separate
+  # volume for the WAL files should just work for new pods.
+  wal:
+    enabled: True
+    size: 1G
+    subPath: ""
+    # When changing this mountPath ensure you also change the following keys to reflect this:
+    # patroni->bootstrap->initdb (waldir option)
+    # patroni->postgresql-basebackup (waldir option)
+    mountPath: "/var/lib/postgresql/wal"
     annotations: {}
     accessModes:
       - ReadWriteOnce

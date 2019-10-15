@@ -31,6 +31,8 @@ stringData:
     recovery-option=recovery_target_timeline=latest
     recovery-option=recovery_target_action=shutdown
 
+    link-all=y
+
     [global:archive-push]
     compress-level=3
 ...

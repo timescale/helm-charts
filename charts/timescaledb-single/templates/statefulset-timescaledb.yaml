@@ -39,10 +39,10 @@ spec:
           - sh
           - "-c"
           # When reusing an already existing volume it sometimes happens that the permissions
-          # of the PGDATA directory are incorrect. To guard against this, we always correctly
-          # set the permissons of the PGDATA directory before we hand over to Patroni
+          # of the PGDATA and/or wal directory are incorrect. To guard against this, we always correctly
+          # set the permissons of these directories before we hand over to Patroni
           - |
-            install -o postgres -g postgres -d "${PATRONI_POSTGRESQL_DATA_DIR}" -m 0700
+            install -o postgres -g postgres -d -m 0700 {{ include "data_directory" . | quote }} {{ include "wal_directory" . | quote }}
             exec patroni /etc/timescaledb/patroni.yaml
         env:
         # We use mixed case environment variables for Patroni User management,
@@ -107,6 +107,11 @@ spec:
         - name: storage-volume
           mountPath: {{ .Values.persistentVolumes.data.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.data.subPath | quote }}
+        {{- if .Values.persistentVolumes.wal.enabled }}
+        - name: wal-volume
+          mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
+          subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
+        {{- end }}
         - mountPath: /etc/timescaledb/patroni.yaml
           subPath: patroni.yaml
           name: patroni-config
@@ -142,6 +147,11 @@ spec:
         - name: storage-volume
           mountPath: {{ .Values.persistentVolumes.data.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.data.subPath | quote }}
+        {{- if .Values.persistentVolumes.wal.enabled }}
+        - name: wal-volume
+          mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
+          subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
+        {{- end }}
         - mountPath: /etc/pgbackrest
           name: pgbackrest
           readOnly: true
@@ -200,19 +210,20 @@ spec:
       - name: storage-volume
         emptyDir: {}
       {{- end }}
-  {{- if .Values.persistentVolumes.data.enabled }}
   volumeClaimTemplates:
+  {{- if .Values.persistentVolumes.data.enabled }}
     - metadata:
         name: storage-volume
         annotations:
         {{- if .Values.persistentVolumes.data.annotations }}
-{{ toYaml .Values.persistentVolume.data.annotations | indent 8 }}
+{{ toYaml .Values.persistentVolumes.data.annotations | indent 8 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
           release: {{ .Release.Name }}
           heritage: {{ .Release.Service }}
           cluster-name: {{ template "clusterName" . }}
+          purpose: data-directory
       spec:
         accessModes:
 {{ toYaml .Values.persistentVolumes.data.accessModes | indent 8 }}
@@ -224,6 +235,33 @@ spec:
         storageClassName: ""
       {{- else }}
         storageClassName: "{{ .Values.persistentVolumes.data.storageClass }}"
+      {{- end }}
+      {{- end }}
+  {{- end }}
+  {{- if .Values.persistentVolumes.wal.enabled }}
+    - metadata:
+        name: wal-volume
+        annotations:
+        {{- if .Values.persistentVolumes.wal.annotations }}
+{{ toYaml .Values.persistentVolumes.wal.annotations | indent 8 }}
+        {{- end }}
+        labels:
+          app: {{ template "timescaledb.fullname" . }}
+          release: {{ .Release.Name }}
+          heritage: {{ .Release.Service }}
+          cluster-name: {{ template "clusterName" . }}
+          purpose: wal-directory
+      spec:
+        accessModes:
+{{ toYaml .Values.persistentVolumes.wal.accessModes | indent 8 }}
+        resources:
+          requests:
+            storage: "{{ .Values.persistentVolumes.wal.size }}"
+      {{- if .Values.persistentVolumes.wal.storageClass }}
+      {{- if (eq "-" .Values.persistentVolumes.wal.storageClass) }}
+        storageClassName: ""
+      {{- else }}
+        storageClassName: "{{ .Values.persistentVolumes.wal.storageClass }}"
       {{- end }}
       {{- end }}
   {{- end }}
