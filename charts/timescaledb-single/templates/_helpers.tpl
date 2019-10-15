@@ -11,7 +11,7 @@ Expand the name of the chart.
 {{- end -}}
 
 {{- define "clusterName" -}}
-{{- default (printf "%s-%s" .Release.Namespace .Release.Name) .Values.clusterName | trunc 63 -}}
+{{- default .Release.Name .Values.clusterName | trunc 63 -}}
 {{- end -}}
 
 {{/*

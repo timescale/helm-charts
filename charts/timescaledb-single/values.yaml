@@ -7,7 +7,7 @@ replicaCount: 3
 # timescaledb-single (the name of the chart)
 nameOverride: timescaledb
 
-# The default Patroni name of the cluster ("scope") is derived from the namespace and the name of the release,
+# The default Patroni name of the cluster ("scope") is derived from the name of the release,
 # but you can override this behaviour here
 # https://patroni.readthedocs.io/en/latest/SETTINGS.html#global-universal
 clusterName:
@@ -133,6 +133,10 @@ patroni:
     role_label: role
     scope_label: cluster-name
     use_endpoints: true
+    ports:
+    - name: postgresql
+      port: 5432
+      targetPort: 5432
   postgresql:
     callbacks: {}
     authentication:
