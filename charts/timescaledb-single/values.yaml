@@ -133,6 +133,10 @@ patroni:
     role_label: role
     scope_label: cluster-name
     use_endpoints: true
+    ports:
+    - name: postgresql
+      port: 5432
+      targetPort: 5432
   postgresql:
     callbacks: {}
     authentication:
