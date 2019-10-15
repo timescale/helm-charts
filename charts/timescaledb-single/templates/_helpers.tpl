@@ -57,3 +57,11 @@ Create the name of the service account to use.
 {{- define "data_directory" -}}
 {{ printf "%s/data" .Values.persistentVolumes.data.mountPath }}
 {{- end -}}
+
+{{- define "wal_directory" -}}
+{{- if .Values.persistentVolumes.wal.enabled -}}
+{{ printf "%s/pg_wal" .Values.persistentVolumes.wal.mountPath }}
+{{- else -}}
+
+{{- end -}}
+{{- end -}}
