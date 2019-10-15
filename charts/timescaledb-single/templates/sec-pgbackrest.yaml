@@ -16,7 +16,7 @@ type: Opaque
 stringData:
   pgbackrest.conf: |
     [global]
-    repo1-path=/{{ template "clusterName" . }}/
+    repo1-path=/{{ .Release.Namespace }}/{{ template "clusterName" . }}/
 {{- range $key, $val := .Values.backup.pgBackRest }}
     {{ $key }}={{ $val }}
 {{- end }}
