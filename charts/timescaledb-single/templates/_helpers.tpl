@@ -55,5 +55,5 @@ Create the name of the service account to use.
 {{- end -}}
 
 {{- define "data_directory" -}}
-{{ printf "%s/data" .Values.persistentVolume.mountPath }}
+{{ printf "%s/data" .Values.persistentVolumes.data.mountPath }}
 {{- end -}}

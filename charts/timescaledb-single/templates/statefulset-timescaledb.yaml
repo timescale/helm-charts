@@ -105,8 +105,8 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - name: storage-volume
-          mountPath: {{ .Values.persistentVolume.mountPath | quote }}
-          subPath: {{ .Values.persistentVolume.subPath | quote }}
+          mountPath: {{ .Values.persistentVolumes.data.mountPath | quote }}
+          subPath: {{ .Values.persistentVolumes.data.subPath | quote }}
         - mountPath: /etc/timescaledb/patroni.yaml
           subPath: patroni.yaml
           name: patroni-config
@@ -140,8 +140,8 @@ spec:
           mountPath: /var/run/postgresql
           readOnly: true
         - name: storage-volume
-          mountPath: {{ .Values.persistentVolume.mountPath | quote }}
-          subPath: {{ .Values.persistentVolume.subPath | quote }}
+          mountPath: {{ .Values.persistentVolumes.data.mountPath | quote }}
+          subPath: {{ .Values.persistentVolumes.data.subPath | quote }}
         - mountPath: /etc/pgbackrest
           name: pgbackrest
           readOnly: true
@@ -196,17 +196,17 @@ spec:
         secret:
           secretName: {{ template "timescaledb.fullname" . }}-certificate
           defaultMode: 416 # 0640 permissions
-      {{- if not .Values.persistentVolume.enabled }}
+      {{- if not .Values.persistentVolumes.data.enabled }}
       - name: storage-volume
         emptyDir: {}
       {{- end }}
-  {{- if .Values.persistentVolume.enabled }}
+  {{- if .Values.persistentVolumes.data.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: storage-volume
         annotations:
-        {{- if .Values.persistentVolume.annotations }}
-{{ toYaml .Values.persistentVolume.annotations | indent 8 }}
+        {{- if .Values.persistentVolumes.data.annotations }}
+{{ toYaml .Values.persistentVolume.data.annotations | indent 8 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
@@ -215,15 +215,15 @@ spec:
           cluster-name: {{ template "clusterName" . }}
       spec:
         accessModes:
-{{ toYaml .Values.persistentVolume.accessModes | indent 8 }}
+{{ toYaml .Values.persistentVolumes.data.accessModes | indent 8 }}
         resources:
           requests:
-            storage: "{{ .Values.persistentVolume.size }}"
-      {{- if .Values.persistentVolume.storageClass }}
-      {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+            storage: "{{ .Values.persistentVolumes.data.size }}"
+      {{- if .Values.persistentVolumes.data.storageClass }}
+      {{- if (eq "-" .Values.persistentVolumes.data.storageClass) }}
         storageClassName: ""
       {{- else }}
-        storageClassName: "{{ .Values.persistentVolume.storageClass }}"
+        storageClassName: "{{ .Values.persistentVolumes.data.storageClass }}"
       {{- end }}
       {{- end }}
   {{- end }}
