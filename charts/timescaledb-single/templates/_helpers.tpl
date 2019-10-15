@@ -51,7 +51,7 @@ Create the name of the service account to use.
 {{- end -}}
 
 {{- define "socket_directory" -}}
-{{ .Values.persistentVolume.mountPath }}
+/var/run/postgresql/
 {{- end -}}
 
 {{- define "data_directory" -}}

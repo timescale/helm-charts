@@ -111,6 +111,8 @@ spec:
         - mountPath: /etc/certificate
           name: certificate
           readOnly: true
+        - name: socket-directory
+          mountPath: /var/run/postgresql
 {{- if .Values.backup.enable }}
         - mountPath: /etc/pgbackrest
           name: pgbackrest
@@ -128,6 +130,9 @@ spec:
         ports:
         - containerPort: 8081
         volumeMounts:
+        - name: socket-directory
+          mountPath: /var/run/postgresql
+          readOnly: true
         - name: storage-volume
           mountPath: {{ .Values.persistentVolume.mountPath | quote }}
           subPath: {{ .Values.persistentVolume.subPath | quote }}
@@ -165,6 +170,9 @@ spec:
 {{ tpl .Values.affinityTemplate . | indent 8 }}
     {{- end }}
       volumes:
+      - name: socket-directory
+        emptyDir:
+          defaultMode: 488 # 0750 permissions
       - name: patroni-config
         configMap:
           name: {{ template "timescaledb.fullname" . }}-patroni
