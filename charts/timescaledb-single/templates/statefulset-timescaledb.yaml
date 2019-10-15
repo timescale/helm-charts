@@ -36,8 +36,14 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
-          - patroni
-          - /etc/timescaledb/patroni.yaml
+          - sh
+          - "-c"
+          # When reusing an already existing volume it sometimes happens that the permissions
+          # of the PGDATA directory are incorrect. To guard against this, we always correctly
+          # set the permissons of the PGDATA directory before we hand over to Patroni
+          - |
+            install -o postgres -g postgres -d "${PATRONI_POSTGRESQL_DATA_DIR}" -m 0700
+            exec patroni /etc/timescaledb/patroni.yaml
         env:
         # We use mixed case environment variables for Patroni User management,
         # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.
