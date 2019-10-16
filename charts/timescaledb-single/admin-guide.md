@@ -17,6 +17,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 |       Parameter                   |           Description                       |                         Default                     |
 |-----------------------------------|---------------------------------------------|-----------------------------------------------------|
 | `nameOverride`                    | Override the name of the chart              | `timescaledb`                                       |
+| `clusterName`                     | Override the name of the PostgreSQL cluster | Equal to the Helm release name                      |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
 | `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
@@ -33,7 +34,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
-| `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname  |
+| `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname and (availability) zone |
 | `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
 | `persistentVolumes.data.enabled`  | If enabled, use a Persistent Data Volume    | `true`                                              |
@@ -83,8 +84,9 @@ To fully purge a deployment in Kubernetes, you should do the following:
 ```console
 # Delete the Helm deployment
 helm delete my-release
-# Delete pvc and the headless Patroni service and the endpoint
-kubectl delete $(kubectl get pvc,service,ep -l release=my-release -o name)
+# Delete pvc and the headless Patroni service and the endpoints
+RELEASE=my-release
+kubectl delete $(kubectl get pvc,service,endpoints -l release=$RELEASE -o name)
 ```
 
 ### Optional: Delete the s3 backups
@@ -93,7 +95,7 @@ this will cause issues.
 
 If you want to purge the backups, (re)move the s3 objects relating to your database, e.g. when using the [AWS Command Line Interface](https://aws.amazon.com/cli/):
 ```console
-aws s3 rm s3://this_bucket_may_not_exist/my-release-timescaledb --recursive
+aws s3 rm s3://this_bucket_may_not_exist/default/my-release --recursive
 ```
 Alternatively, you can use the [AWS Management Console](https://s3.console.aws.amazon.com/s3/) to delete those objects.
 
@@ -257,9 +259,9 @@ psql -p 5430 -c 'SHOW cluster_name'
 ```
 If the restore/recovery/starting was successful the output should be similar to the following:
 ```
-      cluster_name
-------------------------
- my-release-timescaledb
+ cluster_name
+--------------
+ my-release
 (1 row)
 ```
 ### Verify Backup jobs
@@ -344,10 +346,11 @@ All the resources that are deployed can be listed by providing the filter `-l re
 By adding the `role` label in the output, we get some more insight into the deployment, as Patroni adds a `role=master` label to the elected master and set the label
 to `role=replica` for all replicas.
 
-The `<release-name>-timescaledb` endpoint is always pointing to the Patroni elected master.
+The `<release-name>` endpoint is always pointing to the Patroni elected master.
 
 ```console
-kubectl get all,ep,pvc -l release=my-release -L role
+RELEASE=my-release
+kubectl get all,endpoints,pvc -l release=${RELEASE} -L role
 ```
 The output should be similar to the below output:
 ```console
