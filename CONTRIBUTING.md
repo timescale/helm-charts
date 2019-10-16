@@ -1,6 +1,6 @@
-# Contributing to TimescaleDB
+# Contributing to TimescaleDB Kubernetes
 
-We appreciate any help the community can provide to make TimescaleDB better!  
+We appreciate any help the community can provide to make TimescaleDB better!
 
 You can help in different ways:
 
@@ -15,6 +15,6 @@ discuss your proposed improvement (and its implementation) with the core
 development team.
 
 Before we accept any code contributions, Timescale contributors need to
-sign the [Contributor License Agreement](https://cla-assistant.io/timescale/timescaledb) (CLA). By signing a CLA, we can
+sign the [Contributor License Agreement](https://cla-assistant.io/timescale/timescaledb-kubernetes) (CLA). By signing a CLA, we can
 ensure that the community is free and confident in its ability to use your
 contributions.

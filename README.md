@@ -1,10 +1,11 @@
 # TimescaleDB Kubernetes
 
-This repository contains Helm charts to help with the deployment of [TimescaleDB](https://github.com/timescale/timescaledb/) on
-Kubernetes. This project is currently in active development.
+This repository contains Helm charts to help with the deployment of
+[TimescaleDB](https://github.com/timescale/timescaledb/) on Kubernetes. This
+project is currently in active development.
 
 Supported Versions:
-- Kubernetes: [AWS EKS](https://aws.amazon.com/eks/), [MicroK8s](https://microk8s.io/), [minikube](https://github.com/kubernetes/minikube/releases)
+- Kubernetes: [AWS EKS](https://aws.amazon.com/eks/), [MicroK8s](https://microk8s.io/), and [minikube](https://github.com/kubernetes/minikube/releases)
 
 # Recipes
 
@@ -16,9 +17,8 @@ Supported Versions:
 # Additional documentation
 
 - [Why use TimescaleDB?](https://docs.timescale.com/introduction)
-- [Migrating from PostgreSQL](https://docs.timescale.com/getting-started/setup/migrate-from-postgresql)
-- [Writing data](https://docs.timescale.com/using-timescaledb/writing-data)
-- [Querying and data analytics](https://docs.timescale.com/using-timescaledb/reading-data)
+- [Installing TimescaleDB](https://docs.timescale.com/getting-started/installation)
+- [Migrating data to TimescaleDB](https://docs.timescale.com/getting-started/migrating-data)
 - [Tutorials and sample data](https://docs.timescale.com/tutorials)
 
 ## Get Help
@@ -27,8 +27,8 @@ Supported Versions:
 
 ## License
 
-TimescaleDB Kubernetes resources in this repository are released under the [Apache 2.0 license](LICENSE)
+TimescaleDB Kubernetes resources in this repository are released under the [Apache 2.0 license](LICENSE).
 
 ## Contributing
 
-If you wish to make contributions to this project, refer to [Contributor Instructions](CONTRIBUTING.md) for more information.
+If you wish to make contributions to this project, please refer to [Contributor Instructions](CONTRIBUTING.md) for more information.
