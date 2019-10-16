@@ -68,6 +68,10 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
     ```console
     helm upgrade --install my-release charts/timescaledb-single -f myvalues.yaml
     ```
+- Use an example values file to match an AWS EC2 Instance type, for example, using `charts/timescaledb-single/values/m5.large.example.yaml`:
+    ```console
+    helm upgrade --install my-release charts/timescaledb-single -f charts/timescaledb-single/values/m5.large.example.yaml
+    ```
 
 ## Cleanup
 

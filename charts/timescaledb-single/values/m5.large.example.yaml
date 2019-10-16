@@ -1,0 +1,27 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+# This configuration assumes there will be roughly the same number of m5.large instances available
+# as Database pods that will be scheduled, pretty much having a dedicated node per pod.
+resources:
+  limits:
+    cpu: 2000m
+    memory: 8Gi
+  requests:
+    cpu: 1500m
+    memory: 6Gi
+
+patroni:
+  postgresql:
+    parameters:
+      max_wal_size: 16GB  # 80% of the Volume Size
+      min_wal_size: 10GB
+      shared_buffers: 2GB # 25% of available ec2 instance memory
+      work_mem: 64MB
+
+persistentVolumes:
+  data:
+    size: 100G
+  wal:
+    enabled: True
+    size: 20G
