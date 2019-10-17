@@ -12,6 +12,7 @@ These are changes that will probably be included in the next release.
 ### Changed
 ### Removed
 ### Fixed
+ * Always explicitly set wal directory
 
 ## [v0.2.0] - 2019-10-16
 ### Added
