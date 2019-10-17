@@ -1,0 +1,53 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+# In order for you to be able to use this values file you need to ensure local storage is available
+# inside your GKE cluster. You need to do at least the following:
+#
+# 1. Create a node pool that has local-ssd's, by setting --local-ssd-count to a positive value
+#    https://cloud.google.com/sdk/gcloud/reference/container/node-pools/create ()
+# 2. Follow the instructions here on how to ensure the local ssd's show up as Physical Volumes in your
+#    kubernetes cluster:
+#    https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/local-ssd
+# 3. From that same document, ensure you create a storageclass, in this example "local-scsi"
+#
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+nodeSelector:
+  feike/purpose: ssdsingle
+
+resources:
+  requests:
+    cpu: 1500m
+    memory: 7Gi
+
+patroni:
+  #dcs:
+  #  synchronous_mode: "on"
+  postgresql:
+    parameters:
+      # synchronous_commit: "off"
+      # restart_after_crash: "off"
+      bgwriter_delay: 100
+      bgwriter_lru_maxpages: 250
+      checkpoint_timeout: '60min'
+      max_wal_size: 260GB # < 80% of the Volume Size
+      min_wal_size: 200GB
+      shared_buffers: 6GB # 20% of available ec2 instance memory
+      work_mem: 64MB
+      temp_file_limit: 100GB
+      wal_buffers: '64MB'
+      wal_compression: 'on'
+      synchronous_commit: "off"
+      effective_io_concurrency: 5
+      random_page_cost: 1
+
+persistentVolumes:
+  data:
+    size: 368Gi
+  wal:
+    enabled: True
+    size: 368Gi # SSD's are advertised to be 375GB in size, however 368Gi is available when discovered
+    storageClass: "local-scsi"
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
