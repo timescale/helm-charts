@@ -39,7 +39,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
 | `persistentVolumes.data.enabled`  | If enabled, use a Persistent Data Volume    | `true`                                              |
 | `persistentVolumes.data.mountPath`| Persistent Data Volume mount root path      | `/var/lib/postgresql/`                              |
-| `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume     | `false` (WAL will be stored inside the Data Volume) |
+| `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume. If disabled, WAL will be on the Data Volume | `true`     |
 | `persistentVolumes.wal.mountPath` | Persistent Wal Volume mount root path       | `/var/lib/postgresql/wal/`                          |
 | `persistentVolumes.<name>.accessModes` | Persistent Volume access modes         | `[ReadWriteOnce]`                                   |
 | `persistentVolumes.<name>.annotations` | Annotations for Persistent Volume Claim| `{}`                                                |
