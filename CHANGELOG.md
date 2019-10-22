@@ -12,7 +12,14 @@ These are changes that will probably be included in the next release.
 ### Changed
 ### Removed
 ### Fixed
+
+## [v0.2.1] - 2019-10-22
+
+### Changed
+ * Point to the -latest Docker image tag for multinode by default
+### Fixed
  * Always explicitly set wal directory
+ * (multinode) Drop the TimescaleDB extension from the Data Nodes to allow a clean bootstrap to be done
 
 ## [v0.2.0] - 2019-10-16
 ### Added

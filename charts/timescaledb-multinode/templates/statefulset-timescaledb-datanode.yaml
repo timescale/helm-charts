@@ -68,6 +68,9 @@ spec:
             echo "Writing custom PostgreSQL Parameters to ${PGDATA}/postgresql_helm_customizations.conf"
             echo "cluster_name = '$(hostname)'" > "${PGDATA}/postgresql_helm_customizations.conf"
             echo "${POSTGRESQL_CUSTOM_PARAMETERS}" | sort >> "${PGDATA}/postgresql_helm_customizations.conf"
+            # The TimescaleDB extension should not be available by default, as this interferes with the bootstrapping
+            # done by the access nodes. Therefore we drop the extensions from template1
+            echo "DROP EXTENSION timescaledb" | /docker-entrypoint.sh postgres --single -D "${PGDATA}" template1
         volumeMounts:
         - name: storage-volume
           mountPath: "{{ .Values.persistentVolume.mountPath }}"
