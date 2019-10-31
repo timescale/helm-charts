@@ -13,6 +13,11 @@ These are changes that will probably be included in the next release.
 ### Removed
 ### Fixed
 
+## [v0.2.2] - 2019-10-31
+
+### Changed
+ * Use TimescaleDB 1.5 Docker image by default
+
 ## [v0.2.1] - 2019-10-22
 
 ### Changed
