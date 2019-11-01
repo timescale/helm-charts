@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 These are changes that will probably be included in the next release.
 
 ### Added
- * Allow annotations to be specified for the Load Balancer in the values.yaml file
 ### Changed
 ### Removed
 ### Fixed
+
+## [v0.2.3] - 2019-11-01
+
+### Added
+ * Allow annotations to be specified for the Load Balancer in the values.yaml file
 
 ## [v0.2.2] - 2019-10-31
 
