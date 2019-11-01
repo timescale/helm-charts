@@ -12,7 +12,7 @@ metadata:
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "4000"
+{{ .Values.loadBalancer.annotations | toYaml | indent 4 }}
 spec:
   type: LoadBalancer
 
