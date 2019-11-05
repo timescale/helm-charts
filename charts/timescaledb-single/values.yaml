@@ -41,7 +41,7 @@ tls:
 #    -----END PRIVATE KEY-----
 
 backup:
-  enable: false
+  enabled: false
   pgBackRest:
     # https://pgbackrest.org/configuration.html
     process-max: 4

@@ -26,7 +26,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `credentials`                     | A mapping of usernames/passwords            | A postgres, standby and admin user                  |
 | `tls.cert`                        | The public key of the SSL certificate for PostgreSQL | empty (a self-signed certificate will be generated) |
 | `tls.key`                         | The private key of the SSL Certificate for PostgreSQL | empty                                     |
-| `backup.enable`                   | Schedule backups to occur                   | `false`                                             |
+| `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |
 | `backup.pgBackRest`               | [pgBackRest configuration](https://github.com/timescale/timescaledb-kubernetes/blob/master/charts/timescaledb-single/values.yaml)     | Working defaults |
 | `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
 | `env`                             | Extra custom environment variables          | `{}`                                                |
@@ -115,7 +115,7 @@ If you (re)deploy your database with this configuration snippet in the values fi
 ```yaml
 # Filename: myvalues.yaml
 backup:
-  enable: True
+  enabled: True
     pgBackRest:
       repo1-s3-bucket: this_bucket_may_not_exist
       repo1-s3-key: 9E1R2CUZBXJVYSBYRWTB

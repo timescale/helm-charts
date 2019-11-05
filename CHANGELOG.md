@@ -10,6 +10,7 @@ These are changes that will probably be included in the next release.
 
 ### Added
 ### Changed
+ * Rename backup.enable to backup.enabled for consistency, the old naming does still work.
 ### Removed
 ### Fixed
 
