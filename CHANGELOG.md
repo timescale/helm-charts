@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 These are changes that will probably be included in the next release.
 
 ### Added
+ * Allow [postgres-exporter](https://github.com/wrouesnel/postgres_exporter) to run as a sidecar
 ### Changed
 ### Removed
 ### Fixed
