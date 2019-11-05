@@ -9,10 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 These are changes that will probably be included in the next release.
 
 ### Added
- * Allow [postgres-exporter](https://github.com/wrouesnel/postgres_exporter) to run as a sidecar
 ### Changed
 ### Removed
 ### Fixed
+
+## [v0.2.4] - 2019-11-05
+
+### Changed
+ * Use 2.0.0-beta3 Docker Image for multinode
+ * Allow [postgres-exporter](https://github.com/wrouesnel/postgres_exporter) to run as a sidecar
 
 ## [v0.2.3] - 2019-11-01
 
