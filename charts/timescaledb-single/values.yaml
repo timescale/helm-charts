@@ -219,6 +219,15 @@ resources: {}
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
 nodeSelector: {}
 
+# Prometheus exporter for PostgreSQL server metrics.
+# https://github.com/wrouesnel/postgres_exporter
+postgresExporter:
+  enabled: False
+  image:
+    repository: wrouesnel/postgres_exporter
+    tag: v0.7.0
+    pullPolicy: IfNotPresent
+
 # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
 

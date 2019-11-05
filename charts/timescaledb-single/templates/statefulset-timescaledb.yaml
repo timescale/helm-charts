@@ -167,6 +167,25 @@ spec:
             value: /etc/pgbackrest/pgbackrest.conf
 {{ end }}
 
+{{- if .Values.postgresExporter.enable }}
+      - name: postgres-exporter
+        image: "{{ .Values.postgresExporter.image.repository }}:{{ .Values.postgresExporter.image.tag }}"
+        imagePullPolicy: {{ .Values.postgresExporter.image.pullPolicy }}
+        securityContext:
+          runAsUser: 1000
+        ports:
+        - containerPort: 9187
+        volumeMounts:
+        - name: socket-directory
+          mountPath: {{ template "socket_directory" . }}
+          readOnly: true
+        env:
+          - name: DATA_SOURCE_NAME
+            value: "host={{ template "socket_directory" . }} user=postgres application_name=postgres_exporter"
+          - name: PG_EXPORTER_CONSTANT_LABELS
+            value: release={{ .Release.Name }},namespace={{ .Release.Namespace }}
+{{ end }}
+
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
