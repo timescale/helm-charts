@@ -167,10 +167,10 @@ spec:
             value: /etc/pgbackrest/pgbackrest.conf
 {{ end }}
 
-{{- if .Values.postgresExporter.enable }}
+{{- if .Values.prometheus.enabled }}
       - name: postgres-exporter
-        image: "{{ .Values.postgresExporter.image.repository }}:{{ .Values.postgresExporter.image.tag }}"
-        imagePullPolicy: {{ .Values.postgresExporter.image.pullPolicy }}
+        image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
+        imagePullPolicy: {{ .Values.prometheus.image.pullPolicy }}
         securityContext:
           runAsUser: 1000
         ports:
