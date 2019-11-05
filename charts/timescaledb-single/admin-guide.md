@@ -38,6 +38,10 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
 | `loadBalancer.annotations`        | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
+| `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/wrouesnel/postgres_exporter) sidecar | `false` |
+| `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |
+| `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.7.0`                                            |
+| `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
 | `persistentVolumes.data.enabled`  | If enabled, use a Persistent Data Volume    | `true`                                              |
 | `persistentVolumes.data.mountPath`| Persistent Data Volume mount root path      | `/var/lib/postgresql/`                              |
 | `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume. If disabled, WAL will be on the Data Volume | `true`     |
