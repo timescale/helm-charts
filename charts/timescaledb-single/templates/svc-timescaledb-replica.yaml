@@ -4,7 +4,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "clusterName" . }}
+  name: {{ template "clusterName" . }}-replica
   labels:
     app: {{ template "timescaledb.fullname" . }}
     chart: {{ template "timescaledb.chart" . }}
@@ -12,9 +12,13 @@ metadata:
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
   annotations:
-{{ .Values.loadBalancer.annotations | toYaml | indent 4 }}
+{{ .Values.replicaLoadBalancer.annotations | toYaml | indent 4 }}
 spec:
-{{- if .Values.loadBalancer.enabled }}
+  selector:
+    app: {{ template "timescaledb.fullname" . }}
+    cluster-name: {{ template "clusterName" . }}
+    role: replica
+{{- if .Values.replicaLoadBalancer.enabled }}
   type: LoadBalancer
 {{- else }}
   type: ClusterIP
@@ -23,5 +27,4 @@ spec:
   ports:
   - name: postgresql
     port: 5432
-    targetPort: postgresql
     protocol: TCP

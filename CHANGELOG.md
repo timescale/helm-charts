@@ -11,6 +11,8 @@ These are changes that will probably be included in the next release.
 ### Added
  * Add [readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-readiness-probes) for PostgreSQL
  * Allow a (debug) command to run at container startup
+ * Add a [Headless Service](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services) (by default),
+   with the option to convert it into a Load Balancer
 ### Changed
  * Rename backup.enable to backup.enabled for consistency, the old naming does still work.
  * Rename postgresExporter to prometheus

@@ -37,7 +37,10 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname and (availability) zone |
 | `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
+| `loadBalancer.enabled`            | If enabled, creates a LB for the primary    | `true`                                              |
 | `loadBalancer.annotations`        | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
+| `replicaLoadBalancer.enabled`     | If enabled, creates a LB for replica's only | `false`                                             |
+| `replicaLoadBalancer.annotations` | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
 | `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/wrouesnel/postgres_exporter) sidecar | `false` |
 | `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |
 | `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.7.0`                                            |
@@ -78,6 +81,42 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
     ```console
     helm upgrade --install my-release charts/timescaledb-single -f charts/timescaledb-single/values/m5.large.example.yaml
     ```
+
+## Connecting
+
+This Helm chart creates multiple [Service](https://kubernetes.io/docs/concepts/services-networking/service/)s,
+2 of these are meant for connecting to the database.
+
+If a Load Balancer has been configured with `enabled: True`, this Service is also exposed through a Load Balancer,
+otherwise these services are [Headless Service](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)s,
+which allows connections directly to indivudual pods using DNS.
+
+### Connect to the primary
+  ```console
+  psql -h my-release
+  ```
+
+### Connect to a replica
+  ```console
+  psql -h my-release-replica -U postgres
+  ```
+
+### List the services
+```console
+RELEASE=my-release
+kubectl get service -l release=${RELEASE}
+```
+In the below example you can see that
+* `my-release` (the primary service) has a LoadBalancer associated with it which is exposed
+    as `verylongname.example.com`.
+* `my-release-replica` (the replica service) does not have a LoadBalancer, nor a ClusterIP, and therefore is a Headless Service
+* `my-release-config` service is used for HA and cannot be used to connect to PostgreSQL.
+```console
+NAME                 TYPE           CLUSTER-IP      EXTERNAL-IP                PORT(S)          AGE
+my-release           LoadBalancer   10.100.245.92   verylongname.example.com   5432:31271/TCP   5m49s
+my-release-config    ClusterIP      None            <none>                     <none>           4m50s
+my-release-replica   ClusterIP      None            <none>                     5432/TCP         5m49s
+```
 
 ## Cleanup
 
@@ -360,27 +399,31 @@ kubectl get all,endpoints,pvc -l release=${RELEASE} -L role
 The output should be similar to the below output:
 ```console
 NAME                           READY   STATUS    RESTARTS   AGE     ROLE
-pod/my-release-timescaledb-0   1/1     Running   0          3m57s   replica
-pod/my-release-timescaledb-1   1/1     Running   0          3m37s   master
-pod/my-release-timescaledb-2   1/1     Running   0          3m26s   replica
+pod/my-release-timescaledb-0   1/1     Running   0          2m51s   master
+pod/my-release-timescaledb-1   1/1     Running   0          111s    replica
+pod/my-release-timescaledb-2   1/1     Running   0          67s     replica
 
-NAME                        TYPE           CLUSTER-IP      EXTERNAL-IP                PORT(S)          AGE     ROLE
-service/my-release          LoadBalancer   10.100.13.250   verylongname.example.com   5432:31595/TCP   3m59s
-service/my-release-config   ClusterIP      None            <none>                     <none>           20m
+NAME                         TYPE           CLUSTER-IP      EXTERNAL-IP                PORT(S)          AGE     ROLE
+service/my-release           LoadBalancer   10.100.245.92   verylongname.example.com   5432:31271/TCP   2m51s
+service/my-release-config    ClusterIP      None            <none>                     <none>           112s
+service/my-release-replica   ClusterIP      None            <none>                     5432/TCP         2m51s
 
-NAME                                      READY   AGE   ROLE
-statefulset.apps/my-release-timescaledb   3/3     4m
+NAME                                      READY   AGE     ROLE
+statefulset.apps/my-release-timescaledb   3/3     2m51s
 
-NAME                               ENDPOINTS             AGE     ROLE
-endpoints/my-release               192.168.66.154:5432   3m38s
-endpoints/my-release-config        <none>                20m
-endpoints/my-release-timescaledb   <none>                4m
+NAME                               ENDPOINTS                               AGE     ROLE
+endpoints/my-release               192.168.6.0:5432                        110s
+endpoints/my-release-config        <none>                                  113s
+endpoints/my-release-replica       192.168.53.62:5432,192.168.67.91:5432   2m52s
+endpoints/my-release-timescaledb   <none>                                  2m52s
 
 NAME                                                            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE     ROLE
-persistentvolumeclaim/storage-volume-my-release-timescaledb-0   Bound    pvc-5ea02576-ef44-11e9-83cf-0648583d35f4   1Gi        RWO            gp2            20m     
-persistentvolumeclaim/storage-volume-my-release-timescaledb-1   Bound    pvc-69abba64-ef44-11e9-83cf-0648583d35f4   1Gi        RWO            gp2            20m     
-persistentvolumeclaim/storage-volume-my-release-timescaledb-2   Bound    pvc-757503a5-ef44-11e9-83cf-0648583d35f4   1Gi        RWO            gp2            19m     
-persistentvolumeclaim/storage-volume-my-release-timescaledb-3   Bound    pvc-44c31a41-ef46-11e9-83cf-0648583d35f4   1Gi        RWO            gp2            6m51s   
+persistentvolumeclaim/storage-volume-my-release-timescaledb-0   Bound    pvc-43586bd8-0080-11ea-a2fb-06e2eca748a8   2Gi        RWO            gp2            2m52s
+persistentvolumeclaim/storage-volume-my-release-timescaledb-1   Bound    pvc-66e6bc31-0080-11ea-a2fb-06e2eca748a8   2Gi        RWO            gp2            112s
+persistentvolumeclaim/storage-volume-my-release-timescaledb-2   Bound    pvc-814667a0-0080-11ea-a2fb-06e2eca748a8   2Gi        RWO            gp2            68s
+persistentvolumeclaim/wal-volume-my-release-timescaledb-0       Bound    pvc-43592ab2-0080-11ea-a2fb-06e2eca748a8   1Gi        RWO            gp2            2m52s
+persistentvolumeclaim/wal-volume-my-release-timescaledb-1       Bound    pvc-66e824be-0080-11ea-a2fb-06e2eca748a8   1Gi        RWO            gp2            112s
+persistentvolumeclaim/wal-volume-my-release-timescaledb-2       Bound    pvc-81479676-0080-11ea-a2fb-06e2eca748a8   1Gi        RWO            gp2            68s
 ```
 
 ### Investigate TimescaleDB logs
