@@ -123,7 +123,7 @@ spec:
           name: certificate
           readOnly: true
         - name: socket-directory
-          mountPath: /var/run/postgresql
+          mountPath: {{ template "socket_directory" . }}
 {{- if or .Values.backup.enabled .Values.backup.enable }}
         - mountPath: /etc/pgbackrest
           name: pgbackrest
@@ -142,7 +142,7 @@ spec:
         - containerPort: 8081
         volumeMounts:
         - name: socket-directory
-          mountPath: /var/run/postgresql
+          mountPath: {{ template "socket_directory" . }}
           readOnly: true
         - name: storage-volume
           mountPath: {{ .Values.persistentVolumes.data.mountPath | quote }}
