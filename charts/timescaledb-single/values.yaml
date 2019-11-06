@@ -79,7 +79,7 @@ env: {}
 # https://patroni.readthedocs.io/en/latest/SETTINGS.html#settings
 patroni:
   log:
-    level: INFO
+    level: WARNING
   bootstrap:
     post_init: /etc/timescaledb/scripts/post_init.sh
     dcs:
