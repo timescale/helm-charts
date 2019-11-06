@@ -10,6 +10,7 @@ These are changes that will probably be included in the next release.
 
 ### Added
 ### Changed
+ * Reduce loglevel of Patroni from INFO to WARNING
 ### Removed
 ### Fixed
 
