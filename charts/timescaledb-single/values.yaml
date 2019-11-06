@@ -246,6 +246,10 @@ prometheus:
     tag: v0.7.0
     pullPolicy: IfNotPresent
 
+# Annotations that are applied to each pod in the stateful set
+# https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+
 # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
 
@@ -292,4 +296,3 @@ debug:
   # This command will be executed *before* the main container starts. In the
   # example below, we can mimick a slow restore by sleeping for 5 minutes before starting
   execStartPre: # sleep 300
-

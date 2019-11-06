@@ -27,6 +27,10 @@ spec:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
         cluster-name: {{ template "clusterName" . }}
+{{- if .Values.podAnnotations }}
+      annotations:
+{{ toYaml .Values.podAnnotations | indent 8 }}
+{{- end }}
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
