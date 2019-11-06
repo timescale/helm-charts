@@ -276,3 +276,10 @@ serviceAccount:
   # The name of the ServiceAccount to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+
+debug:
+  # This setting is mainly for during development, debugging or troubleshooting.
+  # This command will be executed *before* the main container starts. In the
+  # example below, we can mimick a slow restore by sleeping for 5 minutes before starting
+  execStartPre: # sleep 300
+
