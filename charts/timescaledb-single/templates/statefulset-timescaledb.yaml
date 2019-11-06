@@ -14,6 +14,8 @@ metadata:
 spec:
   serviceName: {{ template "timescaledb.fullname" . }}
   replicas: {{ .Values.replicaCount }}
+  updateStrategy:
+    type: RollingUpdate
   selector:
     matchLabels:
       app: {{ template "timescaledb.fullname" . }}
@@ -103,6 +105,19 @@ spec:
         ports:
         - containerPort: 8008
         - containerPort: 5432
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -h
+              - {{ template "socket_directory" . }}
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        {{- end }}
         volumeMounts:
         - name: storage-volume
           mountPath: {{ .Values.persistentVolumes.data.mountPath | quote }}
