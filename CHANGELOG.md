@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 These are changes that will probably be included in the next release.
 
 ### Added
+
+* Add ability to [annotate](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) pods in the StatefulSet
+
 ### Changed
  * Reduce loglevel of Patroni from INFO to WARNING
 ### Removed
