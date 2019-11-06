@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 These are changes that will probably be included in the next release.
 
 ### Added
+### Changed
+### Removed
+### Fixed
+
+## [v0.2.5] - 2019-11-06
+
+### Added
  * Add [readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-readiness-probes) for PostgreSQL
  * Allow a (debug) command to run at container startup
  * Add a [Headless Service](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services) (by default),
@@ -16,8 +23,6 @@ These are changes that will probably be included in the next release.
 ### Changed
  * Rename backup.enable to backup.enabled for consistency, the old naming does still work.
  * Rename postgresExporter to prometheus
-### Removed
-### Fixed
 
 ## [v0.2.4] - 2019-11-05
 
