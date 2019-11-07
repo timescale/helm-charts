@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v1.0.0] - Unreleased
+## [v0.3.0] - Unreleased
 
 > NOTICE: When migrating from a 0.2.x chart to a 0.3 chart, please take the following into account:
 
@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Add ability to [annotate](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) pods in the StatefulSet
+* Add ability to run any script as callback, if exposed as a ConfigMap
 
 ### Changed
  * Reduce loglevel of Patroni from INFO to WARNING
