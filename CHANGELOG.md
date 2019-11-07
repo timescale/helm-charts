@@ -4,9 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v1.0.0] - Unreleased
 
-These are changes that will probably be included in the next release.
+> NOTICE: When migrating from a 0.2.x chart to a 0.3 chart, please take the following into account:
+
+- if you use the `env` key in your values, you should rewrite them from a
+   plain dict into a list of [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core)
 
 ### Added
 
@@ -14,6 +17,7 @@ These are changes that will probably be included in the next release.
 
 ### Changed
  * Reduce loglevel of Patroni from INFO to WARNING
+ * The values.yaml env key should be expressed as a list of [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core)s
 ### Removed
 ### Fixed
 

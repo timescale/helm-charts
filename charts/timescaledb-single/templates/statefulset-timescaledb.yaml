@@ -101,12 +101,11 @@ spec:
           value: {{ printf "{app: %s, cluster-name: %s, release: %s}" (include "timescaledb.fullname" .) (include "clusterName" .) .Release.Name  | quote }}
         - name: PATRONI_SCOPE
           value: {{ template "clusterName" . }}
-        {{- range $key, $val := (.Values.env | default dict) }}
-        - name: {{  $key | quote | upper }}
-          value: {{ $val | quote }}
-        {{- end }}
         - name: PGBACKREST_CONFIG
           value: /etc/pgbackrest/pgbackrest.conf
+          {{- if .Values.env }}
+{{ .Values.env | default list | toYaml | indent 8 }}
+          {{- end }}
         ports:
         - containerPort: 8008
         - containerPort: 5432

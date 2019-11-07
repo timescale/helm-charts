@@ -24,7 +24,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `credentials.accessNode.superuser`| Password of the superuser for the Access Node | `tea`                                             |
 | `credentials.dataNode.superuser`  | Password of the superuser for the Data Nodes  | `coffee`                                          |
-| `env`                             | Extra custom environment variables          | `PGDATA`, `LC_ALL` and `LANG`                       |
+| `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core) | `PGDATA` and some language settings |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
