@@ -136,7 +136,7 @@ spec:
           subPath: patroni.yaml
           name: patroni-config
           readOnly: true
-        - mountPath: /etc/timescaledb/scripts
+        - mountPath: {{ template "scripts_dir" . }}
           name: timescaledb-scripts
           readOnly: true
         - mountPath: /etc/certificate
@@ -157,7 +157,7 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
-          - /etc/timescaledb/scripts/pgbackrest_bootstrap.sh
+          - {{ template "scripts_dir" . }}/pgbackrest_bootstrap.sh
         ports:
         - containerPort: 8081
         volumeMounts:
@@ -175,7 +175,7 @@ spec:
         - mountPath: /etc/pgbackrest
           name: pgbackrest
           readOnly: true
-        - mountPath: /etc/timescaledb/scripts
+        - mountPath: {{ template "scripts_dir" . }}
           name: timescaledb-scripts
           readOnly: true
         env:
