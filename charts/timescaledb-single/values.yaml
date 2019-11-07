@@ -70,7 +70,16 @@ backup:
       schedule: "12 02 1-6 * *"
 
 # Extra custom environment variables.
-env: {}
+# These should be an EnvVar, as this allows you to inject secrets into the environment
+# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
+env:
+#  - name: NOT_A_SECRET
+#    value: "test"
+#  - name: MYAPPLICATION_STANDBY_PASSWORDS
+#    valueFrom:
+#      secretKeyRef:
+#        name: myapplication-passwords
+#        key: standby
 
 # This configuration will be passed on to Patroni directly, there are a few things that are
 # injected/changed, these are:

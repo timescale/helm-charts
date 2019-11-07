@@ -22,13 +22,18 @@ credentials:
     superuser: coffee
 
 # Extra custom environment variables.
+# These should be an EnvVar, as this allows you to inject secrets into the environment
+# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
 env:
-  LC_ALL: C.UTF-8
-  LANG: C.UTF-8
-  # This should be a subdirectory of the persistentVolume (if any), as PostgreSQL will need to
-  # fully manage permissions. Also, using /var/lib/postgresql/data is discouraged, as this is
-  # a Docker Volume in many Docker images, which means the data is not actually persisted.
-  PGDATA: /var/lib/postgresql/pgdata
+  - name: LC_ALL
+    value: C.UTF-8
+  - name: LANG
+    value: C.UTF-8
+  - name: PGDATA
+    # This should be a subdirectory of the persistentVolume (if any), as PostgreSQL will need to
+    # fully manage permissions. Also, using /var/lib/postgresql/data is discouraged, as this is
+    # a Docker Volume in many Docker images, which means the data is not actually persisted.
+    value: /var/lib/postgresql/pgdata
 
 persistentVolume:
   enabled: true

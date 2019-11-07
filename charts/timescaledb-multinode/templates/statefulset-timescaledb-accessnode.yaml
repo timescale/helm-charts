@@ -51,12 +51,9 @@ spec:
             secretKeyRef:
               name: {{ template "timescaledb.dataname" . }}
               key: password-superuser
-        {{- if .Values.env }}
-        {{- range $key, $val := .Values.env }}
-        - name: {{  $key | quote | upper }}
-          value: {{ $val | quote }}
-        {{- end }}
-        {{- end }}
+          {{- if .Values.env }}
+{{ .Values.env | default list | toYaml | indent 8 }}
+          {{- end }}
         command:
           - sh
           - '-c'
@@ -95,12 +92,9 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-        {{- if .Values.env }}
-        {{- range $key, $val := .Values.env }}
-        - name: {{  $key | quote | upper }}
-          value: {{ $val | quote }}
-        {{- end }}
-        {{- end }}
+          {{- if .Values.env }}
+{{ .Values.env | default list | toYaml | indent 8 }}
+          {{- end }}
         ports:
         - containerPort: 5432
         volumeMounts:
