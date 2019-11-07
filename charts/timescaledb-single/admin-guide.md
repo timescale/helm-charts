@@ -6,9 +6,11 @@ Please see the included NOTICE for copyright information and LICENSE for a copy 
 # TimescaleDB Single Administrator Guide
 
 ##### Table of Contents
+- [Connecting](#connecting)
 - [Configuration](#configuration)
 - [Backups](#backups)
 - [Cleanup](#cleanup)
+- [Callbacks](#callbacks)
 - [Troubleshooting](#troubleshooting)
 
 ## Configuration
@@ -31,6 +33,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)          | `[]`                                                |
 | `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
+| `callbacks.configMap`             | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks) | `nil`                         |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
@@ -381,6 +384,118 @@ stanza: poddb
             backup reference list: 20190904-071709F
 ```
 
+## Callbacks
+Patroni will trigger some callbacks on certain events. These are:
+
+- on_reload
+- on_restart
+- on_role_change
+- on_start
+- on_stop
+
+If you wish to have *your* script run after a certain event happens, you can do so by configuring
+`callbacks.configMap` to point to a [ConfigMap](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.15/#configmap-v1-core).
+This ConfigMap should exist before you install a chart. The data keys that match the event names will be executed
+if the event happens. For convenience the `all` key will be executed at every event.
+
+Every callback will be given 3 additional commandline arguments by Patroni, they are:
+
+* action (e.g. `on_restart`, `on_stop`)
+* role (`master`/`replica`)
+* cluster\_name
+
+For more information about callbacks, we refer you to the [Patroni Documentation](https://patroni.readthedocs.io/en/latest/SETTINGS.html#postgresql)
+
+Inside these callbacks, you also have access to the environment variables of the pod, except the `PATRONI_` environment variables.
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-patroni-callbacks
+data:
+  on_start: |
+    #!/bin/bash
+    echo "I just started"
+  on_role_change: |
+    #!/bin/bash
+    curl http://${MYAPP}/
+  all: |
+    #!/bin/bash
+    echo "$0 happened"
+```
+
+### Example: Register Patroni events in a table
+
+
+*example-patroni-callbacks.yaml*
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-patroni-callbacks
+data:
+  all: |
+    #!/bin/bash
+
+    # This script should only run on the master instance, Patroni
+    # passes on the role in the second parameter
+    [ "$2" != "master" ] && exit 0
+
+    psql --set ON_ERROR_STOP=1 \
+          --set events_table=${EVENTS_TABLE} \
+          --set hostname=$(hostname) \
+          --set event=$1 <<__SQL__
+      -- After a promote it may take a short while before our transaction actually
+      -- allows us to write therefore we sleep a short while if we're still in recovery
+      SELECT pg_sleep(3)
+      WHERE  pg_is_in_recovery();
+
+      CREATE TABLE IF NOT EXISTS :"events_table"(
+        happened timestamptz,
+        event text,
+        pod text
+      );
+
+      INSERT INTO :"events_table"
+      VALUES (now(), :'event', :'hostname');
+    __SQL__
+```
+
+*myvalues.yaml*
+```yaml
+callbacks:
+  configMap: example-patroni-callbacks
+
+env:
+  - name: EVENTS_TABLE
+    value: patroni_events
+```
+
+```console
+kubectl apply -f example-patroni-callbacks.yaml
+helm upgrade --install example ./charts/timescaledb-single -f myvalues.yaml
+```
+
+After waiting a while, and having done some failovers, inspecting the resulting the table shows the following:
+```console
+kubectl exec \
+    $(kubectl get pod -o name -l cluster-name=example,role=master) \
+    -ti -- psql -c 'table patroni_events';
+```
+```
+           happened            |     event      |          pod
+-------------------------------+----------------+-----------------------
+ 2019-11-07 21:11:07.817848+00 | on_start       | example-timescaledb-0
+ 2019-11-07 21:11:36.200115+00 | on_role_change | example-timescaledb-0
+ 2019-11-07 21:12:39.099195+00 | on_role_change | example-timescaledb-1
+ 2019-11-07 21:15:06.596093+00 | on_role_change | example-timescaledb-0
+ 2019-11-07 21:15:12.062173+00 | on_role_change | example-timescaledb-1
+ 2019-11-07 21:15:22.736801+00 | on_role_change | example-timescaledb-0
+ 2019-11-07 21:15:41.676756+00 | on_role_change | example-timescaledb-2
+(7 rows)
+
+```
 
 ## Troubleshooting
 

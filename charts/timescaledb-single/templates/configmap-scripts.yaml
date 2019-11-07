@@ -84,4 +84,16 @@ data:
 
     # We always exit 0 this script, otherwise the database initialization fails.
     exit 0
+  patroni_callback.sh: |
+    #!/bin/bash
+    set -e
+
+    for suffix in "$1" all
+    do
+      CALLBACK="{{ template "callbacks_dir" .}}/${suffix}"
+      if [ -f "${CALLBACK}" ]
+      then
+        "${CALLBACK}" $@
+      fi
+    done
 ...
