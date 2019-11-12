@@ -103,6 +103,12 @@ spec:
           value: {{ template "clusterName" . }}
         - name: PGBACKREST_CONFIG
           value: /etc/pgbackrest/pgbackrest.conf
+        # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly,
+        # but for interactive sessions, callbacks and PostgreSQL tools they should be correct.
+        - name: PGDATA
+          value: "$(PATRONI_POSTGRESQL_DATA_DIR)"
+        - name: PGHOST
+          value: "{{ template "socket_directory" . }}"
           {{- if .Values.env }}
 {{ .Values.env | default list | toYaml | indent 8 }}
           {{- end }}
