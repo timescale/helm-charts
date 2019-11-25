@@ -230,8 +230,7 @@ spec:
     {{- end }}
       volumes:
       - name: socket-directory
-        emptyDir:
-          defaultMode: 488 # 0750 permissions
+        emptyDir: {}
       - name: patroni-config
         configMap:
           name: {{ template "timescaledb.fullname" . }}-patroni

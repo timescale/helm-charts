@@ -128,6 +128,7 @@ patroni:
           temp_file_limit: 1GB
           timescaledb.passfile: '../.pgpass'
           unix_socket_directories: "/var/run/postgresql"
+          unix_socket_permissions: '0750'
           wal_level: hot_standby
           wal_log_hints: 'on'
           work_mem: 16MB
