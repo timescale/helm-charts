@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * The values.yaml env key should be expressed as a list of [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core)s
 ### Removed
 ### Fixed
+ * Set `unix_socket_permissions` using PostgreSQL parameters instead
 
 ## [v0.2.5] - 2019-11-06
 
