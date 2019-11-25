@@ -64,13 +64,13 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 ### Examples
 - Override value using commandline parameters
     ```console
-    helm upgrade --install my-release charts/timescaledb-single --set image.tag=pg11.5-ts1.5.0 --set image.pullPolicy=Always
+    helm upgrade --install my-release charts/timescaledb-single --set image.tag=pg11.6-ts1.5.1 --set image.pullPolicy=Always
     ```
 - Override values using `myvalues.yaml`
     ```yaml
     # Filename: myvalues.yaml
     image:
-      tag: pg11.5-ts1.5.0
+      tag: pg11.6-ts1.5.1
       pullPolicy: Always
     patroni:
       postgresql:
