@@ -149,8 +149,18 @@ patroni:
       port: 5432
       targetPort: 5432
   postgresql:
+    create_replica_methods:
+    - pgbackrest
+    - basebackup
+    pgbackrest:
+      command: /etc/timescaledb/scripts/pgbackrest_restore.sh
+      keep_data: True
+      no_params: True
+      no_master: 1
     basebackup:
     - waldir: "/var/lib/postgresql/wal/pg_wal"
+    recovery_conf:
+      restore_command: /etc/timescaledb/scripts/pgbackrest_archive_get.sh %f "%p"
     callbacks:
       on_role_change: /etc/timescaledb/scripts/patroni_callback.sh
       on_start: /etc/timescaledb/scripts/patroni_callback.sh
