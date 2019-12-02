@@ -116,8 +116,8 @@ patroni:
           max_prepared_transactions: 150
           # These values are set small as the default data volume size
           # is small as well.
-          max_wal_size: 80MB
-          min_wal_size: 80MB
+          max_wal_size: 750MB
+          min_wal_size: 250MB
           shared_buffers: 300MB
           shared_preload_libraries: timescaledb,pg_stat_statements
           ssl: 'on'
@@ -215,7 +215,7 @@ persistentVolumes:
   # https://www.postgresql.org/docs/current/creating-cluster.html#CREATING-CLUSTER-MOUNT-POINTS
   data:
     enabled: True
-    size: 2G
+    size: 2Gi
     ## database data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -233,7 +233,7 @@ persistentVolumes:
   # volume for the WAL files should just work for new pods.
   wal:
     enabled: True
-    size: 1G
+    size: 1Gi
     subPath: ""
     # When changing this mountPath ensure you also change the following keys to reflect this:
     # patroni->bootstrap->initdb (waldir option)
