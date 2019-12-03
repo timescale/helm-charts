@@ -11,6 +11,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
+    role: replica
   annotations:
 {{ .Values.replicaLoadBalancer.annotations | toYaml | indent 4 }}
 spec:
@@ -22,7 +23,6 @@ spec:
   type: LoadBalancer
 {{- else }}
   type: ClusterIP
-  clusterIP: None
 {{- end }}
   ports:
   - name: postgresql

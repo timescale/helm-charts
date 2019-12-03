@@ -549,3 +549,28 @@ The logs for the current `master` of TimescaleDB can be accessed as follows:
 RELEASE=my-release
 kubectl logs $(kubectl get pod -o name -l release=$RELEASE,role=master) -c timescaledb
 ```
+
+### Switching a LoadBalancer type
+If you want to switch a service from `ClusterIP` to `LoadBalancer`, some extra work may be required.
+
+When using Helm 3 when trying to change a value, Helm will try to patch the kubernetes objects involved.
+However, due to some Kubernetes issues ([#221](https://github.com/kubernetes/kubectl/issues/221), [#11237](https://github.com/kubernetes/kubernetes/issues/11237)), this patching strategy does not always work.
+
+
+```console
+$ helm upgrade --install example ./charts/timescaledb-single/ --set replicaLoadBalancer.enabled=True
+Error: UPGRADE FAILED: cannot patch "example-replica" with kind Service: Service "example-replica" is invalid: spec.clusterIP: Invalid value: "": field is immutable
+```
+
+To get around this issue, we can delete the service before we switch the type of the LoadBalancer.
+
+> **WARNING**: This will cause **downtime** for every application that is currently using this specific service.
+> Every client that is currently connected to this specific service will be disconnected and will only
+> be able to reconnect if the new service has been created and is fully functional.
+
+```console
+$ kubectl delete service/example-replica
+service "example-replica" deleted
+$ helm upgrade --install example ./charts/timescaledb-single/ --set replicaLoadBalancer.enabled=True
+Release "example" has been upgraded. Happy Helming!
+```
