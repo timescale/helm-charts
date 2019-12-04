@@ -56,6 +56,8 @@ backup:
     repo1-cipher-type: "none"
     # These secrets should contain an IAM access key ID and a secret access key:
     # https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+    # These can also be specified as EnvVars below, which allows you to refer to k8s
+    # secrets or other secret injection mechanisms
     repo1-s3-key: examplekeyid
     repo1-s3-key-secret: examplesecret+D48GXfDdtl823nlSRRv7dmB
   jobs:
@@ -68,6 +70,17 @@ backup:
     - name: incremental-daily
       type: incr
       schedule: "12 02 1-6 * *"
+  # Extra custom environment variables for prometheus.
+  # These should be an EnvVar, as this allows you to inject secrets into the environment
+  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
+  env:
+  #- name: PGBACKREST_REPO1_S3_KEY
+  #  value: examplekeyid
+  #- name: PGBACKREST_REPO1_S3_KEY_SECRET
+  #  valueFrom:
+  #    secretKeyRef:
+  #      name: pgbackrest-dev-secrets
+  #      key: repo1-s3-key-secret
 
 # Extra custom environment variables.
 # These should be an EnvVar, as this allows you to inject secrets into the environment

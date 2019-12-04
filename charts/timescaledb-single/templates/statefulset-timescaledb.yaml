@@ -112,6 +112,13 @@ spec:
           {{- if .Values.env }}
 {{ .Values.env | default list | toYaml | indent 8 }}
           {{- end }}
+          # pgBackRest is also called using the archive_command if the backup is enabled.
+          # this script will also need access to the environment variables specified for
+          # the backup. This can be removed once we do not directly invoke pgBackRest
+          # from inside the TimescaleDB container anymore
+          {{- if .Values.backup.env }}
+{{ .Values.backup.env | default list | toYaml | indent 8 }}
+          {{- end }}
         ports:
         - containerPort: 8008
         - containerPort: 5432
@@ -195,6 +202,9 @@ spec:
             value: poddb
           - name: PGBACKREST_CONFIG
             value: /etc/pgbackrest/pgbackrest.conf
+          {{- if .Values.backup.env }}
+{{ .Values.backup.env | default list | toYaml | indent 10 }}
+          {{- end }}
 {{ end }}
 
 {{- if .Values.prometheus.enabled }}
