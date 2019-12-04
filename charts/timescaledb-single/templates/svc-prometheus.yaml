@@ -1,0 +1,21 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+#
+# This service is only created if Prometheus is enabled.
+{{ if .Values.prometheus.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "clusterName" . }}-prometheus
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9187"
+spec:
+  ports:
+    - port: 9187
+  selector:
+    app: {{ template "timescaledb.fullname" . }}
+{{ end }}
