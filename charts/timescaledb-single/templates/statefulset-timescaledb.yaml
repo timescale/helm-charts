@@ -209,11 +209,17 @@ spec:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
           readOnly: true
+          {{- if .Values.prometheus.volumeMounts }}
+{{ .Values.prometheus.volumeMounts | default list | toYaml | indent 8 }}
+          {{- end }}
         env:
-          - name: DATA_SOURCE_NAME
-            value: "host={{ template "socket_directory" . }} user=postgres application_name=postgres_exporter"
-          - name: PG_EXPORTER_CONSTANT_LABELS
-            value: release={{ .Release.Name }},namespace={{ .Release.Namespace }}
+        - name: DATA_SOURCE_NAME
+          value: "host={{ template "socket_directory" . }} user=postgres application_name=postgres_exporter"
+        - name: PG_EXPORTER_CONSTANT_LABELS
+          value: release={{ .Release.Name }},namespace={{ .Release.Namespace }}
+          {{- if .Values.prometheus.env }}
+{{ .Values.prometheus.env | default list | toYaml | indent 8 }}
+          {{- end }}
 {{ end }}
 
     {{- with .Values.nodeSelector }}
@@ -263,6 +269,9 @@ spec:
       {{- if not .Values.persistentVolumes.data.enabled }}
       - name: storage-volume
         emptyDir: {}
+      {{- end }}
+      {{- if .Values.prometheus.volumes }}
+{{ .Values.prometheus.volumes | toYaml | indent 6 }}
       {{- end }}
   volumeClaimTemplates:
   {{- if .Values.persistentVolumes.data.enabled }}

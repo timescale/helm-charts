@@ -264,6 +264,33 @@ prometheus:
     repository: wrouesnel/postgres_exporter
     tag: v0.7.0
     pullPolicy: IfNotPresent
+  # Extra custom environment variables for prometheus.
+  # These should be an EnvVar, as this allows you to inject secrets into the environment
+  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
+  env:
+  #- name: NOT_A_SECRET
+  #  value: "test"
+  #- name: MYAPPLICATION_STANDBY_PASSWORDS
+  #  valueFrom:
+  #    secretKeyRef:
+  #      name: myapplication-passwords
+  #      key: standby
+  # Additional volumes for prometheus, e.g., to support additional queries.
+  # These should be a Volume, as this allows you to inject any kind of Volume
+  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#volume-v1-core
+  volumes:
+  #- name: exporter-config
+  #  configMap:
+  #    name: exporter-prometheus
+  #    items:
+  #      - key: metrics_queries
+  #        path: queries.yaml
+  # Additional volume mounts, to be used in conjunction with the above variable.
+  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#volumemount-v1-core
+  volumeMounts:
+  #- name: exporter-config
+  #  mountPath: /var/exporter
+
 
 # Annotations that are applied to each pod in the stateful set
 # https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
