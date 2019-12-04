@@ -171,6 +171,30 @@ backup:
 helm upgrade --install example -f myvalues.yaml charts/timescaledb-single
 ```
 
+#### Configure pgBackRest using environment variables
+Instead of configuring pgBackRest in the `myvalues.yaml`, you can also expose the configuration items as environment variables.
+This allows you to decouple the secret management of the backup credentials from this deployment.
+
+The [pgBackRest Command Reference](https://pgbackrest.org/command.html#introduction) has detailed information about which
+environment variables can be set.
+
+For example, if you would use [Vault](https://www.vaultproject.io/), you could do the following:
+
+```yaml
+# Filename: myvalues.yaml
+
+backup:
+  enabled: True
+    pgBackRest:
+      repo1-s3-bucket: this_bucket_may_not_exist
+  env:
+    - name: PGBACKREST_REPO1_S3_KEY
+      value: vault:secret/data/my-system/mydb#PGBACKREST_REPO1_S3_KEY
+    - name: PGBACKREST_REPO1_S3_KEY_SECRET
+      value: vault:secret/data/my-system/mydb#PGBACKREST_REPO1_S3_KEY_SECRET
+```
+
+
 ### Control the backup schedule
 If you want to alter the backup jobs, or their schedule, you can override the `backup.jobs` in your configuration, for example:
 
