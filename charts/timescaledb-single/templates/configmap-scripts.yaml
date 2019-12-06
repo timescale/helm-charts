@@ -59,7 +59,16 @@ data:
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
     [ "${PGBACKREST_BACKUP_ENABLED}" == "0" ] && exit 1
 
-    pgbackrest --stanza=poddb --delta --log-level-console=detail restore
+    PGDATA={{ include "data_directory" . | quote }}
+    WALDIR={{ include "wal_directory" . | quote }}
+
+    # A missing PGDATA points to Patroni removing a botched PGDATA, or manual
+    # intervention. In this scenario, we need to recreate the DATA and WALDIRs
+    # to keep pgBackRest happy
+    [ -d "${PGDATA}" ] || install -o postgres -g postgres -d -m 0700 "${PGDATA}"
+    [ -d "${WALDIR}" ] || install -o postgres -g postgres -d -m 0700 "${WALDIR}"
+
+    pgbackrest --stanza=poddb --force --delta --log-level-console=detail restore
   post_init.sh: |
     #!/bin/bash
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
