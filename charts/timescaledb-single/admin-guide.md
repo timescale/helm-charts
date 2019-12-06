@@ -48,6 +48,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |
 | `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.7.0`                                            |
 | `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
+| `prometheus.env`                  | Environment Variables for the postgres\_exporter | None                                           |
 | `persistentVolumes.data.enabled`  | If enabled, use a Persistent Data Volume    | `true`                                              |
 | `persistentVolumes.data.mountPath`| Persistent Data Volume mount root path      | `/var/lib/postgresql/`                              |
 | `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume. If disabled, WAL will be on the Data Volume | `true`     |
