@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  These are changes that will probably be included in the next release.
 
 ### Added
+* Enabling Prometheus now creates a Service that can be properly scraped
+* Support for NetworkPolicy
 ### Changed
 * Switch services to ClusterIP if the Load Balancer is set to disabled
 * Create PGDATA and WALDIR before a pgBackRest restore

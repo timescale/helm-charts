@@ -1,0 +1,42 @@
+{{ if .Values.networkPolicy.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: {{ template "clusterName" . }}-policy
+  app: {{ template "timescaledb.fullname" . }}
+  chart: {{ template "timescaledb.chart" . }}
+  release: {{ .Release.Name }}
+  heritage: {{ .Release.Service }}
+  cluster-name: {{ template "clusterName" . }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ template "timescaledb.fullname" . }}
+  ingress:
+    # Replicas and master need to communicate: 5432 for PG/replication,
+    # 8008 is Patroni's race for broadcast, and 8081 is for backups.
+    - from:
+      - podSelector:
+          matchLabels:
+            app: {{ template "timescaledb.fullname" . }}
+      ports:
+      - port: 5432
+        protocol: TCP
+      - port: 8008
+        protocol: TCP
+      - port: 8081
+        protocol: TCP
+    {{ if .Values.prometheus.enabled }}
+    # Prom server for scraping exporter
+    - from:
+      - podSelector:
+          matchLabels:
+            app: {{ .Values.networkPolicy.prometheusApp }}
+      ports:
+        - protocol: TCP
+          port: 9187
+    {{ end }}
+    {{- if .Values.networkPolicy.ingress }}
+{{ .Values.networkPolicy.ingress | default list | toYaml | indent 4 }}
+    {{- end }}
+{{ end }}

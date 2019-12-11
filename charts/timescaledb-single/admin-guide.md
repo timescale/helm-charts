@@ -42,6 +42,9 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
 | `loadBalancer.enabled`            | If enabled, creates a LB for the primary    | `true`                                              |
 | `loadBalancer.annotations`        | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
+| `networkPolicy.enabled`           | If enabled, creates a NetworkPolicy for controlling network access | `false`
+| `networkPolicy.ingress`           | A list of Ingress rules to extend the base NetworkPolicy | `nil`
+| `networkPolicy.prometheusApp`     | Name of Prometheus app to allow it to scrape exporters | `prometheus`
 | `replicaLoadBalancer.enabled`     | If enabled, creates a LB for replica's only | `false`                                             |
 | `replicaLoadBalancer.annotations` | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
 | `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/wrouesnel/postgres_exporter) sidecar | `false` |

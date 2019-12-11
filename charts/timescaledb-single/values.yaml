@@ -276,6 +276,20 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+networkPolicy:
+  enabled: False
+  prometheusApp: prometheus
+  # Below you can specify a whitelist of Ingress rules, for more information:
+  # https://kubernetes.io/docs/concepts/services-networking/network-policies/#the-networkpolicy-resource
+  ingress:
+  #- from:
+  #  - podSelector:
+  #      matchLabels:
+  #        app: foo
+  #  ports:
+  #    - protocol: TCP
+  #      port: 11111
+
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
 nodeSelector: {}
 
