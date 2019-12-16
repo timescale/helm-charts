@@ -78,7 +78,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
     patroni:
       postgresql:
         parameters:
-          checkpoint_completion_target: 32MB
+          checkpoint_completion_target: .9
     ```
     ```console
     helm upgrade --install my-release charts/timescaledb-single -f myvalues.yaml
