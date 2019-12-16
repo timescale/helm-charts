@@ -49,7 +49,7 @@ spec:
           # set the permissons of these directories before we hand over to Patroni
           - |
             {{ .Values.debug.execStartPre }}
-            install -o postgres -g postgres -d -m 0700 {{ include "data_directory" . | quote }} {{ include "wal_directory" . | quote }}
+            install -o postgres -g postgres -d -m 0700 {{ include "data_directory" . | quote }} {{ include "wal_directory" . | quote }} || exit 1
             exec patroni /etc/timescaledb/patroni.yaml
         env:
         # We use mixed case environment variables for Patroni User management,
