@@ -6,9 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  These are changes that will probably be included in the next release.
 
+## [v0.5.0] - To be determined
+
+> NOTICE: When migrating from a < 0.5.x chart, the primary Service needs to be removed before
+> invoking `helm update`, as the update will otherwise fail.
+
 ### Added
  * Optionally tune PostgreSQL settings (e.g. shared\_buffers, work\_mem, max\_wal\_size) using timescaledb-tune
 ### Changed
+ * The Service for the primary is now also created and managed by Helm
 ### Removed
 ### Fixed
 

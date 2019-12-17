@@ -1,0 +1,37 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+{{/*
+This service allows internal connections to the Patroni Api.
+
+The current implementation does not protect this API endpoint,
+therefore we do not want it to be exposed together with
+the PostgreSQL service (every client would then be able to
+reconfigure Patroni).
+
+This Service would have been created by Patroni if it would
+not be part of this Helm Chart. The only thing we do here
+is to add the labels, selector and port. The underlying Endpoints
+is used by Patroni to store the configuration.
+
+https://patroni.readthedocs.io/en/latest/rest_api.html
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "clusterName" . }}-config
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    cluster-name: {{ template "clusterName" . }}
+spec:
+  selector:
+    app: {{ template "timescaledb.fullname" . }}
+    cluster-name: {{ template "clusterName" . }}
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: patroni
+    port: 8008
+    protocol: TCP

@@ -127,17 +127,16 @@ my-release-replica   ClusterIP      None            <none>                     5
 
 ## Cleanup
 
-Removing a deployment can be done by deleting a Helm deployment, however, removing the deployment does not remove:
-- the Persistent Volume Claims (pvc) belonging to the cluster
-- or the headless service that is used by Patroni for its configuration
+Removing a deployment can be done by deleting a Helm deployment, however, removing the deployment does not remove
+the Persistent Volume Claims (pvc) belonging to the cluster.
 
 To fully purge a deployment in Kubernetes, you should do the following:
 ```console
 # Delete the Helm deployment
 helm delete my-release
-# Delete pvc and the headless Patroni service and the endpoints
+# Delete pvc 
 RELEASE=my-release
-kubectl delete $(kubectl get pvc,service,endpoints -l release=$RELEASE -o name)
+kubectl delete $(kubectl get pvc -l release=$RELEASE -o name)
 ```
 
 ### Optional: Delete the s3 backups
