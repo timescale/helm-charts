@@ -1,0 +1,56 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+{{/*
+The sole purpose of this job is to trigger Patroni to rewrite the
+Dynamic Configuration[1] in the DCS.
+
+As the configuration may change between every invocation of Helm, we
+need to run this trigger after every update.
+
+To prevent Helm failing to update a deployment, we add some random characters
+to the created job; Helm cannot create a job with the same name,
+however, (completed) jobs will not immediately be removed by Kubernetes.
+
+1: https://patroni.readthedocs.io/en/latest/dynamic_configuration.html
+*/}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-patroni-{{ randAlphaNum 2 | lower }}"
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    cluster-name: {{ template "clusterName" . }}
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  activeDeadlineSeconds: 60
+  template:
+    metadata:
+      labels:
+        app: {{ template "timescaledb.fullname" . }}
+        chart: {{ template "timescaledb.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+        cluster-name: {{ template "clusterName" . }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: {{ template "timescaledb.fullname" . }}-patch-patroni-config
+        image: curlimages/curl
+        command: ["/usr/bin/curl"]
+        args:
+        - --connect-timeout
+        - '10'
+        - --include
+        - --silent
+        - --show-error
+        - --fail
+        - --request
+        - PATCH
+        - --data
+        - {{ .Values.patroni.bootstrap.dcs | toJson | quote }}
+        - "http://{{ $.Release.Name }}-config:8008/config"

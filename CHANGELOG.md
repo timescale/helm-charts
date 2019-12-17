@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * The Service for the primary is now also created and managed by Helm
 ### Removed
 ### Fixed
+ * Configuration changes in `patroni.bootstrap.dcs` now propagates to PostgreSQL servers, previously these settings
+   were only read during bootstrap.
 
 ## [v0.4.0] - 2019-12-12
 
