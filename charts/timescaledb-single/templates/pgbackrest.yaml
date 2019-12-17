@@ -48,6 +48,7 @@ spec:
         backup-type: {{ .type }}
         cluster-name: {{ template "clusterName" $ }}
     spec:
+      activeDeadlineSeconds: 60
       template:
         metadata:
           labels:
@@ -58,17 +59,24 @@ spec:
             backup-type: {{ .type }}
             cluster-name: {{ template "clusterName" $ }}
         spec:
+          restartPolicy: OnFailure
           containers:
-          - name: {{ template "timescaledb.fullname" $ }}-{{ .type }}
-            image: alpine
-            command: ["wget"]
-            args:
-               - -q  # quiet
-               - -O- # output to stdout
-               - -S  # save headers
-               - '--post-data={"type": {{ quote .type }} }'
-               - "http://{{ template "timescaledb.fullname" $ }}-backup.{{ $.Release.Namespace }}.svc.cluster.local:8081/backups/"
-          restartPolicy: Never
+            - name: {{ template "timescaledb.fullname" $ }}-{{ .type }}
+              image: curlimages/curl
+              command: ["/usr/bin/curl"]
+              args:
+              - --connect-timeout
+              - '10'
+              - --include
+              - --silent
+              - --show-error
+              - --fail
+              - --request
+              - POST
+              - --data
+              - |
+                  {"type": {{ quote .type }}
+              - "http://{{ template "timescaledb.fullname" $ }}-backup:8081/backups/"
 ...
 {{- end }}
 {{ end }}
