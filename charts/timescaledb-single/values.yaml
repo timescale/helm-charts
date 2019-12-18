@@ -102,7 +102,15 @@ env:
 patroni:
   log:
     level: WARNING
+  # https://patroni.readthedocs.io/en/latest/replica_bootstrap.html#bootstrap
   bootstrap:
+    method: restore_or_initdb
+    restore_or_initdb:
+      command: >
+        /etc/timescaledb/scripts/restore_or_initdb.sh
+        --encoding=UTF8
+        --locale=C.UTF-8
+      keep_existing_recovery_conf: True
     post_init: /etc/timescaledb/scripts/post_init.sh
     dcs:
       loop_wait: 10
@@ -149,10 +157,6 @@ patroni:
         use_slots: true
       retry_timeout: 10
       ttl: 30
-    initdb:
-    - encoding: UTF8
-    - locale: C.UTF-8
-    - waldir: "/var/lib/postgresql/wal/pg_wal"
   kubernetes:
     role_label: role
     scope_label: cluster-name
