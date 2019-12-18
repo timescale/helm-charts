@@ -89,6 +89,7 @@ data:
 
     log "Invoking initdb"
     initdb --auth-local=peer --auth-host=md5 --pgdata="${PGDATA}" --waldir="${WALDIR}" ${initdb_args}
+    echo "include_if_exists = '{{ template "tstune_config". }}'" >> "${PGDATA}/postgresql.conf"
 
   post_init.sh: |
     #!/bin/bash

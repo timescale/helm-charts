@@ -37,6 +37,83 @@ spec:
         # The postgres user inside the TimescaleDB image has uid=1000.
         # This configuration ensures the permissions of the mounts are suitable
         fsGroup: 1000
+{{- if .Values.timescaledbTune.enabled }}
+      initContainers:
+      - name: tstune
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        env:
+        - name: TSTUNE_FILE
+          value: {{ template "tstune_config" . }}
+        - name: RESOURCES_WAL_VOLUME
+          value: {{ if .Values.persistentVolumes.wal.enabled }}{{ .Values.persistentVolumes.wal.size }}{{ else }}"0"{{ end }}
+        - name: RESOURCES_DATA_VOLUME
+          value: {{ .Values.persistentVolumes.data.size }}
+        - name: INCLUDE_DIRECTIVE
+          value: include_if_exists = '{{ template "tstune_config" . }}'
+        - name: CPUS
+          valueFrom:
+            resourceFieldRef:
+              containerName: timescaledb
+              resource: requests.cpu
+              divisor: "1"
+        - name: MEMORY
+          valueFrom:
+            resourceFieldRef:
+              containerName: timescaledb
+              resource: requests.memory
+              divisor: 1Mi
+        - name: RESOURCES_CPU_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: timescaledb
+              resource: limits.cpu
+              divisor: "1"
+        - name: RESOURCES_MEMORY_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: timescaledb
+              resource: limits.memory
+              divisor: 1Mi
+        command:
+          - sh
+          - "-c"
+          - |
+              set -e
+              [ $CPUS -eq 0 ]   && CPUS="${RESOURCES_CPU_LIMIT}"
+              [ $MEMORY -eq 0 ] && MEMORY="${RESOURCES_MEMORY_LIMIT}"
+
+              if [ -f "${PGDATA}/postgresql.base.conf" ] && ! grep "${INCLUDE_DIRECTIVE}" postgresql.base.conf -qxF; then
+                echo "${INCLUDE_DIRECTIVE}" >> "${PGDATA}/postgresql.base.conf"
+              fi
+
+              touch "${TSTUNE_FILE}"
+              timescaledb-tune -pg-version 11 -conf-path "${TSTUNE_FILE}" -cpus "${CPUS}" -memory "${MEMORY}MB" -yes
+
+              # If there is a dedicated WAL Volume, we want to set max_wal_size to 80% of that volume
+              # If there isn't a dedicated WAL Volume, we set it to 20% of the data volume
+              if [ "${RESOURCES_WAL_VOLUME}" = "0" ]; then
+                WALMAX="${RESOURCES_DATA_VOLUME}"
+                WALMAXMULTIPLIER=20
+              else
+                WALMAX="${RESOURCES_WAL_VOLUME}"
+                WALMULTIPLIER=80
+              fi
+
+              WALMAX=$(numfmt --from=auto ${WALMAX})
+
+              # Wal segments are 16MB in size, in this way we get a "nice" number of the nearest
+              # 16MB
+              WALMAX=$(( $WALMAX / 100 * $WALMULTIPLIER / 16777216 * 16 ))
+              WALMIN=$(( $WALMAX / 2 ))
+
+              echo "max_wal_size=${WALMAX}MB" >> "${TSTUNE_FILE}"
+              echo "min_wal_size=${WALMIN}MB" >> "${TSTUNE_FILE}"
+
+              cat "${TSTUNE_FILE}"
+        volumeMounts:
+        - name: socket-directory
+          mountPath: {{ template "socket_directory" . }}
+{{- end }}
       containers:
       - name: timescaledb
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
