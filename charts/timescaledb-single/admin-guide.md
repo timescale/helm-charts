@@ -63,6 +63,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |
+| `timescaledbTune.enabled`         | If true, runs `timescaledb-tune` before starting PostgreSQL | `false`                             |
 
 ### Examples
 - Override value using commandline parameters

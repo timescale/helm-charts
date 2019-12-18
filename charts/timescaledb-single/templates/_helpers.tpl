@@ -51,7 +51,7 @@ Create the name of the service account to use.
 {{- end -}}
 
 {{- define "socket_directory" -}}
-/var/run/postgresql/
+/var/run/postgresql
 {{- end -}}
 
 {{- define "data_directory" -}}
@@ -68,4 +68,8 @@ Create the name of the service account to use.
 
 {{- define "wal_directory" -}}
 {{ printf "%s/pg_wal" .Values.persistentVolumes.wal.mountPath }}
+{{- end -}}
+
+{{- define "tstune_config" -}}
+{{ printf "%s/timescaledb.conf" (include "socket_directory" .) }}
 {{- end -}}
