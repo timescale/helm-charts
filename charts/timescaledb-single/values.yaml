@@ -123,7 +123,6 @@ patroni:
           autovacuum_analyze_scale_factor: 0.02
           autovacuum_max_workers: 10
           autovacuum_vacuum_scale_factor: 0.05
-          checkpoint_completion_target: 0.99
           hot_standby: 'on'
           log_autovacuum_min_duration: 0
           log_checkpoints: 'on'
@@ -135,11 +134,6 @@ patroni:
           log_statement: ddl
           max_connections: 100
           max_prepared_transactions: 150
-          # These values are set small as the default data volume size
-          # is small as well.
-          max_wal_size: 750MB
-          min_wal_size: 250MB
-          shared_buffers: 300MB
           shared_preload_libraries: timescaledb,pg_stat_statements
           ssl: 'on'
           ssl_cert_file: '/etc/certificate/tls.crt'
@@ -152,7 +146,6 @@ patroni:
           unix_socket_permissions: '0750'
           wal_level: hot_standby
           wal_log_hints: 'on'
-          work_mem: 16MB
         use_pg_rewind: true
         use_slots: true
       retry_timeout: 10
@@ -262,9 +255,8 @@ persistentVolumes:
     enabled: True
     size: 1Gi
     subPath: ""
-    # When changing this mountPath ensure you also change the following keys to reflect this:
-    # patroni->bootstrap->initdb (waldir option)
-    # patroni->postgresql-basebackup (waldir option)
+    # When changing this mountPath ensure you also change the following key to reflect this:
+    # patroni.postgresql.basebackup.[].waldir
     mountPath: "/var/lib/postgresql/wal"
     annotations: {}
     accessModes:
@@ -279,6 +271,13 @@ resources: {}
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
+
+# timescaledb-tune will be run with the Pod resources requests or - if not set - its limits.
+# This should give a reasonably tuned PostgreSQL instance.
+# Any PostgreSQL parameter that is explicitly set in the Patroni configuration will override
+# the auto-tuned variables.
+timescaledbTune:
+  enabled: False
 
 networkPolicy:
   enabled: False
@@ -296,10 +295,6 @@ networkPolicy:
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
 nodeSelector: {}
-
-# https://github.com/timescale/timescaledb-tune
-timescaledbTune:
-  enabled: False
 
 # Prometheus exporter for PostgreSQL server metrics.
 # https://github.com/wrouesnel/postgres_exporter

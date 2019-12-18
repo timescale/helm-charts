@@ -37,8 +37,8 @@ spec:
         # The postgres user inside the TimescaleDB image has uid=1000.
         # This configuration ensures the permissions of the mounts are suitable
         fsGroup: 1000
-{{- if .Values.timescaledbTune.enabled }}
       initContainers:
+{{- if .Values.timescaledbTune.enabled }}
       - name: tstune
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         env:
@@ -87,29 +87,27 @@ spec:
               fi
 
               touch "${TSTUNE_FILE}"
-              timescaledb-tune -pg-version 11 -conf-path "${TSTUNE_FILE}" -cpus "${CPUS}" -memory "${MEMORY}MB" -yes
+              timescaledb-tune -quiet -pg-version 11 -conf-path "${TSTUNE_FILE}" -cpus "${CPUS}" -memory "${MEMORY}MB" {{ .Values.timescaledbTune.args | join " " }} -yes
 
               # If there is a dedicated WAL Volume, we want to set max_wal_size to 80% of that volume
               # If there isn't a dedicated WAL Volume, we set it to 20% of the data volume
               if [ "${RESOURCES_WAL_VOLUME}" = "0" ]; then
                 WALMAX="${RESOURCES_DATA_VOLUME}"
-                WALMAXMULTIPLIER=20
+                WALPERCENT=20
               else
                 WALMAX="${RESOURCES_WAL_VOLUME}"
-                WALMULTIPLIER=80
+                WALPERCENT=80
               fi
 
               WALMAX=$(numfmt --from=auto ${WALMAX})
 
               # Wal segments are 16MB in size, in this way we get a "nice" number of the nearest
               # 16MB
-              WALMAX=$(( $WALMAX / 100 * $WALMULTIPLIER / 16777216 * 16 ))
+              WALMAX=$(( $WALMAX / 100 * $WALPERCENT / 16777216 * 16 ))
               WALMIN=$(( $WALMAX / 2 ))
 
               echo "max_wal_size=${WALMAX}MB" >> "${TSTUNE_FILE}"
               echo "min_wal_size=${WALMIN}MB" >> "${TSTUNE_FILE}"
-
-              cat "${TSTUNE_FILE}"
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
