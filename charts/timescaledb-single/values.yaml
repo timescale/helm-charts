@@ -278,6 +278,16 @@ resources: {}
 # the auto-tuned variables.
 timescaledbTune:
   enabled: False
+  # For full flexibility, we allow you to override any timescaledb-tune parameter below.
+  # However, these parameters only take effect on newly scheduled pods and their settings are
+  # only visibible inside those new pods.
+  # Therefore you probably want to set explicit overrides in patroni.bootstrap.dcs.postgresql.parameters,
+  # as those will take effect as soon as possible.
+  # https://github.com/timescale/timescaledb-tune
+  args: {}
+    # max-conns: 120
+    # cpus: 5
+    # memory: 4GB
 
 networkPolicy:
   enabled: False
