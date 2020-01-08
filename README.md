@@ -14,6 +14,15 @@ Supported Versions:
 | [TimescaleDB Single](charts/timescaledb-single) | Based on 1.x | TimescaleDB Single allows you to deploy a highly-available TimescaleDB database configuration. |
 | [TimescaleDB Multinode](charts/timescaledb-multinode) | In Development | TimescaleDB Multinode allows you to deploy a multi-node, distributed version of TimescaleDB. |
 
+# Repository
+
+The Charts are available in a Helm Chart Repository, which is part of this project.
+The following command will make this repository ready for use:
+```
+helm repo add timescaledb 'https://github.com/timescale/timescaledb-kubernetes/charts/repo'
+```
+For more information, have a look at the [Using Helm](https://helm.sh/docs/intro/using_helm/#helm-repo-working-with-repositories) documentation.
+
 # Additional documentation
 
 - [Why use TimescaleDB?](https://docs.timescale.com/introduction)
