@@ -19,7 +19,7 @@ Supported Versions:
 The Charts are available in a Helm Chart Repository, which is part of this project.
 The following command will make this repository ready for use:
 ```
-helm repo add timescaledb 'https://github.com/timescale/timescaledb-kubernetes/charts/repo'
+helm repo add timescaledb 'https://raw.githubusercontent.com/timescale/timescaledb-kubernetes/master/charts/repo/'
 ```
 For more information, have a look at the [Using Helm](https://helm.sh/docs/intro/using_helm/#helm-repo-working-with-repositories) documentation.
 
