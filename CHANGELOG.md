@@ -4,9 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
- These are changes that will probably be included in the next release.
+## [Unreleased]
 
-## [v0.5.0] - To be determined
+ These are changes that will probably be included in the next release.
+### Added
+### Changed
+### Removed
+### Fixed
+
+## [v0.5.0] - 2019-01-15
 
 > NOTICE: When migrating from a < 0.5.x chart, the primary Service needs to be removed before
 > invoking `helm update`, as the update will otherwise fail.
@@ -16,9 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * The charts are now also available in a Helm Repository
 ### Changed
  * The Service for the primary is now also created and managed by Helm
-### Removed
+ * Use TimescaleDB 1.6 as the default version
 ### Fixed
- * Configuration changes in `patroni.bootstrap.dcs` now propagates to PostgreSQL servers, previously these settings
+ * Configuration changes in `patroni.bootstrap.dcs` now propagate to PostgreSQL servers, previously these settings
    were only read during bootstrap.
 
 ## [v0.4.0] - 2019-12-12

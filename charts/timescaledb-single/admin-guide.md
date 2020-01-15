@@ -23,7 +23,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
 | `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
-| `image.tag`                       | The version of the image to pull            | `pg11-ts1.5`                                        |
+| `image.tag`                       | The version of the image to pull            | `pg11-ts1.6`                                        |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `credentials`                     | A mapping of usernames/passwords            | A postgres, standby and admin user                  |
 | `tls.cert`                        | The public key of the SSL certificate for PostgreSQL | empty (a self-signed certificate will be generated) |
@@ -68,13 +68,13 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 ### Examples
 - Override value using commandline parameters
     ```console
-    helm upgrade --install my-release charts/timescaledb-single --set image.tag=pg11.6-ts1.5.1 --set image.pullPolicy=Always
+    helm upgrade --install my-release charts/timescaledb-single --set image.tag=pg11.6-ts1.6.0 --set image.pullPolicy=Always
     ```
 - Override values using `myvalues.yaml`
     ```yaml
     # Filename: myvalues.yaml
     image:
-      tag: pg11.6-ts1.5.1
+      tag: pg11.6-ts1.6.0
       pullPolicy: Always
     patroni:
       postgresql:
