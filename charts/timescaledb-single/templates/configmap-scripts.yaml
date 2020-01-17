@@ -47,10 +47,13 @@ data:
         sleep 3
     done
 
-    pgbackrest check || {
-        log "Creating pgBackrest stanza"
-        pgbackrest --stanza=poddb stanza-create --log-level-stderr=info || exit 1
-    }
+    # If we are the primary, we want to create/validate the backup stanza
+    if [ "$(psql -c "SELECT pg_is_in_recovery()::text" -AtXq)" == "false" ]; then
+        pgbackrest check || {
+            log "Creating pgBackrest stanza"
+            pgbackrest --stanza=poddb stanza-create --log-level-stderr=info || exit 1
+        }
+    fi
 
     log "Starting pgBackrest api to listen for backup requests"
     exec python3 /scripts/pgbackrest-rest.py --stanza=poddb --loglevel=debug
