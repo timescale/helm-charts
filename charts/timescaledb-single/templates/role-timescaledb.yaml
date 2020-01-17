@@ -28,7 +28,9 @@ rules:
   verbs:
   - create
 - apiGroups: [""]
-  resources: ["endpoints"]
+  resources:
+  - endpoints
+  - endpoints/restricted
   verbs:
   - create
   - get
