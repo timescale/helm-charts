@@ -53,4 +53,4 @@ spec:
         - PATCH
         - --data
         - {{ .Values.patroni.bootstrap.dcs | toJson | quote }}
-        - "http://{{ $.Release.Name }}-config:8008/config"
+        - "http://{{ template "clusterName" . }}-config:8008/config"
