@@ -66,10 +66,10 @@ backup:
       # schedule: https://en.wikipedia.org/wiki/Cron#CRON_expression
     - name: full-weekly
       type: full
-      schedule: "00 02 * * 0"
+      schedule: "12 02 * * 0"
     - name: incremental-daily
       type: incr
-      schedule: "00 02 * * 1-6"
+      schedule: "12 02 * * 1-6"
   # Extra custom environment variables for prometheus.
   # These should be an EnvVar, as this allows you to inject secrets into the environment
   # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
