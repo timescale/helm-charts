@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
-## [v0.5.0] - 2019-01-15
+## [v0.5.1] -  2019-01-21
 
 > NOTICE: When migrating from a < 0.5.x chart, the primary Service needs to be removed before
 > invoking `helm update`, as the update will otherwise fail.
@@ -26,6 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
  * Configuration changes in `patroni.bootstrap.dcs` now propagate to PostgreSQL servers, previously these settings
    were only read during bootstrap.
+ * Patroni can now also use the endpoint in OpenShift
+ * `pgBackRest` will not check its stanza on a replica
+ * Default Backup Schedule is now set to 1 full a week and 6 incremental backups. (The previous definition mixed up
+   day of month with day of week)
+
+## [v0.5.0] - Never released publicly
 
 ## [v0.4.0] - 2019-12-12
 

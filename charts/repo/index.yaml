@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   timescaledb-multinode:
   - apiVersion: v1
-    created: "2020-01-15T21:22:10.516327008+01:00"
+    created: "2020-01-21T11:53:07.120592612+01:00"
     description: TimescaleDB Multinode Deployment.
     digest: a6c664a75489e069cdd2d36dff87ca6d2b3a38a3edf16de4234418b354e40eea
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -19,7 +19,23 @@ entries:
     version: 0.3.0
   timescaledb-single:
   - apiVersion: v1
-    created: "2020-01-15T21:22:10.519678919+01:00"
+    created: "2020-01-21T11:53:07.125193456+01:00"
+    description: TimescaleDB HA Deployment.
+    digest: 128a7f0738f176a2abe6b7e1c3a1173ac6c4a77f7816704add3f0664609915aa
+    home: https://github.com/timescale/timescaledb-kubernetes
+    maintainers:
+    - email: support@timescale.com
+      name: TimescaleDB
+    name: timescaledb-single
+    sources:
+    - https://github.com/timescale/timescaledb-kubernetes
+    - https://github.com/timescale/timescaledb-docker-ha
+    - https://github.com/zalando/patroni
+    urls:
+    - timescaledb-single-0.5.1.tgz
+    version: 0.5.1
+  - apiVersion: v1
+    created: "2020-01-21T11:53:07.123601534+01:00"
     description: TimescaleDB HA Deployment.
     digest: f4e0e05c989f04c78d9bd0a5b7ab2c6e1d2227af72ad05f7451a3e01b462bba0
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -35,7 +51,7 @@ entries:
     - timescaledb-single-0.5.0.tgz
     version: 0.5.0
   - apiVersion: v1
-    created: "2020-01-15T21:22:10.517995117+01:00"
+    created: "2020-01-21T11:53:07.122086311+01:00"
     description: TimescaleDB HA Deployment.
     digest: 2ae9d4a4ba25caf626e837244bf092721439e822d486f2c17f238b479012dedb
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -50,4 +66,4 @@ entries:
     urls:
     - timescaledb-single-0.4.0.tgz
     version: 0.4.0
-generated: "2020-01-15T21:22:10.513697263+01:00"
+generated: "2020-01-21T11:53:07.119113003+01:00"
