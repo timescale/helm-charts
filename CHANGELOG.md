@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
-## [v0.5.1] -  2019-01-21
+## [v0.5.1] -  2020-01-21
 
 > NOTICE: When migrating from a < 0.5.x chart, the primary Service needs to be removed before
 > invoking `helm update`, as the update will otherwise fail.
