@@ -6,16 +6,37 @@ metadata:
     service.helm.timescale.com/network_policy_enabled: False
     service.helm.timescale.com/timescaledb_tune_enabled: False
 
+env:
+  - name: pizza
+    value: test
+  - name: drink
+    valueFrom:
+      secretKeyRef:
+        name: test
+        key: "abc"
+
 # This part of the configuration ("spec") has the same definition as the TimescaleDB Custom Resource Definition for
 # the Timescale Operator
 spec:
+  accessNode:
   nodes:
     ts0:
       configuration: default
+    ts1:
+      configuration: dataNode
+    ts2:
+      configuration: dataNode
   configurations:
     default:
+      image: timescaledev/timescaledb-ha:pg11-ts1.6
       replicas: 3
       postgresql:
         version: 11
         parameters:
           work_mem: "16MB"
+    dataNode:
+      image: timescaledev/timescaledb-ha:pg11-ts1.6
+      replicas: 3
+      postgresql:
+        parameters:
+          work_mem: "24MB"

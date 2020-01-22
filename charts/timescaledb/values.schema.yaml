@@ -1,0 +1,108 @@
+title: Values
+type: object
+"$schema": "https://json-schema.org/draft-07/schema#"
+additionalProperties: false
+properties:
+  metadata:
+    type: object
+    properties:
+      annotations:
+        type: object
+        additionalProperties: true
+        properties:
+          service.helm.timescale.com/backup_enabled:
+            type: boolean
+          service.helm.timescale.com/backup_method:
+            type: string
+          service.helm.timescale.com/network_policy_enabled:
+            type: boolean
+          service.helm.timescale.com/timescaledb_tune_enabled:
+            type: boolean
+  # All of these environment variables will be made available to the postgres container
+  env:
+    type: array # These variables may depend on eachother, so they require ordering. A dict/object does not suffice.
+    items:
+      $ref: "#/components/schemas/envvar"
+  spec:
+    type: object
+    additionalProperties: false
+    properties:
+      accessNode:
+        type:
+        - string
+        - "null" # Not specifying an access node is only allowed if there is 1 node under the "nodes" key
+        minLength: 1
+      nodes:
+        type: object
+        additionalProperties:
+          type: object
+          properties:
+            # A configuration is a pointer to one of the top-level configurations
+            # Using this pattern allows us to define many nodes without having to repeat detailed configuration
+            configuration:
+              type: string
+              example: default
+      # These configurations are referred to by the nodes in the top-level nodes key.
+      # No overloading (dataNode inherits default) for example is done, each configuration is self-contained,
+      configurations:
+        type: object
+        additionalProperties:
+          type: object
+          properties:
+            replicas:
+              type: integer
+              minimum: 1
+            image:
+              type: string
+              example: timescaledev/timescaledb-ha:pg11-ts1.6-postgis
+              minLength: 1
+            postgresql:
+              type: object
+              properties:
+                # The version mentioned here will be used to set the PATH inside the
+                # container, as well as which Docker image to fetch (if the image is not explicitly set)
+                version:
+                  type: integer
+                  minimum: 11
+                # parameters are the parameters you can set for the PostgreSQL server
+                # we may wish to restrict setting some parameters, but we also like
+                # to expose as much as possible of the underlying PostgreSQL
+                # https://www.postgresql.org/docs/current/config-setting.html
+                parameters:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  example:
+                    work_mem: 24MB
+    required:
+      - nodes
+      - configurations
+
+components:
+  schemas:
+    envvar:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        valueFrom:
+          type: object
+          properties:
+            secretKeyRef:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                key:
+                  type: string
+                  minLength: 1
+              required:
+              - name
+              - key
+          required:
+          - secretKeyRef
+      required:
+      - name

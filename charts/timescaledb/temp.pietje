@@ -1,0 +1,56 @@
+{
+  "required": [
+    "feike",
+    "pietje"
+  ],
+  "type": "object",
+  "properties": {
+    "spec": {
+      "type": "object",
+      "properties": {
+        "accessNode": {
+          "type": "string"
+        },
+        "nodes": {
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "configuration": {
+                "type": "string"
+              }
+            }
+          },
+          "type": "object"
+        },
+        "configurations": {
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "postgresql": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "minimum": 11,
+                    "type": "integer"
+                  },
+                  "parameters": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                }
+              },
+              "replicas": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            }
+          },
+          "type": "object"
+        }
+      }
+    }
+  },
+  "title": "Values"
+}
