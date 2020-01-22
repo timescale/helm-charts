@@ -1,48 +1,4 @@
 {
-  "components": {
-    "schemas": {
-      "envvar": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "valueFrom": {
-            "required": [
-              "secretKeyRef"
-            ],
-            "type": "object",
-            "properties": {
-              "secretKeyRef": {
-                "required": [
-                  "name",
-                  "key"
-                ],
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  "key": {
-                    "minLength": 1,
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "name": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          }
-        }
-      }
-    }
-  },
-  "title": "Values",
   "additionalProperties": false,
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
@@ -73,6 +29,94 @@
             }
           },
           "type": "object"
+        },
+        "databases": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "properties": {
+              "locale": {
+                "minLength": 1,
+                "type": "string",
+                "example": "C"
+              },
+              "encoding": {
+                "minLength": 3,
+                "type": "string",
+                "example": "UTF8"
+              }
+            }
+          },
+          "type": "object"
+        },
+        "users": {
+          "additionalProperties": {
+            "additionalProperties": false,
+            "type": "object",
+            "properties": {
+              "privileges": {
+                "items": {
+                  "enum": [
+                    "createdb",
+                    "createrole"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "password": {
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                  "valueFrom": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                      "secretKeyRef": {
+                        "additionalProperties": false,
+                        "required": [
+                          "name",
+                          "key"
+                        ],
+                        "properties": {
+                          "name": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "key": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "value": {
+                    "minLength": 8,
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "type": "object",
+          "example": {
+            "admin": {
+              "privileges": [
+                "createdb"
+              ],
+              "password": {
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "mysecret",
+                    "key": "admin"
+                  }
+                }
+              }
+            }
+          }
         },
         "configurations": {
           "additionalProperties": {
@@ -111,12 +155,6 @@
         }
       }
     },
-    "env": {
-      "items": {
-        "$ref": "#/components/schemas/envvar"
-      },
-      "type": "array"
-    },
     "metadata": {
       "type": "object",
       "properties": {
@@ -140,5 +178,6 @@
         }
       }
     }
-  }
+  },
+  "title": "Values"
 }

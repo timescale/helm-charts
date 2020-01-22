@@ -9,28 +9,14 @@ metadata:
 # This part of the configuration ("spec") has the same definition as the TimescaleDB Custom Resource Definition for
 # the Timescale Operator
 spec:
-  users:
-    postgres:
-      password:
-        valueFrom:
-          secretKeyRef:
-            name: myverysecret
-            key: postgres
-    admin:
-      privileges:
-      - createdb
-      - createrole
-      password:
-        valueFrom:
-          secretKeyRef:
-            name: myverysecret
-            key: admin
   databases:
     example:
       encoding: UTF8
       locale: C
-      lc-collate: en_US.UTF8
-      lc-ctype: de_DE.UTF8
+    example2:
+      encoding: UTF8
+      lc_collate: C
+      lc_ctype: en_US.UTF8
   accessNode:
   nodes:
     ts0:

@@ -16,6 +16,6 @@ FILES_TO_VERIFY := $(shell ls charts/timescaledb/values/*.yaml charts/timescaled
 verify-schema:
 	@for file in $(FILES_TO_VERIFY); do \
 		echo verifying file $$file ; \
-		helm template charts/timescaledb -f $$file > /dev/null || exit 1; \
+		helm template charts/timescaledb -f $$file || exit 1; \
  	done;
 
