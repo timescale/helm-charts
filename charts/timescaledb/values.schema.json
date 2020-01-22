@@ -1,0 +1,94 @@
+{
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "spec": {
+      "additionalProperties": false,
+      "required": [
+        "nodes",
+        "configurations"
+      ],
+      "type": "object",
+      "properties": {
+        "accessNode": {
+          "pattern": "^.+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nodes": {
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "configuration": {
+                "type": "string",
+                "example": "default"
+              }
+            }
+          },
+          "type": "object"
+        },
+        "configurations": {
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "image": {
+                "type": "string",
+                "example": "timescaledev/timescaledb-ha:pg11-ts1.6-postgis"
+              },
+              "postgresql": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "minimum": 11,
+                    "type": "integer"
+                  },
+                  "parameters": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object",
+                    "example": {
+                      "work_mem": "24MB"
+                    }
+                  }
+                }
+              },
+              "replicas": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            }
+          },
+          "type": "object"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "additionalProperties": true,
+          "type": "object",
+          "properties": {
+            "service.helm.timescale.com/network_policy_enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/backup_enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/backup_method": {
+              "type": "string"
+            },
+            "service.helm.timescale.com/timescaledb_tune_enabled": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  },
+  "title": "Values"
+}
