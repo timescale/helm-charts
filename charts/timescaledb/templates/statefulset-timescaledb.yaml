@@ -1,0 +1,66 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+{{- if and (gt (len .Values.spec.nodes) 1) (eq (.Values.spec.accessNode | default "") "")  -}}
+
+{{- end -}}
+
+{{- $accessNode := (include "accessNode" .) -}}
+{{- range $nodeName, $node := .Values.spec.nodes }}
+{{- $confKey := ($node.configuration | default "default") -}}
+{{- $configuration := required (printf "Configuration %s (for node %s) does not exist" $confKey $nodeName) (index $.Values.spec.configurations $confKey) -}}
+{{- $nodeType := ternary "access" "data" (eq $nodeName $accessNode) }}
+{{- $clusterName := printf "%s-%s" (include "timescaledb.fullname" $) $nodeName -}}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $clusterName }}
+  labels:
+    {{- include "timescaledb.labels" $ | nindent 4 }}
+    timescaledb-node-name: {{ $nodeName }}
+    timescaledb-node-type: {{ $nodeType }}
+    cluster-name: {{ $clusterName }}
+spec:
+  serviceName: {{ template "timescaledb.fullname" $ }}
+  replicas: {{ $configuration.replicas | default 1 }}
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $clusterName }}
+  labels:
+    {{- include "timescaledb.labels" $ | nindent 4 }}
+    timescaledb-node-name: {{ $nodeName }}
+    timescaledb-node-type: {{ $nodeType }}
+    cluster-name: {{ $clusterName }}
+    role: master
+spec:
+  type: ClusterIP
+  ports:
+  - name: postgresql
+    port: 5432
+    targetPort: postgresql
+    protocol: TCP
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $clusterName }}-replica
+  labels:
+    {{- include "timescaledb.labels" $ | nindent 4 }}
+    timescaledb-node-name: {{ $nodeName }}
+    timescaledb-node-type: {{ $nodeType }}
+    cluster-name: {{ $clusterName }}
+    role: replica
+spec:
+  type: ClusterIP
+  ports:
+  - name: postgresql
+    port: 5432
+    targetPort: postgresql
+    protocol: TCP
+...
+{{- end }}

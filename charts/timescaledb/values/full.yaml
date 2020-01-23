@@ -27,12 +27,15 @@ spec:
     example:
       encoding: UTF8
       locale: C
-  accessNode:
+  accessNode: ts0
   nodes:
     ts0:
       configuration: default
     ts1:
       configuration: dataNode
+      certificate:
+        secretKeyRef:
+          name: pietje
     ts2:
       configuration: dataNode
   configurations:
@@ -45,7 +48,7 @@ spec:
           work_mem: "16MB"
     dataNode:
       image: timescaledev/timescaledb-ha:pg11-ts1.6
-      replicas: 3
+      replicas: 2
       postgresql:
         parameters:
           work_mem: "24MB"

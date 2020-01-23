@@ -100,6 +100,39 @@
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
+    "fullnameOverride": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "additionalProperties": true,
+          "type": "object",
+          "properties": {
+            "service.helm.timescale.com/generate-certificates": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/network-policy-enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/generate-passwords": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/timescaledb-tune-enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/backup-method": {
+              "type": "string"
+            },
+            "service.helm.timescale.com/backup-enabled": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
     "spec": {
       "additionalProperties": false,
       "required": [
@@ -123,6 +156,23 @@
               "configuration": {
                 "type": "string",
                 "example": "default"
+              },
+              "certificate": {
+                "additionalProperties": false,
+                "properties": {
+                  "secretKeyRef": {
+                    "additionalProperties": false,
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
               }
             }
           },
@@ -190,31 +240,9 @@
         }
       }
     },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "annotations": {
-          "additionalProperties": true,
-          "type": "object",
-          "properties": {
-            "service.helm.timescale.com/backup-method": {
-              "type": "string"
-            },
-            "service.helm.timescale.com/timescaledb-tune-enabled": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/network-policy-enabled": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/generate-passwords": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/backup-enabled": {
-              "type": "boolean"
-            }
-          }
-        }
-      }
+    "nameOverride": {
+      "type": "string",
+      "maxLength": 40
     }
   }
 }

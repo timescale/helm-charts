@@ -4,6 +4,7 @@ metadata:
     # In order to enable the backup, s3 credentials are required
     service.helm.timescale.com/backup_enabled: false
     service.helm.timescale.com/generate-passwords: True
+    service.helm.timescale.com/generate-certificates: True
 
 # This part of the configuration ("spec") has the same definition as the TimescaleDB Custom Resource Definition for
 # the Timescale Operator
@@ -24,3 +25,6 @@ spec:
         version: 11
         parameters:
           work_mem: "16MB"
+
+nameOverride: ""
+fullnameOverride: ""
