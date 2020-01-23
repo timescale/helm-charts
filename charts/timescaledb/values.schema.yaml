@@ -10,63 +10,22 @@ properties:
         type: object
         additionalProperties: true
         properties:
-          service.helm.timescale.com/backup_enabled:
+          service.helm.timescale.com/backup-enabled:
             type: boolean
-          service.helm.timescale.com/backup_method:
+          service.helm.timescale.com/backup-method:
             type: string
-          service.helm.timescale.com/network_policy_enabled:
+          service.helm.timescale.com/generate-passwords:
             type: boolean
-          service.helm.timescale.com/timescaledb_tune_enabled:
+          service.helm.timescale.com/network-policy-enabled:
+            type: boolean
+          service.helm.timescale.com/timescaledb-tune-enabled:
             type: boolean
   spec:
     type: object
     additionalProperties: false
     properties:
       users:
-        type: object
-        additionalProperties:
-          type: object
-          additionalProperties: false
-          properties:
-            privileges:
-              type: array
-              items:
-                type: string
-                enum:
-                - createdb
-                - createrole
-            password:
-              type: object
-              additionalProperties: false
-              properties:
-                value:
-                  type: string
-                  minLength: 8
-                valueFrom:
-                  type: object
-                  additionalProperties: false
-                  properties:
-                    secretKeyRef:
-                      additionalProperties: false
-                      properties:
-                        name:
-                          type: string
-                          minLength: 1
-                        key:
-                          type: string
-                          minLength: 1
-                      required:
-                      - name
-                      - key
-        example:
-          admin:
-            password:
-              valueFrom:
-                secretKeyRef:
-                  name: mysecret
-                  key: admin
-            privileges:
-            - createdb
+        $ref: '#/components/schemas/User'
       databases:
         type: object
         additionalProperties:
@@ -91,6 +50,7 @@ properties:
         type: object
         additionalProperties:
           type: object
+          additionalProperties: false
           properties:
             # A configuration is a pointer to one of the top-level configurations
             # Using this pattern allows us to define many nodes without having to repeat detailed configuration
@@ -103,6 +63,7 @@ properties:
         type: object
         additionalProperties:
           type: object
+          additionalProperties: false
           properties:
             replicas:
               type: integer
@@ -110,7 +71,7 @@ properties:
             image:
               type: string
               example: timescaledev/timescaledb-ha:pg11-ts1.6-postgis
-              minLength: 1
+              minLength: 3
             postgresql:
               type: object
               properties:
@@ -132,3 +93,74 @@ properties:
     required:
       - nodes
       - configurations
+
+components:
+  schemas:
+    # Even though we currently only reference '#/components/schemas/User' once,
+    # we define it separately here, because:
+    # - we may reuse the definition (global users, local users)
+    # - to keep the general structure easier to read
+    User:
+      type: object
+      additionalProperties:
+        type: object
+        additionalProperties: false
+        properties:
+          privileges:
+            description: https://www.postgresql.org/docs/current/sql-createrole.html
+            type: object
+            additionalProperties: false
+            properties:
+              createdb:
+                type: boolean
+              createrole:
+                type: boolean
+              login:
+                type: boolean
+              superuser:
+                type: boolean
+              replication:
+                type: boolean
+#              validUntil:
+#                type: string
+#                description: A date and time after which the roles password is no longer valid (iso-8601 format)
+#                pattern: ^\s*\d{4}-\d{2}-\d{2}.*$ # Loosely matches most accepted timestamptz's, including date's only
+          password:
+            type: object
+            additionalProperties: false
+            properties:
+              value:
+                type: string
+                minLength: 8
+              valueFrom:
+                type: object
+                additionalProperties: false
+                properties:
+                  secretKeyRef:
+                    additionalProperties: false
+                    properties:
+                      name:
+                        type: string
+                        minLength: 1
+                      key:
+                        type: string
+                        minLength: 1
+                    required:
+                    - name
+                    - key
+      examples:
+        plainTextPassword:
+          admin:
+            password:
+              value: verysecret
+        additionalCreateDBUser:
+          devops:
+            privileges:
+            - createdb
+        referToSelfManagedSecret:
+          admin:
+            password:
+              valueFrom:
+                secretKeyRef:
+                  name: selfManagedSecret
+                  key: admin

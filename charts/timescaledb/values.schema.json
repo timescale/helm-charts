@@ -1,4 +1,101 @@
 {
+  "components": {
+    "schemas": {
+      "User": {
+        "additionalProperties": {
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "privileges": {
+              "additionalProperties": false,
+              "type": "object",
+              "description": "https://www.postgresql.org/docs/current/sql-createrole.html",
+              "properties": {
+                "superuser": {
+                  "type": "boolean"
+                },
+                "createdb": {
+                  "type": "boolean"
+                },
+                "login": {
+                  "type": "boolean"
+                },
+                "createrole": {
+                  "type": "boolean"
+                },
+                "replication": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "password": {
+              "additionalProperties": false,
+              "type": "object",
+              "properties": {
+                "valueFrom": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "properties": {
+                    "secretKeyRef": {
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "key"
+                      ],
+                      "properties": {
+                        "name": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "key": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "value": {
+                  "minLength": 8,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "type": "object",
+        "examples": {
+          "referToSelfManagedSecret": {
+            "admin": {
+              "password": {
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "selfManagedSecret",
+                    "key": "admin"
+                  }
+                }
+              }
+            }
+          },
+          "additionalCreateDBUser": {
+            "devops": {
+              "privileges": [
+                "createdb"
+              ]
+            }
+          },
+          "plainTextPassword": {
+            "admin": {
+              "password": {
+                "value": "verysecret"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "title": "Values",
   "additionalProperties": false,
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
@@ -20,6 +117,7 @@
         },
         "nodes": {
           "additionalProperties": {
+            "additionalProperties": false,
             "type": "object",
             "properties": {
               "configuration": {
@@ -52,78 +150,15 @@
           "type": "object"
         },
         "users": {
+          "$ref": "#/components/schemas/User"
+        },
+        "configurations": {
           "additionalProperties": {
             "additionalProperties": false,
             "type": "object",
             "properties": {
-              "privileges": {
-                "items": {
-                  "enum": [
-                    "createdb",
-                    "createrole"
-                  ],
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "password": {
-                "additionalProperties": false,
-                "type": "object",
-                "properties": {
-                  "valueFrom": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                      "secretKeyRef": {
-                        "additionalProperties": false,
-                        "required": [
-                          "name",
-                          "key"
-                        ],
-                        "properties": {
-                          "name": {
-                            "minLength": 1,
-                            "type": "string"
-                          },
-                          "key": {
-                            "minLength": 1,
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "value": {
-                    "minLength": 8,
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "type": "object",
-          "example": {
-            "admin": {
-              "privileges": [
-                "createdb"
-              ],
-              "password": {
-                "valueFrom": {
-                  "secretKeyRef": {
-                    "name": "mysecret",
-                    "key": "admin"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "configurations": {
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
               "image": {
-                "minLength": 1,
+                "minLength": 3,
                 "type": "string",
                 "example": "timescaledev/timescaledb-ha:pg11-ts1.6-postgis"
               },
@@ -162,22 +197,24 @@
           "additionalProperties": true,
           "type": "object",
           "properties": {
-            "service.helm.timescale.com/network_policy_enabled": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/backup_enabled": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/backup_method": {
+            "service.helm.timescale.com/backup-method": {
               "type": "string"
             },
-            "service.helm.timescale.com/timescaledb_tune_enabled": {
+            "service.helm.timescale.com/timescaledb-tune-enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/network-policy-enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/generate-passwords": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/backup-enabled": {
               "type": "boolean"
             }
           }
         }
       }
     }
-  },
-  "title": "Values"
+  }
 }

@@ -1,14 +1,19 @@
 metadata:
   # These annotations allow you toggle features in the Helm chart to on/off
   annotations:
-    service.helm.timescale.com/backup_enabled: true
-    service.helm.timescale.com/backup_method: pgBackRest
-    service.helm.timescale.com/network_policy_enabled: False
-    service.helm.timescale.com/timescaledb_tune_enabled: False
+    # In order to enable the backup, s3 credentials are required
+    service.helm.timescale.com/backup_enabled: false
+    service.helm.timescale.com/generate-passwords: True
 
 # This part of the configuration ("spec") has the same definition as the TimescaleDB Custom Resource Definition for
 # the Timescale Operator
 spec:
+  users:
+    admin: {}
+    test:
+      password:
+        value:
+          shortest
   nodes:
     ts0:
       configuration: default
