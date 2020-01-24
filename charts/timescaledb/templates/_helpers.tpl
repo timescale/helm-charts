@@ -49,6 +49,7 @@ Selector labels
 {{- define "timescaledb.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "timescaledb.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+timescaledb-name: {{ include "timescaledb.fullname" . }}
 {{- end -}}
 
 {{/*

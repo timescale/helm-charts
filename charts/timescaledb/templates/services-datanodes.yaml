@@ -18,6 +18,7 @@ metadata:
     timescaledb-node-name: {{ $nodeName }}
     timescaledb-node-type: data
     cluster-name: {{ $clusterName }}
+    timescaledb-name: {{ include "timescaledb.fullname" $ }}
     role: master
 spec:
   type: ClusterIP
@@ -36,10 +37,15 @@ metadata:
     {{- include "timescaledb.labels" $ | nindent 4 }}
     timescaledb-node-name: {{ $nodeName }}
     timescaledb-node-type: {{ $nodeType }}
+    timescaledb-name: {{ include "timescaledb.fullname" $ }}
     cluster-name: {{ $clusterName }}
     role: replica
 spec:
   type: ClusterIP
+  selector:
+    timescaledb-name: {{ include "timescaledb.fullname" $ }}
+    timescaledb-node-name: {{ $nodeName }}
+    role: replica
   ports:
   - name: postgresql
     port: 5432

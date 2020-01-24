@@ -6,25 +6,27 @@
 {{- $nodeType := ternary "access" "data" (eq $nodeName $accessNode) }}
 {{- $confKey := ($node.configuration | default "default") -}}
 {{- $configuration := required (printf "Configuration %s (for node %s) does not exist" $confKey $nodeName) (index $.Values.spec.configurations $confKey) -}}
+{{- $timescaleDBName := (include "timescaledb.fullname" $) }}
+{{- $statefulSetName := printf "%s-%s" $timescaleDBName $nodeName }}
 {{- /*
 SCOPE influences the name of the endpoint used by Patroni,
 that in the end expose the whole deployment to the end user.
 As we want the name of the service for the user to be friendly (equal to release name),
-we set PATRONI_SCOPE = timescaledb.fullname for the access node only
+we set PATRONI_SCOPE = $timescaleDBName for the access node only
 */}}
-{{- $clusterName := ternary (include "timescaledb.fullname" $) (printf "%s-%s" (include "timescaledb.fullname" $) $nodeName) (eq $nodeType "access") -}}
+{{- $clusterName := ternary $timescaleDBName $statefulSetName (eq $nodeType "access") -}}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ $clusterName }}
+  name: {{ $statefulSetName }}
   labels:
     {{- include "timescaledb.labels" $ | nindent 4 }}
     timescaledb-node-name: {{ $nodeName }}
     timescaledb-node-type: {{ $nodeType }}
     cluster-name: {{ $clusterName }}
 spec:
-  serviceName: {{ template "timescaledb.fullname" $ }}
+  serviceName: {{ $statefulSetName }}
   replicas: {{ $configuration.replicas | default 1 }}
   updateStrategy:
     type: RollingUpdate
@@ -35,7 +37,7 @@ spec:
       cluster-name: {{ $clusterName }}
   template:
     metadata:
-      name: {{ template "timescaledb.fullname" $ }}
+      name: {{ $timescaleDBName }}
       labels:
         {{- include "timescaledb.labels" $ | nindent 8 }}
         timescaledb-node-name: {{ $nodeName }}
@@ -103,8 +105,8 @@ spec:
           - name: PATRONI_SCOPE
             value: {{ $clusterName }}
           - name: PATRONI_KUBERNETES_LABELS
-            value: {{ printf "{cluster-name: %s}" $clusterName | quote }}
-          # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly,
+            value: {{ printf "{cluster-name: %s, timescaledb-name: %s}" $clusterName ( include "timescaledb.fullname" $ ) | quote }}
+          # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly, q 
           # but for interactive sessions, callbacks and PostgreSQL tools they should be correct.
           - name: PGDATA
             value: "$(PATRONI_POSTGRESQL_DATA_DIR)"
@@ -125,7 +127,7 @@ spec:
         emptyDir: {}
       - name: patroni-config
         configMap:
-          name: {{ $clusterName }}-patroni
+          name: {{ $statefulSetName }}-patroni
       - name: certificate
         secret:
           secretName: {{ template "certificatePrefix" $ }}-{{ $nodeType }}

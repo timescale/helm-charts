@@ -18,9 +18,14 @@ spec:
       password:
         value:
           shortest
+  accessNode: ts1
   nodes:
     ts0:
       configuration: default
+    ts1:
+      configuration: default
+    ts2:
+      configuration: default 
   configurations:
     default:
       replicas: 3
@@ -29,7 +34,7 @@ spec:
         parameters:
           work_mem: "16MB"
   debug:
-    execStartPre: sleep 3600
+    execStartPre: sleep 3
 
 readinessProbe:
   initialDelaySeconds: 5

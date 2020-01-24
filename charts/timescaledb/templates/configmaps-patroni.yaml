@@ -4,13 +4,7 @@
 {{- $nodeType := ternary "access" "data" (eq $nodeName $accessNode) }}
 {{- $confKey := ($node.configuration | default "default") -}}
 {{- $configuration := required (printf "Configuration %s (for node %s) does not exist" $confKey $nodeName) (index $.Values.spec.configurations $confKey) -}}
-{{- /*
-SCOPE influences the name of the endpoint used by Patroni,
-that in the end expose the whole deployment to the end user.
-As we want the name of the service for the user to be friendly (equal to release name),
-we set PATRONI_SCOPE = timescaledb.fullname for the access node only
-*/}}
-{{- $clusterName := ternary (include "timescaledb.fullname" $) (printf "%s-%s" (include "timescaledb.fullname" $) $nodeName) (eq $nodeType "access") -}}
+{{- $clusterName := printf "%s-%s" (include "timescaledb.fullname" $) $nodeName -}}
 ---
 apiVersion: v1
 kind: ConfigMap

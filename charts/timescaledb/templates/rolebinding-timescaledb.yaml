@@ -8,6 +8,7 @@ metadata:
   name: {{ template "timescaledb.fullname" . }}
   labels:
     {{- include "timescaledb.labels" $ | nindent 4 }}
+    timescaledb-name: {{ include "timescaledb.fullname" . }}
 subjects:
   - kind: ServiceAccount
     name: {{ template "timescaledb.serviceAccountName" . }}
