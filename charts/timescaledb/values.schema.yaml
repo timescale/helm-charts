@@ -32,6 +32,8 @@ properties:
             type: boolean
           service.helm.timescale.com/timescaledb-tune-enabled:
             type: boolean
+          service.helm.timescale.com/rbac-create:
+            type: boolean
   spec:
     type: object
     additionalProperties: false

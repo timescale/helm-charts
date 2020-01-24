@@ -6,6 +6,7 @@ metadata:
     service.helm.timescale.com/passwords-generate: True
     service.helm.timescale.com/certificates-generate: True
     service.helm.timescale.com/readinessprobe-enable: True
+    service.helm.timescale.com/rbac-create: True
 
 
 # This part of the configuration ("spec") has the same definition as the TimescaleDB Custom Resource Definition for
@@ -28,7 +29,7 @@ spec:
         parameters:
           work_mem: "16MB"
   debug:
-    execStartPre:
+    execStartPre: sleep 3600
 
 readinessProbe:
   initialDelaySeconds: 5

@@ -249,6 +249,9 @@
             "service.helm.timescale.com/generate-passwords": {
               "type": "boolean"
             },
+            "service.helm.timescale.com/rbac-create": {
+              "type": "boolean"
+            },
             "service.helm.timescale.com/timescaledb-tune-enabled": {
               "type": "boolean"
             },
