@@ -34,6 +34,8 @@ properties:
             type: boolean
           service.helm.timescale.com/rbac-create:
             type: boolean
+          service.helm.timescale.com/serviceaccount-create:
+            type: boolean
   spec:
     type: object
     additionalProperties: false

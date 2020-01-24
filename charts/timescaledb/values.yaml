@@ -7,7 +7,7 @@ metadata:
     service.helm.timescale.com/certificates-generate: True
     service.helm.timescale.com/readinessprobe-enable: True
     service.helm.timescale.com/rbac-create: True
-
+    service.helm.timescale.com/serviceaccount-create: True
 
 # This part of the configuration ("spec") has the same definition as the TimescaleDB Custom Resource Definition for
 # the Timescale Operator
@@ -42,3 +42,6 @@ nameOverride: ""
 fullnameOverride: ""
 serviceAccount:
   create: False
+
+serviceAccount:
+  name:

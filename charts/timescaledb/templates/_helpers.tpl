@@ -55,7 +55,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "timescaledb.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
+{{- if (index .Values.metadata.annotations "service.helm.timescale.com/serviceaccount-create") -}}
     {{ default (include "timescaledb.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}

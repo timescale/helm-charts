@@ -6,7 +6,13 @@
 {{- $nodeType := ternary "access" "data" (eq $nodeName $accessNode) }}
 {{- $confKey := ($node.configuration | default "default") -}}
 {{- $configuration := required (printf "Configuration %s (for node %s) does not exist" $confKey $nodeName) (index $.Values.spec.configurations $confKey) -}}
-{{- $clusterName := printf "%s-%s" (include "timescaledb.fullname" $) $nodeName -}}
+{{- /*
+SCOPE influences the name of the endpoint used by Patroni,
+that in the end expose the whole deployment to the end user.
+As we want the name of the service for the user to be friendly (equal to release name),
+we set PATRONI_SCOPE = timescaledb.fullname for the access node only
+*/}}
+{{- $clusterName := ternary (include "timescaledb.fullname" $) (printf "%s-%s" (include "timescaledb.fullname" $) $nodeName) (eq $nodeType "access") -}}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -36,6 +42,11 @@ spec:
         timescaledb-node-type: {{ $nodeType }}
         cluster-name: {{ $clusterName }}
     spec:
+      serviceAccountName: {{ template "timescaledb.serviceAccountName" $ }}
+      securityContext:
+        # The postgres user inside the TimescaleDB image has uid=1000.
+        # This configuration ensures the permissions of the mounts are suitable
+        fsGroup: 1000
       containers:
         - name: timescaledb
           image: "{{ $.Values.image | default (printf "timescaledev/timescaledb-ha:pg%s-ts1.6" ($node.version | default 11 | toString)) }}"
@@ -89,16 +100,10 @@ spec:
             value: {{ include "data_directory" . | quote }}
           - name: PATRONI_KUBERNETES_NAMESPACE
             value: {{ $.Release.Namespace }}
-          - name: PATRONI_KUBERNETES_LABELS
-            value: {{ printf "{timescaledb-node-name: %s, cluster-name: %s, timescaledb-node-type: %s}" $nodeName $clusterName $nodeType | quote }}
-            {{- /*
-            SCOPE influences the name of the endpoint used by Patroni,
-            that in the end expose the whole deployment to the end user.
-            As we want the name of the service for the user to be friendly (equal to release name),
-            we set SCOPE = timescaledb.fullname for the access node only
-            */}}
           - name: PATRONI_SCOPE
-            value: {{ ternary (include "timescaledb.fullname" $) $clusterName (eq $nodeType "access") }}
+            value: {{ $clusterName }}
+          - name: PATRONI_KUBERNETES_LABELS
+            value: {{ printf "{cluster-name: %s}" $clusterName | quote }}
           # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly,
           # but for interactive sessions, callbacks and PostgreSQL tools they should be correct.
           - name: PGDATA

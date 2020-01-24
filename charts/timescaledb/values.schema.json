@@ -243,6 +243,9 @@
             "service.helm.timescale.com/generate-certificates": {
               "type": "boolean"
             },
+            "service.helm.timescale.com/timescaledb-tune-enabled": {
+              "type": "boolean"
+            },
             "service.helm.timescale.com/network-policy-enabled": {
               "type": "boolean"
             },
@@ -252,7 +255,7 @@
             "service.helm.timescale.com/rbac-create": {
               "type": "boolean"
             },
-            "service.helm.timescale.com/timescaledb-tune-enabled": {
+            "service.helm.timescale.com/serviceaccount-create": {
               "type": "boolean"
             },
             "service.helm.timescale.com/backup-method": {

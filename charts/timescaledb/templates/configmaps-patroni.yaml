@@ -4,7 +4,13 @@
 {{- $nodeType := ternary "access" "data" (eq $nodeName $accessNode) }}
 {{- $confKey := ($node.configuration | default "default") -}}
 {{- $configuration := required (printf "Configuration %s (for node %s) does not exist" $confKey $nodeName) (index $.Values.spec.configurations $confKey) -}}
-{{- $clusterName := printf "%s-%s" (include "timescaledb.fullname" $) $nodeName -}}
+{{- /*
+SCOPE influences the name of the endpoint used by Patroni,
+that in the end expose the whole deployment to the end user.
+As we want the name of the service for the user to be friendly (equal to release name),
+we set PATRONI_SCOPE = timescaledb.fullname for the access node only
+*/}}
+{{- $clusterName := ternary (include "timescaledb.fullname" $) (printf "%s-%s" (include "timescaledb.fullname" $) $nodeName) (eq $nodeType "access") -}}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -27,7 +33,7 @@ data:
           --encoding=UTF8
           --locale=C.UTF-8
         keep_existing_recovery_conf: True
-      post_init: /etc/timescaledb/scripts/post_init.sh
+      # post_init: /etc/timescaledb/scripts/post_init.sh
       dcs:
         loop_wait: 10
         maximum_lag_on_failover: 33554432
@@ -75,9 +81,9 @@ data:
         port: 5432
         targetPort: 5432
     postgresql:
-      create_replica_methods:
-      - pgbackrest
-      - basebackup
+      #create_replica_methods:
+      #- pgbackrest
+      #- basebackup
       pgbackrest:
         command: /etc/timescaledb/scripts/pgbackrest_restore.sh
         keep_data: True
@@ -85,14 +91,14 @@ data:
         no_master: 1
       basebackup:
       - waldir: "/var/lib/postgresql/wal/pg_wal"
-      recovery_conf:
-        restore_command: /etc/timescaledb/scripts/pgbackrest_archive_get.sh %f "%p"
+      recovery_conf: {}
+      # restore_command: /etc/timescaledb/scripts/pgbackrest_archive_get.sh %f "%p"
       callbacks:
-        on_role_change: /etc/timescaledb/scripts/patroni_callback.sh
-        on_start: /etc/timescaledb/scripts/patroni_callback.sh
-        on_reload: /etc/timescaledb/scripts/patroni_callback.sh
-        on_restart: /etc/timescaledb/scripts/patroni_callback.sh
-        on_stop: /etc/timescaledb/scripts/patroni_callback.sh
+        # on_role_change: /etc/timescaledb/scripts/patroni_callback.sh
+        # on_start: /etc/timescaledb/scripts/patroni_callback.sh
+        # on_reload: /etc/timescaledb/scripts/patroni_callback.sh
+        # on_restart: /etc/timescaledb/scripts/patroni_callback.sh
+        # on_stop: /etc/timescaledb/scripts/patroni_callback.sh
       authentication:
         replication:
           username: standby
