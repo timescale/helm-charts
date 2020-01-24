@@ -27,7 +27,7 @@ spec:
     example:
       encoding: UTF8
       locale: C
-  accessNode: ts0
+  accessNode: ts2
   nodes:
     ts0:
       configuration: default

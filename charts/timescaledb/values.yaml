@@ -2,9 +2,11 @@ metadata:
   # These annotations allow you toggle features in the Helm chart to on/off
   annotations:
     # In order to enable the backup, s3 credentials are required
-    service.helm.timescale.com/backup_enabled: false
-    service.helm.timescale.com/generate-passwords: True
-    service.helm.timescale.com/generate-certificates: True
+    service.helm.timescale.com/backup_enable: false
+    service.helm.timescale.com/passwords-generate: True
+    service.helm.timescale.com/certificates-generate: True
+    service.helm.timescale.com/readinessprobe-enable: True
+
 
 # This part of the configuration ("spec") has the same definition as the TimescaleDB Custom Resource Definition for
 # the Timescale Operator
@@ -25,6 +27,17 @@ spec:
         version: 11
         parameters:
           work_mem: "16MB"
+  debug:
+    execStartPre:
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
 
 nameOverride: ""
 fullnameOverride: ""
+serviceAccount:
+  create: False

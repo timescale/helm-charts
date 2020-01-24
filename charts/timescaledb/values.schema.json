@@ -104,34 +104,15 @@
       "type": "string",
       "maxLength": 40
     },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "annotations": {
-          "additionalProperties": true,
-          "type": "object",
-          "properties": {
-            "service.helm.timescale.com/generate-certificates": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/network-policy-enabled": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/generate-passwords": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/timescaledb-tune-enabled": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/backup-method": {
-              "type": "string"
-            },
-            "service.helm.timescale.com/backup-enabled": {
-              "type": "boolean"
-            }
-          }
-        }
-      }
+    "nameOverride": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "readinessProbe": {
+      "type": "object"
+    },
+    "serviceAccount": {
+      "type": "object"
     },
     "spec": {
       "additionalProperties": false,
@@ -147,6 +128,42 @@
             "string",
             "null"
           ]
+        },
+        "users": {
+          "$ref": "#/components/schemas/User"
+        },
+        "databases": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "properties": {
+              "locale": {
+                "minLength": 1,
+                "type": "string",
+                "example": "C"
+              },
+              "encoding": {
+                "minLength": 3,
+                "type": "string",
+                "example": "UTF8"
+              }
+            }
+          },
+          "type": "object"
+        },
+        "debug": {
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "execStartPre": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
         },
         "nodes": {
           "additionalProperties": {
@@ -177,30 +194,6 @@
             }
           },
           "type": "object"
-        },
-        "databases": {
-          "additionalProperties": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object",
-            "properties": {
-              "locale": {
-                "minLength": 1,
-                "type": "string",
-                "example": "C"
-              },
-              "encoding": {
-                "minLength": 3,
-                "type": "string",
-                "example": "UTF8"
-              }
-            }
-          },
-          "type": "object"
-        },
-        "users": {
-          "$ref": "#/components/schemas/User"
         },
         "configurations": {
           "additionalProperties": {
@@ -240,9 +233,34 @@
         }
       }
     },
-    "nameOverride": {
-      "type": "string",
-      "maxLength": 40
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "additionalProperties": true,
+          "type": "object",
+          "properties": {
+            "service.helm.timescale.com/generate-certificates": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/network-policy-enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/generate-passwords": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/timescaledb-tune-enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/backup-method": {
+              "type": "string"
+            },
+            "service.helm.timescale.com/backup-enabled": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
     }
   }
 }

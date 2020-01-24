@@ -9,6 +9,10 @@ properties:
   nameOverride:
     type: string
     maxLength: 40
+  serviceAccount:
+    type: object
+  readinessProbe:
+    type: object
   metadata:
     type: object
     properties:
@@ -32,6 +36,14 @@ properties:
     type: object
     additionalProperties: false
     properties:
+      debug:
+        type: object
+        additionalProperties: false
+        properties:
+          execStartPre:
+            type:
+            - string
+            - "null"
       users:
         $ref: '#/components/schemas/User'
       databases:

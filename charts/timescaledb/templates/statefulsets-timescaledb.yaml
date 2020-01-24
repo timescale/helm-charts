@@ -1,0 +1,130 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+{{- $accessNode := (include "accessNode" $) -}}
+{{- range $nodeName, $node := .Values.spec.nodes }}
+{{- $nodeType := ternary "access" "data" (eq $nodeName $accessNode) }}
+{{- $confKey := ($node.configuration | default "default") -}}
+{{- $configuration := required (printf "Configuration %s (for node %s) does not exist" $confKey $nodeName) (index $.Values.spec.configurations $confKey) -}}
+{{- $clusterName := printf "%s-%s" (include "timescaledb.fullname" $) $nodeName -}}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $clusterName }}
+  labels:
+    {{- include "timescaledb.labels" $ | nindent 4 }}
+    timescaledb-node-name: {{ $nodeName }}
+    timescaledb-node-type: {{ $nodeType }}
+    cluster-name: {{ $clusterName }}
+spec:
+  serviceName: {{ template "timescaledb.fullname" $ }}
+  replicas: {{ $configuration.replicas | default 1 }}
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      timescaledb-node-name: {{ $nodeName }}
+      timescaledb-node-type: {{ $nodeType }}
+      cluster-name: {{ $clusterName }}
+  template:
+    metadata:
+      name: {{ template "timescaledb.fullname" $ }}
+      labels:
+        {{- include "timescaledb.labels" $ | nindent 8 }}
+        timescaledb-node-name: {{ $nodeName }}
+        timescaledb-node-type: {{ $nodeType }}
+        cluster-name: {{ $clusterName }}
+    spec:
+      containers:
+        - name: timescaledb
+          image: "{{ $.Values.image | default (printf "timescaledev/timescaledb-ha:pg%s-ts1.6" ($node.version | default 11 | toString)) }}"
+          imagePullPolicy: Always
+          command:
+            - sh
+            - "-c"
+            # When reusing an already existing volume it sometimes happens that the permissions
+            # of the PGDATA and/or wal directory are incorrect. To guard against this, we always correctly
+            # set the permissons of these directories before we hand over to Patroni
+            - |
+              {{ $.Values.spec.debug.execStartPre }}
+              install -o postgres -g postgres -d -m 0700 {{ include "data_directory" $ | quote }} {{ include "wal_directory" $ | quote }} || exit 1
+              exec patroni /etc/timescaledb/patroni.yaml
+          env:
+          # We use mixed case environment variables for Patroni User management,
+          # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.
+          # Where possible, we want to have lowercase usernames in PostgreSQL as more complex postgres usernames
+          # requiring quoting to be done in certain contexts, which many tools do not do correctly, or even at all.
+          # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#bootstrap-configuration
+          - name: PATRONI_admin_OPTIONS
+            value: createrole,createdb
+          - name: PATRONI_REPLICATION_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "patroniUsersPrefix" $ }}-{{ $nodeType }}
+                key: standby
+          - name: PATRONI_SUPERUSER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name:  {{ template "patroniUsersPrefix" $ }}-{{ $nodeType }}
+                key: postgres
+          - name: PATRONI_REPLICATION_USERNAME
+            value: standby
+          # To specify the PostgreSQL and Rest API connect addresses we need
+          # the PATRONI_KUBERNETES_POD_IP to be available as a bash variable, so we can compose an
+          # IP:PORT address later on
+          - name: PATRONI_KUBERNETES_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: PATRONI_POSTGRESQL_CONNECT_ADDRESS
+            value: "$(PATRONI_KUBERNETES_POD_IP):5432"
+          - name: PATRONI_RESTAPI_CONNECT_ADDRESS
+            value: "$(PATRONI_KUBERNETES_POD_IP):8008"
+          - name: PATRONI_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: PATRONI_POSTGRESQL_DATA_DIR
+            value: {{ include "data_directory" . | quote }}
+          - name: PATRONI_KUBERNETES_NAMESPACE
+            value: {{ $.Release.Namespace }}
+          - name: PATRONI_KUBERNETES_LABELS
+            value: {{ printf "{timescaledb-node-name: %s, cluster-name: %s, timescaledb-node-type: %s}" $nodeName $clusterName $nodeType | quote }}
+            {{- /*
+            SCOPE influences the name of the endpoint used by Patroni,
+            that in the end expose the whole deployment to the end user.
+            As we want the name of the service for the user to be friendly (equal to release name),
+            we set SCOPE = timescaledb.fullname for the access node only
+            */}}
+          - name: PATRONI_SCOPE
+            value: {{ ternary (include "timescaledb.fullname" $) $clusterName (eq $nodeType "access") }}
+          # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly,
+          # but for interactive sessions, callbacks and PostgreSQL tools they should be correct.
+          - name: PGDATA
+            value: "$(PATRONI_POSTGRESQL_DATA_DIR)"
+          - name: PGHOST
+            value: "{{ template "socket_directory" $ }}"
+          volumeMounts:
+          - mountPath: /etc/timescaledb/patroni.yaml
+            subPath: patroni.yaml
+            name: patroni-config
+            readOnly: true
+          - mountPath: /etc/certificate
+            name: certificate
+            readOnly: true
+          - name: socket-directory
+            mountPath: {{ template "socket_directory" . }}
+      volumes:
+      - name: socket-directory
+        emptyDir: {}
+      - name: patroni-config
+        configMap:
+          name: {{ $clusterName }}-patroni
+      - name: certificate
+        secret:
+          secretName: {{ template "certificatePrefix" $ }}-{{ $nodeType }}
+          defaultMode: 416 # 0640 permissions
+...
+{{ end }}
+

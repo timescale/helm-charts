@@ -94,3 +94,36 @@ set.
 {{- fail "specifying the accessNode is required when configuring multiple nodes" -}}
 {{- end -}}
 {{- end -}}
+
+
+{{- define "socket_directory" -}}
+/var/run/postgresql
+{{- end -}}
+
+{{- define "data_mountpoint" -}}
+/var/lib/postgresql/
+{{- end -}}
+
+{{- define "wal_mountpoint" -}}
+/var/lib/postgresql/wal
+{{- end -}}
+
+{{- define "data_directory" -}}
+/var/lib/postgresql/data
+{{- end -}}
+
+{{- define "callbacks_dir" -}}
+/etc/timescaledb/callbacks
+{{- end -}}
+
+{{- define "scripts_dir" -}}
+/etc/timescaledb/scripts
+{{- end -}}
+
+{{- define "wal_directory" -}}
+/var/lib/postgresql/pg_wal
+{{- end -}}
+
+{{- define "tstune_config" -}}
+{{ printf "%s/timescaledb.conf" (include "socket_directory" .) }}
+{{- end -}}

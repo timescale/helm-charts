@@ -1,0 +1,114 @@
+
+{{- $accessNode := (include "accessNode" $) -}}
+{{- range $nodeName, $node := .Values.spec.nodes }}
+{{- $nodeType := ternary "access" "data" (eq $nodeName $accessNode) }}
+{{- $confKey := ($node.configuration | default "default") -}}
+{{- $configuration := required (printf "Configuration %s (for node %s) does not exist" $confKey $nodeName) (index $.Values.spec.configurations $confKey) -}}
+{{- $clusterName := printf "%s-%s" (include "timescaledb.fullname" $) $nodeName -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $clusterName }}-patroni
+  labels:
+    {{- include "timescaledb.labels" $ | nindent 4 }}
+    timescaledb-node-type: {{ $nodeType }}
+    timescaledb-node-name: {{ $nodeName }}
+data:
+  patroni.yaml: |
+    patroni:
+      log:
+        level: DEBUG
+      # https://patroni.readthedocs.io/en/latest/replica_bootstrap.html#bootstrap
+      bootstrap:
+        #method: restore_or_initdb
+        restore_or_initdb:
+          command: >
+            /etc/timescaledb/scripts/restore_or_initdb.sh
+            --encoding=UTF8
+            --locale=C.UTF-8
+          keep_existing_recovery_conf: True
+        post_init: /etc/timescaledb/scripts/post_init.sh
+        dcs:
+          loop_wait: 10
+          maximum_lag_on_failover: 33554432
+          postgresql:
+            parameters:
+              archive_command: "/etc/timescaledb/scripts/pgbackrest_archive.sh %p"
+              archive_mode: 'on'
+              archive_timeout: 1800s
+              autovacuum_analyze_scale_factor: 0.02
+              autovacuum_max_workers: 10
+              autovacuum_vacuum_scale_factor: 0.05
+              hot_standby: 'on'
+              log_autovacuum_min_duration: 0
+              log_checkpoints: 'on'
+              log_connections: 'on'
+              log_disconnections: 'on'
+              log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
+              log_lock_waits: 'on'
+              log_min_duration_statement: '1s'
+              log_statement: ddl
+              max_connections: 100
+              max_prepared_transactions: 150
+              shared_preload_libraries: timescaledb,pg_stat_statements
+              ssl: 'on'
+              ssl_cert_file: '/etc/certificate/tls.crt'
+              ssl_key_file: '/etc/certificate/tls.key'
+              tcp_keepalives_idle: 900
+              tcp_keepalives_interval: 100
+              temp_file_limit: 1GB
+              timescaledb.passfile: '../.pgpass'
+              unix_socket_directories: "/var/run/postgresql"
+              unix_socket_permissions: '0750'
+              wal_level: hot_standby
+              wal_log_hints: 'on'
+            use_pg_rewind: true
+            use_slots: true
+          retry_timeout: 10
+          ttl: 30
+      kubernetes:
+        role_label: role
+        scope_label: cluster-name
+        use_endpoints: true
+        ports:
+        - name: postgresql
+          port: 5432
+          targetPort: 5432
+      postgresql:
+        create_replica_methods:
+        - pgbackrest
+        - basebackup
+        pgbackrest:
+          command: /etc/timescaledb/scripts/pgbackrest_restore.sh
+          keep_data: True
+          no_params: True
+          no_master: 1
+        basebackup:
+        - waldir: "/var/lib/postgresql/wal/pg_wal"
+        recovery_conf:
+          restore_command: /etc/timescaledb/scripts/pgbackrest_archive_get.sh %f "%p"
+        callbacks:
+          on_role_change: /etc/timescaledb/scripts/patroni_callback.sh
+          on_start: /etc/timescaledb/scripts/patroni_callback.sh
+          on_reload: /etc/timescaledb/scripts/patroni_callback.sh
+          on_restart: /etc/timescaledb/scripts/patroni_callback.sh
+          on_stop: /etc/timescaledb/scripts/patroni_callback.sh
+        authentication:
+          replication:
+            username: standby
+          superuser:
+            username: postgres
+        listen: 0.0.0.0:5432
+        pg_hba:
+        - hostnossl all,replication all                all                reject
+        - local     all             all                                   peer
+        - hostssl   all             all                127.0.0.1/32       md5
+        - hostssl   all             all                ::1/128            md5
+        - hostssl   replication     standby            all                md5
+        - hostssl   all             all                all                md5
+        use_unix_socket: true
+      restapi:
+        listen: 0.0.0.0:8008
+...
+{{ end }}
