@@ -75,7 +75,7 @@ spec:
               - POST
               - --data
               - |
-                  {"type": {{ quote .type }}
+                  {"type": {{ quote .type }}}
               - "http://{{ template "timescaledb.fullname" $ }}-backup:8081/backups/"
 ...
 {{- end }}
