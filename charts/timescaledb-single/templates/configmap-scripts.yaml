@@ -114,6 +114,17 @@ data:
       CREATE EXTENSION timescaledb;
     __SQL__
 
+    TABLESPACES={{ $.Values.persistentVolumes.tablespaces | default dict | keys | join " " | quote }}
+    for tablespace in $TABLESPACES
+    do
+      log "Creating tablespace ${tablespace}"
+      tablespacedir="{{ include "tablespaces_dir" . }}/${tablespace}/data"
+      psql -d "$URL" --set tablespace="${tablespace}" --set directory="${tablespacedir}" --set ON_ERROR_STOP=1 <<__SQL__
+        SET synchronous_commit to 'off';
+        CREATE TABLESPACE :"tablespace" LOCATION :'directory';
+    __SQL__
+    done
+
     if [ "${PGBACKREST_BACKUP_ENABLED}" == "1" ]; then
       log "Waiting for pgBackRest API to become responsive"
       while sleep 1; do

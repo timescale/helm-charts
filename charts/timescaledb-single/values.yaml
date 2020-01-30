@@ -255,12 +255,22 @@ persistentVolumes:
     enabled: True
     size: 1Gi
     subPath: ""
+    storageClass:
     # When changing this mountPath ensure you also change the following key to reflect this:
     # patroni.postgresql.basebackup.[].waldir
     mountPath: "/var/lib/postgresql/wal"
     annotations: {}
     accessModes:
       - ReadWriteOnce
+  # Any tablespace mentioned here requires a volume that will be associated with it.
+  # tablespaces:
+    # example1:
+    #   size: 5Gi
+    #   storageClass: gp2
+    # example2:
+    #   size: 5Gi
+    #   storageClass: gp2
+
 
 resources: {}
   # If you do want to specify resources, uncomment the following

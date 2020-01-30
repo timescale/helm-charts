@@ -60,6 +60,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `persistentVolumes.<name>.size`   | Persistent Volume size                      | `2Gi`                                               |
 | `persistentVolumes.<name>.storageClass`| Persistent Volume Storage Class        | `volume.alpha.kubernetes.io/storage-class: default` |
 | `persistentVolumes.<name>.subPath`| Subdirectory of Persistent Volume to mount  | `""`                                                |
+| `persistentVolumes.tablespaces`   | A mapping of tablespaces and Volumes        | `nil`, see [multiple-tablespaces.yaml](values/multiple-tablespaces.yaml) for a full example |
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |

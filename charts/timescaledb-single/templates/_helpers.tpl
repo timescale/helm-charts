@@ -62,6 +62,10 @@ Create the name of the service account to use.
 /etc/timescaledb/callbacks
 {{- end -}}
 
+{{- define "tablespaces_dir" -}}
+{{ printf "%s/tablespaces" .Values.persistentVolumes.data.mountPath }}
+{{- end -}}
+
 {{- define "scripts_dir" -}}
 /etc/timescaledb/scripts
 {{- end -}}
