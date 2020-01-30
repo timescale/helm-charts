@@ -1,0 +1,34 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+# These settings will override the defaults for the Volumes used by your deployment.
+# It will create three Volumes:
+# 1.  500 Gi - Used for the main PostgreSQL Data Files
+# 2.  300 Gi - Used for the PostgreSQL WAL files
+# 3. 5000 Gi - Used for the "historical" tablespace
+#
+#
+# An example[1] on how to create a slow storage class using io1 instead of gp2 EBS storage[2]
+#
+#         apiVersion: storage.k8s.io/v1
+#         kind: StorageClass
+#         metadata:
+#           name: slow
+#         provisioner: kubernetes.io/aws-ebs
+#         parameters:
+#           type: io1
+#           iopsPerGB: "10"
+#
+# 1: https://kubernetes.io/docs/concepts/storage/storage-classes/#aws-ebs
+# 2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+persistentVolumes:
+  data:
+    size: 500Gi
+    storageClass: gp2
+  wal:
+    size: 300Gi
+    storageClass: gp2
+  tablespaces:
+    historical:
+      size: 5Ti
+      storageClass: slow

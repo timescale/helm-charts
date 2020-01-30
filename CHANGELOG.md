@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  These are changes that will probably be included in the next release.
 ### Added
+ * Support for multiple tablespaces at initialization time
 ### Changed
 ### Removed
 ### Fixed

@@ -117,15 +117,25 @@ spec:
       - name: timescaledb
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # When reusing an already existing volume it sometimes happens that the permissions
+        # of the PGDATA and/or wal directory are incorrect. To guard against this, we always correctly
+        # set the permissons of these directories before we hand over to Patroni.
+        # We also create all the tablespaces that are defined, to ensure a smooth restore/recovery on a
+        # pristine set of Volumes.
+        # As PostgreSQL requires to have full control over the permissions of the tablespace directories,
+        # we create a subdirectory "data" in every tablespace mountpoint. The full path of every tablespace
+        # therefore always ends on "/data".
         command:
           - sh
           - "-c"
-          # When reusing an already existing volume it sometimes happens that the permissions
-          # of the PGDATA and/or wal directory are incorrect. To guard against this, we always correctly
-          # set the permissons of these directories before we hand over to Patroni
           - |
             {{ .Values.debug.execStartPre }}
             install -o postgres -g postgres -d -m 0700 {{ include "data_directory" . | quote }} {{ include "wal_directory" . | quote }} || exit 1
+            TABLESPACES={{ $.Values.persistentVolumes.tablespaces | default dict | keys | join " " | quote }}
+            for tablespace in {{ $.Values.persistentVolumes.tablespaces | default dict | keys | join " " }}; do
+              install -o postgres -g postgres -d -m 0700 "{{ include "tablespaces_dir" . }}/${tablespace}/data"
+            done
+
             exec patroni /etc/timescaledb/patroni.yaml
         env:
         # We use mixed case environment variables for Patroni User management,
@@ -220,6 +230,10 @@ spec:
           mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
         {{- end }}
+{{- range $tablespaceName := keys .Values.persistentVolumes.tablespaces }}
+        - name: {{ $tablespaceName }}
+          mountPath: {{ printf "%s/%s" (include "tablespaces_dir" $) $tablespaceName }}
+{{- end }}
         - mountPath: /etc/timescaledb/patroni.yaml
           subPath: patroni.yaml
           name: patroni-config
@@ -265,6 +279,10 @@ spec:
           mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
         {{- end }}
+{{- range $tablespaceName := keys .Values.persistentVolumes.tablespaces }}
+        - name: {{ $tablespaceName }}
+          mountPath: {{ printf "%s/%s" (include "tablespaces_dir" $) $tablespaceName }}
+{{- end }}
         - mountPath: /etc/pgbackrest
           name: pgbackrest
           readOnly: true
@@ -392,7 +410,7 @@ spec:
         name: wal-volume
         annotations:
         {{- if .Values.persistentVolumes.wal.annotations }}
-{{ toYaml .Values.persistentVolumes.wal.annotations | indent 8 }}
+{{ toYaml .Values.persistentVolumes.wal.annotations | indent 10 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
@@ -414,3 +432,23 @@ spec:
       {{- end }}
       {{- end }}
   {{- end }}
+{{- range $tablespaceName, $volume := ($.Values.persistentVolumes.tablespaces | default dict ) }}
+    - metadata:
+        name: {{ $tablespaceName }}
+        annotations:
+{{ $volume.annotations | default dict | toYaml | indent 10 }}
+        labels:
+          app: {{ template "timescaledb.fullname" $ }}
+          release: {{ $.Release.Name }}
+          heritage: {{ $.Release.Service }}
+          cluster-name: {{ template "clusterName" $ }}
+          tablespace: {{ $tablespaceName }}
+          purpose: tablespace
+      spec:
+        accessModes:
+{{ $volume.accessModes | default (list "ReadWriteOnce") | toYaml | indent 8 }}
+        resources:
+          requests:
+            storage: "{{ $volume.size }}"
+        storageClassName: {{ $volume.storageClass | default "" }}
+{{- end }}
