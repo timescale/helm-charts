@@ -6,12 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
- These are changes that will probably be included in the next release.
 ### Added
- * Support for multiple tablespaces at initialization time
 ### Changed
 ### Removed
 ### Fixed
+
+## [v0.5.2] -  2020-01-31
+
+> NOTICE: When migrating from a < 0.5.x chart, the primary Service needs to be removed before
+> invoking `helm update`, as the update will otherwise fail.
+
+### Added
+ * Support for multiple tablespaces at initialization time
+### Fixed
+ * CronJob triggering the backup (the POST request was not valid json)
 
 ## [v0.5.1] -  2020-01-21
 
