@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 ### Changed
+ * Set autotune max\_wal\_size to 60% (instead of 80%) for a dedicated WAL volume
 ### Removed
 ### Fixed
 
