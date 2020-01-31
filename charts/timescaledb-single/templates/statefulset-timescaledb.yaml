@@ -230,7 +230,7 @@ spec:
           mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
         {{- end }}
-{{- range $tablespaceName := keys .Values.persistentVolumes.tablespaces }}
+{{- range $tablespaceName := ( .Values.persistentVolumes.tablespaces | default dict | keys ) }}
         - name: {{ $tablespaceName }}
           mountPath: {{ printf "%s/%s" (include "tablespaces_dir" $) $tablespaceName }}
 {{- end }}
@@ -279,7 +279,7 @@ spec:
           mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
         {{- end }}
-{{- range $tablespaceName := keys .Values.persistentVolumes.tablespaces }}
+{{- range $tablespaceName := ( .Values.persistentVolumes.tablespaces | default dict | keys ) }}
         - name: {{ $tablespaceName }}
           mountPath: {{ printf "%s/%s" (include "tablespaces_dir" $) $tablespaceName }}
 {{- end }}
