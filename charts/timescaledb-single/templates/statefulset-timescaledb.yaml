@@ -138,32 +138,6 @@ spec:
 
             exec patroni /etc/timescaledb/patroni.yaml
         env:
-        # We use mixed case environment variables for Patroni User management,
-        # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.
-        # Where possible, we want to have lowercase usernames in PostgreSQL as more complex postgres usernames
-        # requiring quoting to be done in certain contexts, which many tools do not do correctly, or even at all.
-        # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#bootstrap-configuration
-        - name: PATRONI_admin_OPTIONS
-          value: createrole,createdb
-{{- range $key, $_ := $.Values.credentials }}
-        - name: PATRONI_{{ $key }}_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" $ }}-passwords
-              key: {{ $key | quote }}
-{{- end }}
-        - name: PATRONI_REPLICATION_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}-passwords
-              key: standby
-        - name: PATRONI_SUPERUSER_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}-passwords
-              key: postgres
-        - name: PATRONI_REPLICATION_USERNAME
-          value: standby
         # To specify the PostgreSQL and Rest API connect addresses we need
         # the PATRONI_KUBERNETES_POD_IP to be available as a bash variable, so we can compose an
         # IP:PORT address later on
