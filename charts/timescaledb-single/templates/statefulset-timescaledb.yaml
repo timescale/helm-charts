@@ -189,23 +189,6 @@ spec:
         # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#bootstrap-configuration
         - name: PATRONI_admin_OPTIONS
           value: createrole,createdb
-{{- range $key, $_ := $.Values.credentials }}
-        - name: PATRONI_{{ $key }}_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" $ }}-passwords
-              key: {{ $key | quote }}
-{{- end }}
-        - name: PATRONI_REPLICATION_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}-passwords
-              key: standby
-        - name: PATRONI_SUPERUSER_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}-passwords
-              key: postgres
         - name: PATRONI_REPLICATION_USERNAME
           value: standby
         # To specify the PostgreSQL and Rest API connect addresses we need
