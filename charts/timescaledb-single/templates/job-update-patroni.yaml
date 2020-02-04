@@ -35,7 +35,6 @@ spec:
         chart: {{ template "timescaledb.chart" . }}
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}
-        cluster-name: {{ template "clusterName" . }}
     spec:
       restartPolicy: OnFailure
       containers:
