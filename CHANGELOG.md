@@ -8,12 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 ### Changed
- * Set autotune max\_wal\_size to 60% (instead of 80%) for a dedicated WAL volume
 ### Removed
+### Fixed
+
+## [v0.5.3] - 2020-02-04
+
+### Changed
+ * Set autotune max\_wal\_size to 60% (instead of 80%) for a dedicated WAL volume
 ### Fixed
  * Prevent creation of replication slots for Jobs
 
-## [v0.5.2] -  2020-01-31
+## [v0.5.2] - 2020-01-31
 
 > NOTICE: When migrating from a < 0.5.x chart, the primary Service needs to be removed before
 > invoking `helm update`, as the update will otherwise fail.
