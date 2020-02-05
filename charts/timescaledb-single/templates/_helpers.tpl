@@ -62,6 +62,10 @@ ${HOME}/.pod_environment
 ${HOME}/.pgbackrest_environment
 {{- end -}}
 
+{{- define "pgbackrest_bootstrap_environment_dir" -}}
+/etc/pgbackrest/bootstrap
+{{- end -}}
+
 {{- define "data_directory" -}}
 {{ printf "%s/data" .Values.persistentVolumes.data.mountPath }}
 {{- end -}}

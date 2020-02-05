@@ -87,6 +87,23 @@ backup:
     #      name: pgbackrest-dev-secrets
     #      key: repo1-s3-key-secret
 
+# When creating a *new* deployment, the default is to initialize (using initdb) the database.
+# If however, you want to initialize the database using an existing backup, you can do so by
+# configuring this section.
+#
+# WARNING: You *should not* run 2 identically named deployments in separate Kubernetes
+#          clusters using the same S3 bucket for backups.
+bootstrapFromBackup:
+  enabled: False
+  # Setting the s3 path is mandatory to avoid overwriting an already existing backup,
+  # and to be sure the restore is explicitly the one requested.
+  repo1-path:
+  # Here you can (optionally) provide a Secret to configure the restore process further.
+  # For example, if you need to specify a different restore bucket, you should set
+  # PGBACKREST_REPO1_S3_BUCKET: <base64 encoded value of the bucket> in these secrets
+  secretName: pgbackrest-bootstrap
+
+
 # Extra custom environment variables.
 # These should be an EnvVar, as this allows you to inject secrets into the environment
 # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core

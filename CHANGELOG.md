@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
  * The possibility to run a [`pgBouncer`](https://www.pgbouncer.org/) container in every Pod.
+ * Allow clusters to be initialized from a backup
 ### Changed
  * Use the PostgreSQL 12 Docker Image by default
 ### Removed

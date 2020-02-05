@@ -270,6 +270,59 @@ backup:
 - *type*: choose from `full`, `incr` or `diff`, as explained in the [pgBackRest documentation](https://pgbackrest.org/user-guide.html)
 - *schedule*: A schedule, specified in [cron format](https://en.wikipedia.org/wiki/Cron)
 
+### Bootstrap from Backup
+If you want to create a new deployment using a backup of another deployment, you can do so by enabling bootstap from backup.
+
+This mode will instead of running [`initdb`](https://www.postgresql.org/docs/current/app-initdb.html), attempt a restore
+using the specified PGBACKREST configuration.
+
+```yaml
+bootstrapFromBackup:
+  enabled: True
+  repo1-path: /namespace/deployment
+  secretName: pgbackrest-bootstrap # optional
+```
+
+Restoring a different deployment using an existing deployment is possible, but can be dangerous,
+as at this point you may be having 2 deployments pointing to the same S3 bucket/path.
+Therefore, `bootstrapFromBackup.repo1-path` is required to be set.
+
+If there are any other changes to be made, for example the bucket itself, you can create a secret containing that
+information, for example:
+
+```console
+kubectl create secret generic pgbackrest-bootstrap --from-literal=PGBACKREST_REPO1_S3_BUCKET=acme_test_backups
+```
+
+#### Example: Restore a no longer used deployment in the same namespace
+
+- Source: test01 in namespace testing
+- Target: test01 in namespace testing
+
+> WARNING: This new deployment will - once the backup is enabled - use the same S3 bucket/path to 
+> write its backup than the previous deployment.
+
+1. Create (or restore) [secrets](#creating-the-secrets) for the new deployment in the `testing` namespace.
+2. Create a new deployment using the backup of the former deployment
+    ```console
+    helm upgrade --install test01 --namespace testing ./charts/timescaledb-single \
+      --set bootstrapFromBackup=true \
+      --set bootstrapFromBackup.repo1-path=/testing/test01
+    ```
+
+#### Example: Create a clone of one deployment to another namespace
+
+- Source: test01 in namespace testing
+- Target: test02 in namespace troubleshooting
+
+1. Create new [secrets](#creating-the-secrets) for the new deployment in the `troubleshooting` namespace.
+2. Create a new deployment using the backup of the former deployment
+    ```console
+    helm upgrade --install test02 --namespace troubleshooting ./charts/timescaledb-single \
+      --set bootstrapFromBackup.enabled=true \
+      --set bootstrapFromBackup.repo1-path=/testing2/test01
+    ```
+
 ### Testing restore/recovery from inside the Kubernetes cluster
 Every new pod that gets created needs to copy the PostgreSQL instance data. It will attempt do do this using the backup stored in the S3 bucket if available.
 Once the restore is done, it will connect to the `master` and use streaming replication to catch up the last bits.
