@@ -1,7 +1,6 @@
 # This file and its contents are licensed under the Apache License 2.0.
 # Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 
-{{- if or .Values.backup.enable .Values.backup.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -41,4 +40,3 @@ data:
     {{ $key }}={{ index $get $key }}
 {{- end }}
 ...
-{{ end }}

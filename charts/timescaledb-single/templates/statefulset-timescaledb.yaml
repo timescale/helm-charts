@@ -230,6 +230,8 @@ spec:
           value: "$(PATRONI_POSTGRESQL_DATA_DIR)"
         - name: PGHOST
           value: "{{ template "socket_directory" . }}"
+        - name: BOOTSTRAP_FROM_BACKUP
+          value: {{ .Values.bootstrapFromBackup.enabled | int | quote }}
         {{- if .Values.env }}{{ .Values.env | default list | toYaml | nindent 8 }}{{- end }}
           # pgBackRest is also called using the archive_command if the backup is enabled.
           # this script will also need access to the environment variables specified for
@@ -301,11 +303,12 @@ spec:
           mountPath: {{ template "callbacks_dir" . }}
           readOnly: true
         {{- end }}
-{{- if or .Values.backup.enabled .Values.backup.enable }}
         - mountPath: /etc/pgbackrest
           name: pgbackrest
           readOnly: true
-{{ end }}
+        - mountPath: {{ template "pgbackrest_bootstrap_environment_dir" . }}
+          name: pgbackrest-bootstrap
+          readOnly: true
         resources:
 {{ toYaml .Values.resources | indent 10 }}
 
@@ -472,6 +475,10 @@ spec:
         secret:
           secretName:  {{ template "secrets_certificate" . }}
           defaultMode: 416 # 0640 permissions
+      - name: pgbackrest-bootstrap
+        secret:
+          secretName: {{ .Values.bootstrapFromBackup.secretName }}
+          optional: True
       {{- if not .Values.persistentVolumes.data.enabled }}
       - name: storage-volume
         emptyDir: {}
