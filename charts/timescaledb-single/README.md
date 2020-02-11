@@ -31,21 +31,24 @@ When configured for Backups to S3:
 
 ## Installing
 
+The Helm chart expects a Kubernetes secret named `postgres-secrets` to already be present in the same namespace. Copy the example secrets file `postgres-secrets-example.yaml` to `postgres-secrets.yaml`. Double-check that the secrets file is excluded from being comitted to version control (Git should automatically ignore the file).
+
+Replace the placeholders with base64 encoded passwords. Apply the configuration to generate the secret on the cluster:
+
+```console
+kubectl apply -f postgres-secrets.yaml
+```
+
 To install the chart with the release name `my-release`:
 
 ```console
 helm install --name my-release charts/timescaledb-single
 ```
 
-You can override parameters using the `--set key=value[,key=value]` argument to `helm install`,
-e.g., to install the chart with randomly generated passwords:
+You can override parameters using the `--set key=value[,key=value]` argument to `helm install`, e.g.
 
 ```console
-random_password () { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32; }
-helm install --name my-release charts/timescaledb-single \
-    --set credentials.postgres="$(random_password)" \
-    --set credentials.admin="$(random_password)" \
-    --set credentials.standby="$(random_password)"
+helm install --name my-release charts/timescaledb-single --set image.tag=pg11.6-ts1.6.0 --set image.pullPolicy=Always
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,

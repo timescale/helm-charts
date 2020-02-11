@@ -25,7 +25,6 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
 | `image.tag`                       | The version of the image to pull            | `pg11-ts1.6`                                        |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
-| `credentials`                     | A mapping of usernames/passwords            | A postgres, standby and admin user                  |
 | `tls.cert`                        | The public key of the SSL certificate for PostgreSQL | empty (a self-signed certificate will be generated) |
 | `tls.key`                         | The private key of the SSL Certificate for PostgreSQL | empty                                     |
 | `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |

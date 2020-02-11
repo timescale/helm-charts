@@ -85,6 +85,14 @@ env:
 #        name: myapplication-passwords
 #        key: standby
 
+# Externally created Kubernetes secrets will be injected into the pods by referencing them here. You
+# can also add more configuration options and secrets this way (see https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables)
+envFrom:
+  - secretRef:
+      name: postgres-secrets
+  # - configMapRef:
+  #     name: my-special-config
+
 # This configuration will be passed on to Patroni directly, there are a few things that are
 # injected/changed, these are:
 #   - archive_command will be set to /bin/true if backup is disabled
