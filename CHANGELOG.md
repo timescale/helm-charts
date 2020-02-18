@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
- * Example for a High Throuhput cluster
+ * Examples for setting up a High Throughput Cluster, or using different backup parameters
  * Ability to override archive-push/archive-get pgBackRest settings
 ### Changed
 ### Removed

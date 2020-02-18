@@ -1,0 +1,21 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+backup:
+  enabled: true
+  pgBackRest:
+    # The path of the backup defaults to NAMESPACE/DEPLOYMENT, however you may want
+    # to override that here:
+    repo1-path: /testing123/testing456/
+
+  # The referenced secret can be created using kubectl, for example:
+  #
+  # kubectl create secret generic pgbackrest-secrets \
+  # --from-literal=PGBACKREST_REPO1_S3_KEY=examplekeyid \
+  # --from-literal=PGBACKREST_REPO1_S3_KEY_SECRET=examplesecret+D48GXfDdtl823nlSRRv7dmB \
+  # --from-literal=PGBACKREST_REPO1_S3_BUCKET=my_example_s3_bucket_for_backups
+  #
+  # https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#create-a-secret
+  envFrom:
+    - secretRef:
+        name: pgbackrest-secrets

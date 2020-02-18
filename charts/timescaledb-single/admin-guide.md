@@ -185,22 +185,16 @@ This allows you to decouple the secret management of the backup credentials from
 The [pgBackRest Command Reference](https://pgbackrest.org/command.html#introduction) has detailed information about which
 environment variables can be set.
 
-For example, if you would use [Vault](https://www.vaultproject.io/), you could do the following:
+For example, if you create a secret `pgbackrest-secrets`, you could use the following to avoid specifying plain text secrets in the `values.yaml`:
 
 ```yaml
-# Filename: myvalues.yaml
-
 backup:
-  enabled: True
-    pgBackRest:
-      repo1-s3-bucket: this_bucket_may_not_exist
-  env:
-    - name: PGBACKREST_REPO1_S3_KEY
-      value: vault:secret/data/my-system/mydb#PGBACKREST_REPO1_S3_KEY
-    - name: PGBACKREST_REPO1_S3_KEY_SECRET
-      value: vault:secret/data/my-system/mydb#PGBACKREST_REPO1_S3_KEY_SECRET
+  enabled: true
+  envFrom:
+    - secretRef:
+        name: pgbackrest-secrets
 ```
-
+For a full example, have a look at [backup_variations.yaml](values/backup_variations.yaml)
 
 ### Control the backup schedule
 If you want to alter the backup jobs, or their schedule, you can override the `backup.jobs` in your configuration, for example:
