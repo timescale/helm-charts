@@ -201,8 +201,8 @@ spec:
           # the backup. This can be removed once we do not directly invoke pgBackRest
           # from inside the TimescaleDB container anymore
         {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 8 }}{{- end }}
-        {{- if .Values.envFrom }}
-        envFrom: {{ .Values.envFrom | default list | toYaml | nindent 8 }}
+        {{- if or .Values.envFrom .Values.backup.envFrom }}
+        envFrom: {{ .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 }}
         {{- end }}
         ports:
         - containerPort: 8008
