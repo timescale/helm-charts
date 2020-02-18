@@ -29,7 +29,9 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `tls.cert`                        | The public key of the SSL certificate for PostgreSQL | empty (a self-signed certificate will be generated) |
 | `tls.key`                         | The private key of the SSL Certificate for PostgreSQL | empty                                     |
 | `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |
-| `backup.pgBackRest`               | [pgBackRest configuration](https://github.com/timescale/timescaledb-kubernetes/blob/master/charts/timescaledb-single/values.yaml)     | Working defaults |
+| `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults |
+| `backup.pgBackRest:archive-push`  | [pgBackRest global:archive-push configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza) | empty |
+| `backup.pgBackRest:archive-get`   | [pgBackRest global:archive-get configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)  | empty |
 | `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)          | `[]`                                                |
 | `envFrom`                         | Extra custom environment variables, expressed as [EnvFrom](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envfromsource-v1-core)          | `[]`                                                |
