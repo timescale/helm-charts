@@ -1,0 +1,97 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+# High Throughput requires a good throughput on the I/O layer, for most cloud providers,
+# IOPS are related to disk size, therefore setting up a decent sized WAL volume is benificial
+# for getting good troughput.
+#
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-io-characteristics.html
+# https://cloud.google.com/compute/docs/disks/performance
+#
+persistentVolumes:
+  data:
+    size: 2Ti
+  wal:
+    # We need good IOPS (see above), but we also need a significant amount of disk space
+    # to ensure we have a few hours of previous WAL on disk so replica's or the archiver
+    # can catch up if they have had interruptions.
+    size: 750Gi
+
+patroni:
+  bootstrap:
+    method: restore_or_initdb
+    restore_or_initdb:
+      # Increasing the wal-segsize from the default 16MB to 256MB has the upside of not having
+      # as many files per second, and not as many files in the pg_waldir.
+      # An immediate benefactor is the backup to s3: there will be less API calls, and many
+      # s3 operations with WAL therefore experience a speedup if the default is increased.
+      #
+      # https://www.postgresql.org/docs/current/app-initdb.html (search for --wal-segsize)
+      command: >
+        /etc/timescaledb/scripts/restore_or_initdb.sh
+        --encoding=UTF8
+        --locale=C.UTF-8
+        --wal-segsize=256
+    dcs:
+      # For High Throughput clusters it is likely that the bottleneck will be the recovery
+      # of the WAL on the replica's. If the high throughput is continous, this means
+      # the replica's will never catch up.
+      # Enabling synchronous_mode will ensure that there is at least 1 synchronous replica,
+      # which will ensure that the throughput will be limited to whatever the replica process
+      # of the synchronous replica can process.
+      #
+      # https://patroni.readthedocs.io/en/latest/replication_modes.html#synchronous-mode
+      master_start_timeout: 0
+      synchronous_mode: true
+      postgresql:
+        parameters:
+          # For good performance we want to have a long interval between checkpoints,
+          # however for continous high throughput, the replica's will have very limited
+          # capacity to catch up after a crash/restart.
+          #
+          # For example, if the recovery process of the replica requires on average
+          # 90% of the CPU, it could recover 1.11 seconds of WAL per second.
+          # If after a crash it is delayed by 5 minutes, it will only catch up in:
+          #
+          #   300/(1.11 - 1) = 2727 seconds (roughly 45 minutes)
+          #
+          # We therefore want to pick a middle ground between recoverability of instances
+          # and performance, and for now come up with 5 minutes.
+          checkpoint_timeout: 300s
+          temp_file_limit: '200GB'
+          # remote_apply will throttle the replica's, see also the comment at patroni.bootstrap.synchronous_mode
+          synchronous_commit: remote_apply
+
+# Enabling tuning allows us to use this configuration on many types of instances, therefore we enable it
+timescaledbTune:
+  enabled: true
+
+backup:
+  enabled: true
+
+  # For High Throughput clusters, the archiver will likely not be able to keep up if running synchronously.
+  # Therefore, we'll need to enable asynchronous archiving.
+  #
+  # Not using asynchronous archiving may cause failures far in the future, for example, on a 
+  # cluster with a WAL Volume of 500GB, and an archiver lagging 200MB/minute, the primary pod will only
+  # fail after 2500 minutes, or almost 2 days.
+  pgBackRest:archive-push:
+    process-max: 4
+    archive-async: "y"
+
+  pgBackRest:archive-get:
+    process-max: 4
+    archive-async: "y"
+    archive-get-queue-max: 2GB
+
+  # The referenced secret can be created using kubectl, for example:
+  #
+  # kubectl create secret generic pgbackrest-secrets \
+  # --from-literal=PGBACKREST_REPO1_S3_KEY=examplekeyid \
+  # --from-literal=PGBACKREST_REPO1_S3_KEY_SECRET=examplesecret+D48GXfDdtl823nlSRRv7dmB \
+  # --from-literal=PGBACKREST_REPO1_S3_BUCKET=my_example_s3_bucket_for_backups
+  #
+  # https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#create-a-secret
+  envFrom:
+  - secretRef:
+      name: pgbackrest-secrets
