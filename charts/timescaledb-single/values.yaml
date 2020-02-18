@@ -82,6 +82,11 @@ backup:
   #      name: pgbackrest-dev-secrets
   #      key: repo1-s3-key-secret
 
+  # Alternatively, you can expose all data of a secret to pgBackRest with envFrom
+  envFrom:
+  #- secretRef:
+  #    name: pgbackrest-secrets
+
 # Extra custom environment variables.
 # These should be an EnvVar, as this allows you to inject secrets into the environment
 # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
@@ -93,6 +98,13 @@ env:
 #      secretKeyRef:
 #        name: myapplication-passwords
 #        key: standby
+
+# use envFrom to expose all data of a secret/configmap
+# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#container-v1-core
+envFrom:
+#  - configMapRef:
+#      name: my-deployment-settings
+#      optional: true
 
 # This configuration will be passed on to Patroni directly, there are a few things that are
 # injected/changed, these are:
