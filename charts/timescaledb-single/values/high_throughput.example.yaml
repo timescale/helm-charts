@@ -41,9 +41,21 @@ patroni:
       # of the synchronous replica can process.
       #
       # https://patroni.readthedocs.io/en/latest/replication_modes.html#synchronous-mode
-      master_start_timeout: 0
       synchronous_mode: true
+      master_start_timeout: 0
       postgresql:
+        # Using replication slots in high throughput situations has a significant danger:
+        # The master may need to retain more WAL than the size of the WAL Volume allows,
+        # if a replica is catching up.
+        #
+        # With backup enabled: while the replica is catching up it will be fetching archives
+        # from s3, until s3 is exhausted, after which the replica will switch to streaming
+        # from the master. While the replica is not yet streaming (this may take hours),
+        # the replication slot reserved for it is stale and will cause WAL to be retained by
+        # the master.
+        # If we have a backup, we don't need replication slots, as s3 will have the WAL, therefore,
+        # if the backup is enabled, we can safely disable the use of replication slots.
+        use_slots: false
         parameters:
           # For good performance we want to have a long interval between checkpoints,
           # however for continous high throughput, the replica's will have very limited
