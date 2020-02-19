@@ -37,7 +37,6 @@ backup:
     # https://pgbackrest.org/configuration.html
     process-max: 4
     start-fast: "y"
-    compress-level: 3
     repo1-retention-diff: 2
     repo1-retention-full: 2
     repo1-s3-region: us-east-2
@@ -51,6 +50,10 @@ backup:
     # secrets or other secret injection mechanisms
     repo1-s3-key: examplekeyid
     repo1-s3-key-secret: examplesecret+D48GXfDdtl823nlSRRv7dmB
+  # Overriding the archive-push/archive-get sections is most useful in
+  # very high througput situations. Look at values/high_throuhgput_example.yaml for more details
+  pgBackRest:archive-push: {}
+  pgBackRest:archive-get: {}
   jobs:
       # name: needs to adhere to the kubernetes restrictions
       # type: can be full, incr or diff, see https://pgbackrest.org/user-guide.html
@@ -72,6 +75,11 @@ backup:
   #    secretKeyRef:
   #      name: pgbackrest-dev-secrets
   #      key: repo1-s3-key-secret
+
+  # Alternatively, you can expose all data of a secret to pgBackRest with envFrom
+  envFrom:
+  #- secretRef:
+  #    name: pgbackrest-secrets
 
 # Extra custom environment variables.
 # These should be an EnvVar, as this allows you to inject secrets into the environment

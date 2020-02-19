@@ -90,14 +90,14 @@ spec:
               timescaledb-tune -quiet -pg-version 11 -conf-path "${TSTUNE_FILE}" -cpus "${CPUS}" -memory "${MEMORY}MB" \
                 {{ range $key, $value := .Values.timescaledbTune.args | default dict }}{{ printf "--%s %s " $key (quote $value)}}{{ end }} -yes
 
-              # If there is a dedicated WAL Volume, we want to set max_wal_size to 80% of that volume
+              # If there is a dedicated WAL Volume, we want to set max_wal_size to 60% of that volume
               # If there isn't a dedicated WAL Volume, we set it to 20% of the data volume
               if [ "${RESOURCES_WAL_VOLUME}" = "0" ]; then
                 WALMAX="${RESOURCES_DATA_VOLUME}"
                 WALPERCENT=20
               else
                 WALMAX="${RESOURCES_WAL_VOLUME}"
-                WALPERCENT=80
+                WALPERCENT=60
               fi
 
               WALMAX=$(numfmt --from=auto ${WALMAX})
@@ -175,8 +175,8 @@ spec:
           # the backup. This can be removed once we do not directly invoke pgBackRest
           # from inside the TimescaleDB container anymore
         {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 8 }}{{- end }}
-        {{- if .Values.envFrom }}
-        envFrom: {{ .Values.envFrom | default list | toYaml | nindent 8 }}
+        {{- if or .Values.envFrom .Values.backup.envFrom }}
+        envFrom: {{ .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 }}
         {{- end }}
         ports:
         - containerPort: 8008
