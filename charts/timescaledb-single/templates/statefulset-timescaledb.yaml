@@ -113,10 +113,24 @@ spec:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
 {{- end }}
+      # Issuing the final checkpoints on a busy database may take considerable time.
+      # Unfinished checkpoints will require more time during startup, so the tradeoff
+      # here is time spent in shutdown/time spent in startup.
+      # We choose shutdown here, especially as during the largest part of the shutdown
+      # we can still serve clients.
+      terminationGracePeriodSeconds: 600
       containers:
       - name: timescaledb
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - psql
+              - -X
+              - --file
+              - "{{ template "scripts_dir" . }}/lifecycle_preStop.psql"
         # When reusing an already existing volume it sometimes happens that the permissions
         # of the PGDATA and/or wal directory are incorrect. To guard against this, we always correctly
         # set the permissons of these directories before we hand over to Patroni.
@@ -125,6 +139,11 @@ spec:
         # As PostgreSQL requires to have full control over the permissions of the tablespace directories,
         # we create a subdirectory "data" in every tablespace mountpoint. The full path of every tablespace
         # therefore always ends on "/data".
+        # By creating a .pgpass file in the $HOME directory, we expose the superuser password
+        # to processes that may not have it in their environment (like the preStop lifecycle hook).
+        # To ensure Patroni will not mingle with this file, we give Patroni its own pgpass file.
+        # As these files are in the $HOME directory, they are only available to *this* container,
+        # and they are ephemeral.
         command:
           - /bin/bash
           - "-c"
@@ -155,6 +174,11 @@ spec:
             do
                 unset "${UNKNOWNVAR}"
             done
+
+            echo "*:*:*:postgres:${PATRONI_SUPERUSER_PASSWORD}" >> ${HOME}/.pgpass
+            chmod 0600 ${HOME}/.pgpass
+
+            export PATRONI_POSTGRESQL_PGPASS="${HOME}/.pgpass.patroni"
 
             exec patroni /etc/timescaledb/patroni.yaml
         env:
