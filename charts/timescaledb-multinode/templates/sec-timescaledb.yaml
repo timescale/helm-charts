@@ -11,6 +11,9 @@ metadata:
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{- with .Values.labels }}
+{{ toYaml . | indent 4 }}
+    {{- end }}
 type: Opaque
 data:
   password-superuser: {{ .Values.credentials.accessNode.superuser | b64enc }}
@@ -25,6 +28,9 @@ metadata:
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{- with .Values.labels }}
+{{ toYaml . | indent 4 }}
+    {{- end }}
 type: Opaque
 data:
   password-superuser: {{ .Values.credentials.dataNode.superuser | b64enc }}

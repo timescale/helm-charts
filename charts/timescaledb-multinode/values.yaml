@@ -21,6 +21,19 @@ credentials:
   dataNode:
     superuser: coffee
 
+# Additional labels
+labels: {}
+
+
+# Additional annotations
+annotations: {}
+
+# Additional pod labels to apply
+podLabels: {}
+
+# Annotations to be added to pods
+podAnnotations: {}
+
 # Extra custom environment variables.
 # These should be an EnvVar, as this allows you to inject secrets into the environment
 # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
@@ -49,6 +62,7 @@ persistentVolume:
   subPath: ""
   mountPath: "/var/lib/postgresql"
   annotations: {}
+  labels: {}
   accessModes:
     - ReadWriteOnce
 

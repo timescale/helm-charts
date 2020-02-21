@@ -11,6 +11,9 @@ metadata:
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{- with .Values.labels }}
+{{ toYaml . | indent 4 }}
+    {{- end }}
 spec:
   clusterIP: None
   ports:
@@ -20,4 +23,5 @@ spec:
   selector:
     app: {{ template "timescaledb.fullname" . }}
     timescaleNodeType: data
+    release: {{ .Release.Name }}
 ...
