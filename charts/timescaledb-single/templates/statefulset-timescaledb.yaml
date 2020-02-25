@@ -126,7 +126,7 @@ spec:
         # we create a subdirectory "data" in every tablespace mountpoint. The full path of every tablespace
         # therefore always ends on "/data".
         command:
-          - sh
+          - /bin/bash
           - "-c"
           - |
             {{ .Values.debug.execStartPre }}
@@ -134,6 +134,26 @@ spec:
             TABLESPACES={{ $.Values.persistentVolumes.tablespaces | default dict | keys | join " " | quote }}
             for tablespace in {{ $.Values.persistentVolumes.tablespaces | default dict | keys | join " " }}; do
               install -o postgres -g postgres -d -m 0700 "{{ include "tablespaces_dir" . }}/${tablespace}/data"
+            done
+
+            # Environment variables can be read by regular users of PostgreSQL. Especially in a Kubernetes
+            # context it is likely that some secrets are part of those variables.
+            # To ensure we expose as little as possible to the underlying PostgreSQL instance, we have a list
+            # of allowed environment variable patterns to retain.
+            #
+            # We need the KUBERNETES_ environment variables for the native Kubernetes support of Patroni to work.
+            #
+            # NB: Patroni will remove all PATRONI_.* environment variables before starting PostgreSQL
+
+            # We store the current environment, as initscripts, callbacks, archive_commands etc. may require
+            # to have the environment available to them
+            set -o posix
+            export -p > "{{ template "pod_environment_file" }}"
+            export -p | grep PGBACKREST > "{{ template "pgbackrest_environment_file" }}"
+
+            for UNKNOWNVAR in $(env | awk -F '=' '!/^(PATRONI_.*|HOME|PGDATA|PGHOST|LC_.*|LANG|PATH|KUBERNETES_SERVICE_.*)=/ {print $1}')
+            do
+                unset "${UNKNOWNVAR}"
             done
 
             exec patroni /etc/timescaledb/patroni.yaml
