@@ -29,3 +29,6 @@ spec:
     # This always defaults to 5432, even if `!replicaLoadBalancer.enabled`.
     port: {{ .Values.replicaLoadBalancer.port }}
     protocol: TCP
+{{- if .Values.replicaLoadBalancer.spec }}
+{{ .Values.replicaLoadBalancer.spec | toYaml | indent 2 }}
+{{- end }}
