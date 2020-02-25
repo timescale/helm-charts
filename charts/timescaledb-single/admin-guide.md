@@ -50,11 +50,13 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
 | `loadBalancer.enabled`            | If enabled, creates a LB for the primary    | `true`                                              |
 | `loadBalancer.annotations`        | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
+| `loadBalancer.extraSpec`          | Extra configuration for service spec        | `nil`                                               |
 | `networkPolicy.enabled`           | If enabled, creates a NetworkPolicy for controlling network access | `false`
 | `networkPolicy.ingress`           | A list of Ingress rules to extend the base NetworkPolicy | `nil`
 | `networkPolicy.prometheusApp`     | Name of Prometheus app to allow it to scrape exporters | `prometheus`
 | `replicaLoadBalancer.enabled`     | If enabled, creates a LB for replica's only | `false`                                             |
 | `replicaLoadBalancer.annotations` | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
+| `replicaLoadBalancer.extraSpec`   | Extra configuration for replica service spec | `nil`                                              |
 | `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/wrouesnel/postgres_exporter) sidecar | `false` |
 | `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |
 | `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.7.0`                                            |
@@ -211,7 +213,7 @@ To fully purge a deployment in Kubernetes, you should do the following:
 ```sh
 # Delete the Helm deployment
 helm delete my-release
-# Delete pvc 
+# Delete pvc
 RELEASE=my-release
 kubectl delete $(kubectl get pvc -l release=$RELEASE -o name)
 ```

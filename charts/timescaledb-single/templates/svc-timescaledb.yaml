@@ -26,3 +26,6 @@ spec:
     port: {{ .Values.loadBalancer.port }}
     targetPort: postgresql
     protocol: TCP
+{{- if .Values.loadBalancer.spec }}
+{{ .Values.loadBalancer.spec | toYaml | indent 2 }}
+{{- end }}
