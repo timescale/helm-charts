@@ -54,6 +54,14 @@ Create the name of the service account to use.
 /var/run/postgresql
 {{- end -}}
 
+{{- define "pod_environment_file" -}}
+${HOME}/.pod_environment
+{{- end -}}
+
+{{- define "pgbackrest_environment_file" -}}
+${HOME}/.pgbackrest_environment
+{{- end -}}
+
 {{- define "data_directory" -}}
 {{ printf "%s/data" .Values.persistentVolumes.data.mountPath }}
 {{- end -}}

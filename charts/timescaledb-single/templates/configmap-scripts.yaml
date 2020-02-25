@@ -24,15 +24,16 @@ data:
   pgbackrest_archive.sh: |
     #!/bin/bash
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
-
     [ "${PGBACKREST_BACKUP_ENABLED}" == "0" ] && exit 0
 
+    source "{{ template "pgbackrest_environment_file" }}"
     exec pgbackrest --stanza=poddb archive-push $1
   pgbackrest_archive_get.sh: |
     #!/bin/bash
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
     [ "${PGBACKREST_BACKUP_ENABLED}" == "0" ] && exit 1
 
+    source "{{ template "pgbackrest_environment_file" }}"
     exec pgbackrest --stanza=poddb archive-get ${1} "${2}"
   pgbackrest_bootstrap.sh: |
     #!/bin/bash
@@ -62,6 +63,8 @@ data:
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
     [ "${PGBACKREST_BACKUP_ENABLED}" == "0" ] && exit 1
 
+    source "{{ template "pod_environment_file" }}"
+
     PGDATA={{ include "data_directory" . | quote }}
     WALDIR={{ include "wal_directory" . | quote }}
 
@@ -74,6 +77,8 @@ data:
     pgbackrest --stanza=poddb --force --delta --log-level-console=detail restore
   restore_or_initdb.sh: |
     #!/bin/bash
+
+    source "{{ template "pod_environment_file" }}"
 
     function log {
       echo "$(date '+%Y-%m-%d %H:%M:%S') - restore_or_initdb - $1"
@@ -97,6 +102,8 @@ data:
   post_init.sh: |
     #!/bin/bash
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
+
+    source "{{ template "pod_environment_file" }}"
 
     function log {
         echo "$(date '+%Y-%m-%d %H:%M:%S') - post_init - $1"
@@ -144,6 +151,8 @@ data:
   patroni_callback.sh: |
     #!/bin/bash
     set -e
+
+    source "{{ template "pod_environment_file" }}"
 
     for suffix in "$1" all
     do
