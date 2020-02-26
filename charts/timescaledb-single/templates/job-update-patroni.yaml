@@ -40,6 +40,8 @@ spec:
       containers:
       - name: {{ template "timescaledb.fullname" . }}-patch-patroni-config
         image: curlimages/curl
+        securityContext:
+          runAsUser: 100
         command: ["/usr/bin/curl"]
         args:
         - --connect-timeout

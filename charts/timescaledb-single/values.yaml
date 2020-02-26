@@ -19,6 +19,9 @@ image:
   tag: pg11-ts1.6
   pullPolicy: IfNotPresent
 
+securityContext:
+  runAsUser: 1000
+
 # Credentials used by PostgreSQL and Patroni
 # https://github.com/zalando/patroni/blob/master/docs/SETTINGS.rst#postgresql
 credentials:
