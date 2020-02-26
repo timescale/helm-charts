@@ -7,11 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
- * Examples for setting up a High Throughput Cluster, or using different backup parameters
- * Ability to override archive-push/archive-get pgBackRest settings
 ### Changed
 ### Removed
 ### Fixed
+
+## [v0.5.4] - 2020-02-26
+
+### Added
+ * Examples for setting up a High Throughput Cluster, or using different backup parameters
+ * Ability to override archive-push/archive-get pgBackRest settings
+ * Ability to use [envFrom](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables) to specify environment variables
+### Changed
+ * Update references to the latest Docker image (PostgreSQL 11.7). This also means PostGIS is now included
+     in the default Docker Image
+### Fixed
+ * Remove all non-PostgreSQL/Kubernetes environment variables from Patroni/PostgreSQL
+    A regular user in PostgreSQL has the ability to read the environment variables of the
+    postmaster. Up to now, the chance of leaking secrets would have been small, but with
+    commit 9708c38b, it is now much more likely that environment variables are exposed
+    to the PostgreSQL processes.
 
 ## [v0.5.3] - 2020-02-04
 
