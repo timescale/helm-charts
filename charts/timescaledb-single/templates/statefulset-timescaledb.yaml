@@ -228,8 +228,15 @@ spec:
           # the backup. This can be removed once we do not directly invoke pgBackRest
           # from inside the TimescaleDB container anymore
         {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 8 }}{{- end }}
-        {{- if or .Values.envFrom .Values.backup.envFrom }}
-        envFrom: {{ .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 }}
+        envFrom:
+        - secretRef:
+            name: {{ template "secrets_credentials" . }}
+            optional: false
+        - secretRef:
+            name: {{ template "secrets_pgbackrest" . }}
+            optional: true
+        {{- if or .Values.envFrom .Values.backup.envFrom -}}
+        {{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 -}}
         {{- end }}
         ports:
         - containerPort: 8008
@@ -327,8 +334,15 @@ spec:
           - name: PGBACKREST_CONFIG
             value: /etc/pgbackrest/pgbackrest.conf
           {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 10 }}{{- end }}
-        {{- if .Values.backup.envFrom }}
-        envFrom: {{ .Values.backup.envFrom | default list | toYaml | nindent 10 }}
+        envFrom:
+        - secretRef:
+            name: {{ template "secrets_credentials" . }}
+            optional: false
+        - secretRef:
+            name: {{ template "secrets_pgbackrest" . }}
+            optional: false
+        {{- if or .Values.envFrom .Values.backup.envFrom -}}
+        {{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 -}}
         {{- end }}
 {{ end }}
 
@@ -398,13 +412,13 @@ spec:
       {{- end }}
       {{- if or .Values.backup.enabled .Values.backup.enable }}
       - name: pgbackrest
-        secret:
-          secretName: {{ template "timescaledb.fullname" . }}-pgbackrest
+        configMap:
+          name: {{ template "timescaledb.fullname" . }}-pgbackrest
           defaultMode: 416 # 0640 permissions
       {{- end }}
       - name: certificate
         secret:
-          secretName: {{ template "timescaledb.fullname" . }}-certificate
+          secretName:  {{ template "secrets_certificate" . }}
           defaultMode: 416 # 0640 permissions
       {{- if not .Values.persistentVolumes.data.enabled }}
       - name: storage-volume

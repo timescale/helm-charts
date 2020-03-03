@@ -95,15 +95,3 @@ backup:
     process-max: 4
     archive-async: "y"
     archive-get-queue-max: 2GB
-
-  # The referenced secret can be created using kubectl, for example:
-  #
-  # kubectl create secret generic pgbackrest-secrets \
-  # --from-literal=PGBACKREST_REPO1_S3_KEY=examplekeyid \
-  # --from-literal=PGBACKREST_REPO1_S3_KEY_SECRET=examplesecret+D48GXfDdtl823nlSRRv7dmB \
-  # --from-literal=PGBACKREST_REPO1_S3_BUCKET=my_example_s3_bucket_for_backups
-  #
-  # https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#create-a-secret
-  envFrom:
-  - secretRef:
-      name: pgbackrest-secrets

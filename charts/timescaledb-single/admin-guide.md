@@ -26,9 +26,6 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
 | `image.tag`                       | The version of the image to pull            | `pg11-ts1.6`                                        |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
-| `credentials`                     | A mapping of usernames/passwords            | A postgres, standby and admin user                  |
-| `tls.cert`                        | The public key of the SSL certificate for PostgreSQL | empty (a self-signed certificate will be generated) |
-| `tls.key`                         | The private key of the SSL Certificate for PostgreSQL | empty                                     |
 | `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |
 | `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults |
 | `backup.pgBackRest:archive-push`  | [pgBackRest global:archive-push configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza) | empty |
@@ -165,38 +162,17 @@ Alternatively, you can use the [AWS Management Console](https://s3.console.aws.a
 - a [S3 Bucket Policy](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/add-bucket-policy.html) that allows the IAM user read and write access to (parts of) the S3 bucket
 - access key that allows you to login as the IAM user
 
-If you (re)deploy your database with this configuration snippet in the values file, the backup should start working.
+These configuration items should be part of the `RELEASE-pgbackrest` secret. Once you recreate this secret
+with the correct configurations, you can enable the backup by setting `backup.enabled` to `true`, for example:
 
 ```yaml
 # Filename: myvalues.yaml
 backup:
-  enabled: True
-    pgBackRest:
-      repo1-s3-bucket: this_bucket_may_not_exist
-      repo1-s3-key: 9E1R2CUZBXJVYSBYRWTB
-      repo1-s3-key-secret: 5CrhvJD08bp9emxI+D48GXfDdtl823nlSRRv7dmB
+  enabled: true
 ```
 ```
 helm upgrade --install example -f myvalues.yaml charts/timescaledb-single
 ```
-
-#### Configure pgBackRest using environment variables
-Instead of configuring pgBackRest in the `myvalues.yaml`, you can also expose the configuration items as environment variables.
-This allows you to decouple the secret management of the backup credentials from this deployment.
-
-The [pgBackRest Command Reference](https://pgbackrest.org/command.html#introduction) has detailed information about which
-environment variables can be set.
-
-For example, if you create a secret `pgbackrest-secrets`, you could use the following to avoid specifying plain text secrets in the `values.yaml`:
-
-```yaml
-backup:
-  enabled: true
-  envFrom:
-    - secretRef:
-        name: pgbackrest-secrets
-```
-For a full example, have a look at [backup_variations.yaml](values/backup_variations.yaml)
 
 ### Control the backup schedule
 If you want to alter the backup jobs, or their schedule, you can override the `backup.jobs` in your configuration, for example:
@@ -305,8 +281,6 @@ repo1-type=s3
 repo1-s3-bucket=this_bucket_may_not_exist
 repo1-path=/my-release-timescaledb/
 repo1-s3-endpoint=s3.amazonaws.com
-repo1-s3-key=9E1R2CUZBXJVYSBYRWTB
-repo1-s3-key-secret=5CrhvJD08bp9emxI+D48GXfDdtl823nlSRRv7dmB
 repo1-s3-region=us-east-2
 
 [poddb]
