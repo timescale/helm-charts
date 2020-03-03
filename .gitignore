@@ -1,1 +1,9 @@
 .DS_Store
+
+**/*secret*
+!**/*secret*-example*
+**/*certificate*
+**/*credentials*
+**/*pgbackrest*
+!**/configmap-pgbackrest.yaml
+!**/pgbackrest.yaml

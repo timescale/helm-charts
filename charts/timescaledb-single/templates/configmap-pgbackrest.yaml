@@ -4,7 +4,7 @@
 {{- if or .Values.backup.enable .Values.backup.enabled }}
 ---
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
   name: {{ template "timescaledb.fullname" . }}-pgbackrest
   labels:
@@ -12,13 +12,15 @@ metadata:
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-type: Opaque
-stringData:
+{{- $globalDefaults := dict "spool-path" (include "socket_directory" .) "compress-level" "3" "repo1-path" (printf "/%s/%s/" .Release.Namespace (include "clusterName" .)) }}
+{{- $globals := merge .Values.backup.pgBackRest $globalDefaults }}
+{{- $push := index .Values.backup "pgBackRest:archive-push" | default dict }}
+{{- $get := index .Values.backup "pgBackRest:archive-get" | default dict }}
+data:
   pgbackrest.conf: |
     [global]
-    repo1-path=/{{ .Release.Namespace }}/{{ template "clusterName" . }}/
-{{- range $key, $val := .Values.backup.pgBackRest }}
-    {{ $key }}={{ $val }}
+{{- range $key := keys $globals | sortAlpha }}
+    {{ $key }}={{ index $globals $key }}   
 {{- end }}
 
     [poddb]
@@ -34,6 +36,13 @@ stringData:
     link-all=y
 
     [global:archive-push]
-    compress-level=3
+{{- range $key := keys $push | sortAlpha }}
+    {{ $key }}={{ index $push $key }}
+{{- end }}
+
+    [global:archive-get]
+{{- range $key := keys $get | sortAlpha }}
+    {{ $key }}={{ index $get $key }}
+{{- end }}
 ...
 {{ end }}

@@ -19,47 +19,33 @@ image:
   tag: pg11-ts1.6
   pullPolicy: IfNotPresent
 
-# Credentials used by PostgreSQL and Patroni
-# https://github.com/zalando/patroni/blob/master/docs/SETTINGS.rst#postgresql
-credentials:
-  admin: cola
-  # the postgres and standby users are vital for Patroni, and therefore should not be
-  # removed altogether.
-  postgres: tea
-  standby: pinacolada
 
-# To set your own certificate (instead of autogenerating one), you can add
-# the certificate and key here
-tls:
-  cert: |
-#    -----BEGIN CERTIFICATE-----
-#    ABC
-#    -----END CERTIFICATE-----
-  key: |
-#    -----BEGIN PRIVATE KEY-----
-#    ABC
-#    -----END PRIVATE KEY-----
+secretNames:
+  credentials:
+  certificate:
+  pgbackrest:
 
 backup:
   enabled: false
   pgBackRest:
     # https://pgbackrest.org/configuration.html
+    # Although not impossible, care should be taken not to include secrets
+    # in these parameters. Use Kubernetes Secrets to specify S3 Keys, Secrets etc.
     process-max: 4
     start-fast: "y"
     compress-level: 3
     repo1-retention-diff: 2
     repo1-retention-full: 2
-    repo1-s3-region: us-east-2
-    repo1-s3-bucket: my_example_s3_bucket_for_backups
-    repo1-s3-endpoint: s3.amazonaws.com
     repo1-type: s3
     repo1-cipher-type: "none"
-    # These secrets should contain an IAM access key ID and a secret access key:
-    # https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
-    # These can also be specified as EnvVars below, which allows you to refer to k8s
-    # secrets or other secret injection mechanisms
-    repo1-s3-key: examplekeyid
-    repo1-s3-key-secret: examplesecret+D48GXfDdtl823nlSRRv7dmB
+    repo1-s3-region: us-east-2
+    repo1-s3-endpoint: s3.amazonaws.com
+    repo1-s3-bucket: my_example_s3_bucket_for_backups
+    
+  # Overriding the archive-push/archive-get sections is most useful in
+  # very high througput situations. Look at values/high_throuhgput_example.yaml for more details
+  pgBackRest:archive-push: {}
+  pgBackRest:archive-get: {}
   jobs:
       # name: needs to adhere to the kubernetes restrictions
       # type: can be full, incr or diff, see https://pgbackrest.org/user-guide.html
@@ -70,17 +56,25 @@ backup:
     - name: incremental-daily
       type: incr
       schedule: "12 02 * * 1-6"
-  # Extra custom environment variables for prometheus.
-  # These should be an EnvVar, as this allows you to inject secrets into the environment
+  # Extra custom environment variables for the backup container.
+  # This points to an already existing secret in the namespace
+  envFrom:
+  - secretRef:
+      name: longbench-secret
+      optional: true
+  #- secretRef:
+  #    name: pgbackrest-secrets
+
+  # Alternatively, you can expose individual environment variables:
   # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
   env:
-  #- name: PGBACKREST_REPO1_S3_KEY
-  #  value: examplekeyid
-  #- name: PGBACKREST_REPO1_S3_KEY_SECRET
-  #  valueFrom:
-  #    secretKeyRef:
-  #      name: pgbackrest-dev-secrets
-  #      key: repo1-s3-key-secret
+    #- name: PGBACKREST_REPO1_S3_KEY
+    #  value: examplekeyid
+    #- name: PGBACKREST_REPO1_S3_KEY_SECRET
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: pgbackrest-dev-secrets
+    #      key: repo1-s3-key-secret
 
 # Extra custom environment variables.
 # These should be an EnvVar, as this allows you to inject secrets into the environment
@@ -93,6 +87,16 @@ env:
 #      secretKeyRef:
 #        name: myapplication-passwords
 #        key: standby
+
+# Externally created Kubernetes secrets will be injected into the pods by referencing them here. You
+# can also add more configuration options and secrets this way (see https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables)
+envFrom:
+  - secretRef:
+      name: longbench-secret
+      optional: true
+
+  # - configMapRef:
+  #     name: my-special-config
 
 # This configuration will be passed on to Patroni directly, there are a few things that are
 # injected/changed, these are:

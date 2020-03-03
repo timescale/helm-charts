@@ -77,3 +77,15 @@ Create the name of the service account to use.
 {{- define "tstune_config" -}}
 {{ printf "%s/timescaledb.conf" (include "socket_directory" .) }}
 {{- end -}}
+
+{{- define "secrets_credentials" -}}
+{{ .Values.secretNames.credentials | default (printf "%s-credentials" (include "timescaledb.fullname" .)) }}
+{{- end -}}
+
+{{- define "secrets_certificate" -}}
+{{ .Values.secretNames.certificate | default (printf "%s-certificate" (include "timescaledb.fullname" .)) }}
+{{- end -}}
+
+{{- define "secrets_pgbackrest" -}}
+{{ .Values.secretNames.pgbackrest | default (printf "%s-pgbackrest" (include "timescaledb.fullname" .)) }}
+{{- end -}}

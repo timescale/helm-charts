@@ -145,23 +145,6 @@ spec:
         # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#bootstrap-configuration
         - name: PATRONI_admin_OPTIONS
           value: createrole,createdb
-{{- range $key, $_ := $.Values.credentials }}
-        - name: PATRONI_{{ $key }}_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" $ }}-passwords
-              key: {{ $key | quote }}
-{{- end }}
-        - name: PATRONI_REPLICATION_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}-passwords
-              key: standby
-        - name: PATRONI_SUPERUSER_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "timescaledb.fullname" . }}-passwords
-              key: postgres
         - name: PATRONI_REPLICATION_USERNAME
           value: standby
         # To specify the PostgreSQL and Rest API connect addresses we need
@@ -201,9 +184,14 @@ spec:
           # the backup. This can be removed once we do not directly invoke pgBackRest
           # from inside the TimescaleDB container anymore
         {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 8 }}{{- end }}
-        {{- if .Values.envFrom }}
-        envFrom: {{ .Values.envFrom | default list | toYaml | nindent 8 }}
-        {{- end }}
+        envFrom:
+        - secretRef:
+            name: {{ template "secrets_credentials" . }}
+            optional: false
+        - secretRef:
+            name: {{ template "secrets_pgbackrest" . }}
+            optional: true
+{{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 }}
         ports:
         - containerPort: 8008
         - containerPort: 5432
@@ -296,9 +284,14 @@ spec:
           - name: PGBACKREST_CONFIG
             value: /etc/pgbackrest/pgbackrest.conf
           {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 10 }}{{- end }}
-        {{- if .Values.backup.envFrom }}
-        envFrom: {{ .Values.backup.envFrom | default list | toYaml | nindent 10 }}
-        {{- end }}
+        envFrom:
+        - secretRef:
+            name: {{ template "secrets_credentials" . }}
+            optional: false
+        - secretRef:
+            name: {{ template "secrets_pgbackrest" . }}
+            optional: false
+{{- .Values.envFrom | default list | concat (.Values.backup.envFrom | default list) | toYaml | nindent 8 }}
 {{ end }}
 
 {{- if .Values.prometheus.enabled }}
@@ -362,13 +355,13 @@ spec:
       {{- end }}
 {{- if or .Values.backup.enabled .Values.backup.enable }}
       - name: pgbackrest
-        secret:
-          secretName: {{ template "timescaledb.fullname" . }}-pgbackrest
+        configMap:
+          name: {{ template "timescaledb.fullname" . }}-pgbackrest
           defaultMode: 416 # 0640 permissions
 {{ end }}
       - name: certificate
         secret:
-          secretName: {{ template "timescaledb.fullname" . }}-certificate
+          secretName:  {{ template "secrets_certificate" . }}
           defaultMode: 416 # 0640 permissions
       {{- if not .Values.persistentVolumes.data.enabled }}
       - name: storage-volume
