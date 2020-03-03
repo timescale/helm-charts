@@ -4,7 +4,7 @@
 {{- if or .Values.backup.enable .Values.backup.enabled }}
 ---
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
   name: {{ template "timescaledb.fullname" . }}-pgbackrest
   labels:
@@ -12,12 +12,11 @@ metadata:
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-type: Opaque
-stringData:
 {{- $globalDefaults := dict "spool-path" (include "socket_directory" .) "compress-level" "3" "repo1-path" (printf "/%s/%s/" .Release.Namespace (include "clusterName" .)) }}
 {{- $globals := merge .Values.backup.pgBackRest $globalDefaults }}
 {{- $push := index .Values.backup "pgBackRest:archive-push" | default dict }}
 {{- $get := index .Values.backup "pgBackRest:archive-get" | default dict }}
+data:
   pgbackrest.conf: |
     [global]
 {{- range $key := keys $globals | sortAlpha }}

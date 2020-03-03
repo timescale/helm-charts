@@ -85,3 +85,15 @@ ${HOME}/.pgbackrest_environment
 {{- define "tstune_config" -}}
 {{ printf "%s/timescaledb.conf" (include "socket_directory" .) }}
 {{- end -}}
+
+{{- define "secrets_credentials" -}}
+{{ .Values.secretNames.credentials | default (printf "%s-credentials" (include "clusterName" .)) }}
+{{- end -}}
+
+{{- define "secrets_certificate" -}}
+{{ .Values.secretNames.certificate | default (printf "%s-certificate" (include "clusterName" .)) }}
+{{- end -}}
+
+{{- define "secrets_pgbackrest" -}}
+{{ .Values.secretNames.pgbackrest | default (printf "%s-pgbackrest" (include "clusterName" .)) }}
+{{- end -}}

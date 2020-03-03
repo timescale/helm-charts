@@ -38,14 +38,10 @@ helm install --name my-release charts/timescaledb-single
 ```
 
 You can override parameters using the `--set key=value[,key=value]` argument to `helm install`,
-e.g., to install the chart with randomly generated passwords:
+e.g., to install the chart with backup enabled:
 
 ```console
-random_password () { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32; }
-helm install --name my-release charts/timescaledb-single \
-    --set credentials.postgres="$(random_password)" \
-    --set credentials.admin="$(random_password)" \
-    --set credentials.standby="$(random_password)"
+helm install --name my-release charts/timescaledb-single --set backup.enabled=true
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,

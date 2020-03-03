@@ -19,37 +19,39 @@ image:
   tag: pg11-ts1.6
   pullPolicy: IfNotPresent
 
-# To set your own certificate (instead of autogenerating one), you can add
-# the certificate and key here
-tls:
-  cert: |
-#    -----BEGIN CERTIFICATE-----
-#    ABC
-#    -----END CERTIFICATE-----
-  key: |
-#    -----BEGIN PRIVATE KEY-----
-#    ABC
-#    -----END PRIVATE KEY-----
+# These secrets should exist before the Helm is used to deploy this TimescaleDB.
+# You can use generate_kustomization.sh to help in creating these secrets, or have
+# a look at kustomize/example to see how you could install them.
+secretNames:
+  # This secret should contain environment variables that influence Patroni,
+  # for example PATRONI_SUPERUSER_PASSWORD or PATRONI_REPLICATION_PASSWORD
+  # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#postgresql
+  credentials: # defaults to RELEASE-credentials
+
+  # This secret should be a Secret of type kubernetes.io/tls, containing
+  # both a tls.key and a tls.crt
+  certificate: # defaults to RELEASE-certificate
+
+  # This secret should contain environment variables that influence pgBackRest,
+  # for example, PGBACKREST_REPO1_S3_KEY or PGBACKREST_REPO1_S3_KEY_SECRET
+  pgbackrest:  # defaults to RELEASE-pgbackrest
 
 backup:
   enabled: false
   pgBackRest:
     # https://pgbackrest.org/configuration.html
+    # Although not impossible, care should be taken not to include secrets
+    # in these parameters. Use Kubernetes Secrets to specify S3 Keys, Secrets etc.
     process-max: 4
     start-fast: "y"
     repo1-retention-diff: 2
     repo1-retention-full: 2
-    repo1-s3-region: us-east-2
-    repo1-s3-bucket: my_example_s3_bucket_for_backups
-    repo1-s3-endpoint: s3.amazonaws.com
     repo1-type: s3
     repo1-cipher-type: "none"
-    # These secrets should contain an IAM access key ID and a secret access key:
-    # https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
-    # These can also be specified as EnvVars below, which allows you to refer to k8s
-    # secrets or other secret injection mechanisms
-    repo1-s3-key: examplekeyid
-    repo1-s3-key-secret: examplesecret+D48GXfDdtl823nlSRRv7dmB
+    repo1-s3-region: us-east-2
+    repo1-s3-endpoint: s3.amazonaws.com
+    repo1-s3-bucket: my_example_s3_bucket_for_backups
+
   # Overriding the archive-push/archive-get sections is most useful in
   # very high througput situations. Look at values/high_throuhgput_example.yaml for more details
   pgBackRest:archive-push: {}
@@ -64,22 +66,22 @@ backup:
     - name: incremental-daily
       type: incr
       schedule: "12 02 * * 1-6"
-  # Extra custom environment variables for prometheus.
-  # These should be an EnvVar, as this allows you to inject secrets into the environment
-  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
-  env:
-  #- name: PGBACKREST_REPO1_S3_KEY
-  #  value: examplekeyid
-  #- name: PGBACKREST_REPO1_S3_KEY_SECRET
-  #  valueFrom:
-  #    secretKeyRef:
-  #      name: pgbackrest-dev-secrets
-  #      key: repo1-s3-key-secret
-
-  # Alternatively, you can expose all data of a secret to pgBackRest with envFrom
+  # Extra custom environment variables for the backup container.
+  # This points to an already existing secret in the namespace
   envFrom:
   #- secretRef:
   #    name: pgbackrest-secrets
+
+  # Alternatively, you can expose individual environment variables:
+  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
+  env:
+    #- name: PGBACKREST_REPO1_S3_KEY
+    #  value: examplekeyid
+    #- name: PGBACKREST_REPO1_S3_KEY_SECRET
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: pgbackrest-dev-secrets
+    #      key: repo1-s3-key-secret
 
 # Extra custom environment variables.
 # These should be an EnvVar, as this allows you to inject secrets into the environment
@@ -93,12 +95,13 @@ env:
 #        name: myapplication-passwords
 #        key: standby
 
-# use envFrom to expose all data of a secret/configmap
-# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#container-v1-core
+# Externally created Kubernetes secrets will be injected into the pods by referencing them here. You
+# can also add more configuration options and secrets this way (see https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables)
 envFrom:
 #  - configMapRef:
 #      name: my-deployment-settings
 #      optional: true
+
 
 # This configuration will be passed on to Patroni directly, there are a few things that are
 # injected/changed, these are:
