@@ -1,1 +1,6 @@
 *.png
+kustomize/*
+*.crt
+*.key
+pgbackrest.conf
+credentials.conf
