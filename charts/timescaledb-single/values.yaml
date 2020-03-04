@@ -19,7 +19,10 @@ image:
   tag: pg11-ts1.6
   pullPolicy: IfNotPresent
 
+# Some documentation about to what purpose this serves
+# https://example.com/...
 securityContext:
+  enabled: false
   runAsUser: 1000
 
 # Credentials used by PostgreSQL and Patroni
