@@ -297,6 +297,21 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+sharedMemory:
+  # By default Kubernetes only provides 64MB to /dev/shm
+  # /dev/shm is only used by PostgreSQL for work_mem for parallel workers,
+  # so most will not run into this issue.
+  # https://github.com/kubernetes/kubernetes/issues/28272
+  #
+  # If you do however run into:
+  #
+  #   SQLSTATE 53100
+  #   ERROR:  could not resize shared memory segment "/PostgreSQL.12345" to 4194304 bytes:
+  #   No space left on device
+  #
+  # you may wish to use a mount to Memory, by setting useMount to true
+  useMount: false
+
 # timescaledb-tune will be run with the Pod resources requests or - if not set - its limits.
 # This should give a reasonably tuned PostgreSQL instance.
 # Any PostgreSQL parameter that is explicitly set in the Patroni configuration will override
