@@ -249,6 +249,10 @@ spec:
           mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
         {{- end }}
+        {{- if .Values.sharedMemory.useMount }}
+        - name: shared-memory
+          mountPath: /dev/shm
+        {{- end }}
 {{- range $tablespaceName := ( .Values.persistentVolumes.tablespaces | default dict | keys ) }}
         - name: {{ $tablespaceName }}
           mountPath: {{ printf "%s/%s" (include "tablespaces_dir" $) $tablespaceName }}
@@ -380,12 +384,17 @@ spec:
           name: {{ .Values.callbacks.configMap }}
           defaultMode: 488 # 0750 permissions
       {{- end }}
-{{- if or .Values.backup.enabled .Values.backup.enable }}
+      {{- if .Values.sharedMemory.useMount }}
+      - name: shared-memory
+        emptyDir:
+          medium: Memory
+      {{- end }}
+      {{- if or .Values.backup.enabled .Values.backup.enable }}
       - name: pgbackrest
         secret:
           secretName: {{ template "timescaledb.fullname" . }}-pgbackrest
           defaultMode: 416 # 0640 permissions
-{{ end }}
+      {{- end }}
       - name: certificate
         secret:
           secretName: {{ template "timescaledb.fullname" . }}-certificate

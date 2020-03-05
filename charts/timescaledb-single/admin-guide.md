@@ -12,6 +12,7 @@ Please see the included NOTICE for copyright information and LICENSE for a copy 
 - [Cleanup](#cleanup)
 - [Callbacks](#callbacks)
 - [Troubleshooting](#troubleshooting)
+- [Common Issues](#common-issues)
 
 ## Configuration
 The following table lists the configurable parameters of the TimescaleDB Helm chart and their default values.
@@ -38,6 +39,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
 | `callbacks.configMap`             | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks) | `nil`                         |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
+| `sharedMemory.useMount`           | Mount `/dev/shm` as a Memory disk           | `false`                                             |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
 | `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname and (availability) zone |
@@ -599,3 +601,28 @@ service "example-replica" deleted
 $ helm upgrade --install example ./charts/timescaledb-single/ --set replicaLoadBalancer.enabled=True
 Release "example" has been upgraded. Happy Helming!
 ```
+
+## Common Issues
+
+### `Could not resize shared memory segment "/PostgreSQL.1521128888" to 8388608 bytes:`
+
+This error message occurs if you're running out of space on the `/dev/shm` Volume.
+By default, Kubernetes only provides 64MB of space for `/dev/shm`, however, PostgreSQL may
+require (a lot) more space depending on the work load.
+
+This memory however is only used for the work memory for parallel query workers.
+To mitigate this, you could:
+
+- reduce [`work_mem`](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-WORK-MEM)
+- reduce [`max_parallel_workers`](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAX-PARALLEL-WORKERS)
+
+Alternatively, you could enable the mounting of Memory to `/dev/shm`, by enabling this feature in `values.yaml`:
+
+```yaml
+sharedMemory:
+  useMount: true
+```
+
+For some further background:
+- [Support Posix Shared Memory across containers in a pod](https://github.com/kubernetes/kubernetes/issues/28272)
+- [Increase POSIX Shared Memory for Kubernetes](https://docs.okd.io/latest/dev_guide/shared_memory.html)
