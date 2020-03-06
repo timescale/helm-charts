@@ -22,6 +22,7 @@ spec:
 {{- end }}
   ports:
   - name: postgresql
-    port: 5432
+    # This always defaults to 5432, even if `!loadBalancer.enabled`.
+    port: {{ .Values.loadBalancer.port }}
     targetPort: postgresql
     protocol: TCP

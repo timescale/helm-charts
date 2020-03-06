@@ -217,6 +217,7 @@ loadBalancer:
   # If not enabled, we still expose the primary using a so called Headless Service
   # https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
   enabled: True
+  port: 5432
   # Read more about the AWS annotations here:
   # https://kubernetes.io/docs/concepts/cluster-administration/cloud-providers/#aws
   # https://docs.aws.amazon.com/eks/latest/userguide/load-balancing.html
@@ -232,6 +233,7 @@ replicaLoadBalancer:
   # If not enabled, we still expose the replica's using a so called Headless Service
   # https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
   enabled: False
+  port: 5432
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "4000"
 
