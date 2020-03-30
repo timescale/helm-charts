@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
+## [v0.5.5] - 2020-03-30
+
+### Added
+ * Issue CHECKPOINTs when terminating a Pod to improve time to recover
+ * Add possibility to specify LoadBalancer port
+ * Allow mounting `/dev/shm` from Memory, allows bigger Parallel Query workloads
+ * Ability to generate Secrets outside of Helm. This lays the groundwork for removing plain text
+    secrets from the Helm deployment.
+### Fixed
+ * Anti-Affinity clause was using the wrong name to match pods, causing unbalanced deployments
+
 ## [v0.5.4] - 2020-02-26
 
 ### Added
