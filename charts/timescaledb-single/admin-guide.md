@@ -37,7 +37,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)          | `[]`                                                |
 | `envFrom`                         | Extra custom environment variables, expressed as [EnvFrom](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envfromsource-v1-core)          | `[]`                                                |
 | `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
-| `callbacks.configMapTpl`          | Templated name of a kubernetes ConfigMap containing [Patroni callbacks](#callbacks) | `nil`                         |
+| `callbacks.configMap`          | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks). You can use templates in the name. | `nil`                         |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `sharedMemory.useMount`           | Mount `/dev/shm` as a Memory disk           | `false`                                             |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
