@@ -211,7 +211,7 @@ patroni:
 
 callbacks:
   # If set, this configMap will be used for the Patroni callbacks.
-  configMapTpl: # example-patroni-callbacks
+  configMap: # example-patroni-callbacks
 
 loadBalancer:
   # If not enabled, we still expose the primary using a so called Headless Service

@@ -421,7 +421,7 @@ Patroni will trigger some callbacks on certain events. These are:
 - on_stop
 
 If you wish to have *your* script run after a certain event happens, you can do so by configuring
-`callbacks.configMapTpl` to point to a [ConfigMap](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.15/#configmap-v1-core). The value is templated so you can use `"{{ .Release.Name }}-patroni-callbacks"`
+`callbacks.configMap` to point to a [ConfigMap](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.15/#configmap-v1-core). The value is templated so you can use `"{{ .Release.Name }}-patroni-callbacks"`
 if you're deploying this chart in the same release with another chart that will create the config map.
 
 This ConfigMap should exist before you install a chart. The data keys that match the event names will be executed
