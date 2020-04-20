@@ -1,135 +1,5 @@
-title: Values
-type: object
-"$schema": "https://json-schema.org/draft-07/schema#"
+$schema: https://json-schema.org/draft-07/schema#
 additionalProperties: false
-properties:
-  fullnameOverride:
-    type: string
-    maxLength: 40
-  nameOverride:
-    type: string
-    maxLength: 40
-  serviceAccount:
-    type: object
-  readinessProbe:
-    type: object
-  metadata:
-    type: object
-    properties:
-      annotations:
-        type: object
-        additionalProperties: true
-        properties:
-          service.helm.timescale.com/backup-enabled:
-            type: boolean
-          service.helm.timescale.com/backup-method:
-            type: string
-          service.helm.timescale.com/generate-passwords:
-            type: boolean
-          service.helm.timescale.com/generate-certificates:
-            type: boolean
-          service.helm.timescale.com/network-policy-enabled:
-            type: boolean
-          service.helm.timescale.com/timescaledb-tune-enabled:
-            type: boolean
-          service.helm.timescale.com/rbac-create:
-            type: boolean
-          service.helm.timescale.com/serviceaccount-create:
-            type: boolean
-  spec:
-    type: object
-    additionalProperties: false
-    properties:
-      debug:
-        type: object
-        additionalProperties: false
-        properties:
-          execStartPre:
-            type:
-            - string
-            - "null"
-      users:
-        $ref: '#/components/schemas/User'
-      databases:
-        type: object
-        additionalProperties:
-          type: object
-          properties:
-            encoding:
-              type: string
-              minLength: 3
-              example: UTF8
-            locale:
-              type: string
-              minLength: 1
-              example: C
-          additionalProperties:
-            type: string
-      accessNode:
-        type:
-        - string
-        - "null" # Not specifying an access node is only allowed if there is 1 node under the "nodes" key
-        minLength: 1
-      nodes:
-        type: object
-        additionalProperties:
-          type: object
-          additionalProperties: false
-          properties:
-            # A configuration is a pointer to one of the top-level configurations
-            # Using this pattern allows us to define many nodes without having to repeat detailed configuration
-            configuration:
-              type: string
-              example: default
-            certificate:
-              additionalProperties: false
-              properties:
-                secretKeyRef:
-                  additionalProperties: false
-                  properties:
-                    name:
-                      type: string
-                      minLength: 1
-                  required:
-                  - name
-
-      # These configurations are referred to by the nodes in the top-level nodes key.
-      # No overloading (dataNode inherits default) for example is done, each configuration is self-contained,
-      configurations:
-        type: object
-        additionalProperties:
-          type: object
-          additionalProperties: false
-          properties:
-            replicas:
-              type: integer
-              minimum: 1
-            image:
-              type: string
-              example: timescaledev/timescaledb-ha:pg11-ts1.6-postgis
-              minLength: 3
-            postgresql:
-              type: object
-              properties:
-                # The version mentioned here will be used to set the PATH inside the
-                # container, as well as which Docker image to fetch (if the image is not explicitly set)
-                version:
-                  type: integer
-                  minimum: 11
-                # parameters are the parameters you can set for the PostgreSQL server
-                # we may wish to restrict setting some parameters, but we also like
-                # to expose as much as possible of the underlying PostgreSQL
-                # https://www.postgresql.org/docs/current/config-setting.html
-                parameters:
-                  type: object
-                  additionalProperties:
-                    type: string
-                  example:
-                    work_mem: 24MB
-    required:
-      - nodes
-      - configurations
-
 components:
   schemas:
     # Even though we currently only reference '#/components/schemas/User' once,
@@ -137,15 +7,35 @@ components:
     # - we may reuse the definition (global users, local users)
     # - to keep the general structure easier to read
     User:
-      type: object
       additionalProperties:
-        type: object
         additionalProperties: false
         properties:
-          privileges:
-            description: https://www.postgresql.org/docs/current/sql-createrole.html
-            type: object
+          password:
             additionalProperties: false
+            properties:
+              value:
+                minLength: 8
+                type: string
+              valueFrom:
+                additionalProperties: false
+                properties:
+                  secretKeyRef:
+                    additionalProperties: false
+                    properties:
+                      key:
+                        minLength: 1
+                        type: string
+                      name:
+                        minLength: 1
+                        type: string
+                    required:
+                    - name
+                    - key
+                type: object
+            type: object
+          privileges:
+            additionalProperties: false
+            description: https://www.postgresql.org/docs/current/sql-createrole.html
             properties:
               createdb:
                 type: boolean
@@ -153,50 +43,172 @@ components:
                 type: boolean
               login:
                 type: boolean
-              superuser:
-                type: boolean
               replication:
                 type: boolean
-#              validUntil:
-#                type: string
-#                description: A date and time after which the roles password is no longer valid (iso-8601 format)
-#                pattern: ^\s*\d{4}-\d{2}-\d{2}.*$ # Loosely matches most accepted timestamptz's, including date's only
-          password:
+              superuser:
+                type: boolean
             type: object
-            additionalProperties: false
-            properties:
-              value:
-                type: string
-                minLength: 8
-              valueFrom:
-                type: object
-                additionalProperties: false
-                properties:
-                  secretKeyRef:
-                    additionalProperties: false
-                    properties:
-                      name:
-                        type: string
-                        minLength: 1
-                      key:
-                        type: string
-                        minLength: 1
-                    required:
-                    - name
-                    - key
+        type: object
       examples:
-        plainTextPassword:
-          admin:
-            password:
-              value: verysecret
         additionalCreateDBUser:
           devops:
             privileges:
             - createdb
+        plainTextPassword:
+          admin:
+            password:
+              value: verysecret
         referToSelfManagedSecret:
           admin:
             password:
               valueFrom:
                 secretKeyRef:
-                  name: selfManagedSecret
                   key: admin
+                  name: selfManagedSecret
+      type: object
+    Volume:
+      additionalProperties:
+        properties:
+          size: string
+        required:
+        - size
+      type: object
+properties:
+  fullnameOverride:
+    maxLength: 40
+    type: string
+  metadata:
+    properties:
+      annotations:
+        additionalProperties: true
+        properties:
+          service.helm.timescale.com/backup-enabled:
+            type: boolean
+          service.helm.timescale.com/backup-method:
+            type: string
+          service.helm.timescale.com/generate-certificates:
+            type: boolean
+          service.helm.timescale.com/generate-passwords:
+            type: boolean
+          service.helm.timescale.com/network-policy-enabled:
+            type: boolean
+          service.helm.timescale.com/rbac-create:
+            type: boolean
+          service.helm.timescale.com/serviceaccount-create:
+            type: boolean
+          service.helm.timescale.com/timescaledb-tune-enabled:
+            type: boolean
+        type: object
+    type: object
+  nameOverride:
+    maxLength: 40
+    type: string
+  readinessProbe:
+    type: object
+  serviceAccount:
+    type: object
+  spec:
+    additionalProperties: false
+    properties:
+      accessNode:
+        minLength: 1
+        type:
+        - string
+        - 'null'  # Not specifying an access node is only allowed if there is 1 node under the "nodes" key
+      annotations:
+        additionalProperties:
+          type: string
+        type: object
+      # These configurations are referred to by the nodes in the top-level nodes key.
+      # No overloading (dataNode inherits default) for example is done, each configuration is self-contained,
+      configurations:
+        additionalProperties:
+          additionalProperties: false
+          properties:
+            dataVolumes:
+              additionalProperties:
+                properties:
+                  size:
+                    type: string
+                  type: object
+              type: object
+            image:
+              example: timescaledev/timescaledb-ha:pg11-ts1.6-postgis
+              minLength: 3
+              type: string
+            postgresql:
+              properties:
+                # parameters are the parameters you can set for the PostgreSQL server
+                # we may wish to restrict setting some parameters, but we also like
+                # to expose as much as possible of the underlying PostgreSQL
+                # https://www.postgresql.org/docs/current/config-setting.html
+                parameters:
+                  additionalProperties:
+                    type: string
+                  example:
+                    work_mem: 24MB
+                  type: object
+                # The version mentioned here will be used to set the PATH inside the
+                # container, as well as which Docker image to fetch (if the image is not explicitly set)
+                version:
+                  minLength: 2
+                  type: string
+                  example: "11"
+              type: object
+            replicas:
+              minimum: 1
+              type: integer
+          type: object
+        type: object
+      databases:
+        additionalProperties:
+          additionalProperties:
+            type: string
+          properties:
+            encoding:
+              example: UTF8
+              minLength: 3
+              type: string
+            locale:
+              example: C
+              minLength: 1
+              type: string
+          type: object
+        type: object
+      debug:
+        additionalProperties: false
+        properties:
+          execStartPre:
+            type:
+            - string
+            - 'null'
+        type: object
+      nodes:
+        additionalProperties:
+          additionalProperties: false
+          properties:
+            certificate:
+              additionalProperties: false
+              properties:
+                secretKeyRef:
+                  additionalProperties: false
+                  properties:
+                    name:
+                      minLength: 1
+                      type: string
+                  required:
+                  - name
+            configuration:
+              example: default
+              type: string
+          type: object
+        type: object
+      users:
+        $ref: '#/components/schemas/User'
+    required:
+    - nodes
+    - configurations
+    type: object
+title: Values
+type: object
+
