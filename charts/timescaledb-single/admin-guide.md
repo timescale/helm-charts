@@ -37,7 +37,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)          | `[]`                                                |
 | `envFrom`                         | Extra custom environment variables, expressed as [EnvFrom](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envfromsource-v1-core)          | `[]`                                                |
 | `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
-| `callbacks.configMap`             | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks) | `nil`                         |
+| `callbacks.configMap`          | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks). You can use templates in the name. | `nil`                         |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `sharedMemory.useMount`           | Mount `/dev/shm` as a Memory disk           | `false`                                             |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
@@ -421,7 +421,9 @@ Patroni will trigger some callbacks on certain events. These are:
 - on_stop
 
 If you wish to have *your* script run after a certain event happens, you can do so by configuring
-`callbacks.configMap` to point to a [ConfigMap](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.15/#configmap-v1-core).
+`callbacks.configMap` to point to a [ConfigMap](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.15/#configmap-v1-core). The value is templated so you can use `"{{ .Release.Name }}-patroni-callbacks"`
+if you're deploying this chart in the same release with another chart that will create the config map.
+
 This ConfigMap should exist before you install a chart. The data keys that match the event names will be executed
 if the event happens. For convenience the `all` key will be executed at every event.
 

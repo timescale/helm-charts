@@ -405,7 +405,7 @@ spec:
       {{ if .Values.callbacks.configMap -}}
       - name: patroni-callbacks
         configMap:
-          name: {{ .Values.callbacks.configMap }}
+          name: {{ tpl .Values.callbacks.configMap . }}
           defaultMode: 488 # 0750 permissions
       {{- end }}
       {{- if .Values.sharedMemory.useMount }}
