@@ -1,82 +1,71 @@
 {
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
   "components": {
     "schemas": {
       "User": {
         "additionalProperties": {
           "additionalProperties": false,
-          "type": "object",
           "properties": {
+            "password": {
+              "additionalProperties": false,
+              "properties": {
+                "value": {
+                  "minLength": 8,
+                  "type": "string"
+                },
+                "valueFrom": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "secretKeyRef": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "name": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "key"
+                      ]
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
             "privileges": {
               "additionalProperties": false,
-              "type": "object",
               "description": "https://www.postgresql.org/docs/current/sql-createrole.html",
               "properties": {
-                "superuser": {
-                  "type": "boolean"
-                },
                 "createdb": {
-                  "type": "boolean"
-                },
-                "login": {
                   "type": "boolean"
                 },
                 "createrole": {
                   "type": "boolean"
                 },
+                "login": {
+                  "type": "boolean"
+                },
                 "replication": {
                   "type": "boolean"
-                }
-              }
-            },
-            "password": {
-              "additionalProperties": false,
-              "type": "object",
-              "properties": {
-                "valueFrom": {
-                  "additionalProperties": false,
-                  "type": "object",
-                  "properties": {
-                    "secretKeyRef": {
-                      "additionalProperties": false,
-                      "required": [
-                        "name",
-                        "key"
-                      ],
-                      "properties": {
-                        "name": {
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "key": {
-                          "minLength": 1,
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
                 },
-                "value": {
-                  "minLength": 8,
-                  "type": "string"
+                "superuser": {
+                  "type": "boolean"
                 }
-              }
-            }
-          }
-        },
-        "type": "object",
-        "examples": {
-          "referToSelfManagedSecret": {
-            "admin": {
-              "password": {
-                "valueFrom": {
-                  "secretKeyRef": {
-                    "name": "selfManagedSecret",
-                    "key": "admin"
-                  }
-                }
-              }
+              },
+              "type": "object"
             }
           },
+          "type": "object"
+        },
+        "examples": {
           "additionalCreateDBUser": {
             "devops": {
               "privileges": [
@@ -90,23 +79,67 @@
                 "value": "verysecret"
               }
             }
+          },
+          "referToSelfManagedSecret": {
+            "admin": {
+              "password": {
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "key": "admin",
+                    "name": "selfManagedSecret"
+                  }
+                }
+              }
+            }
           }
-        }
+        },
+        "type": "object"
       }
     }
   },
-  "title": "Values",
-  "additionalProperties": false,
-  "$schema": "https://json-schema.org/draft-07/schema#",
-  "type": "object",
   "properties": {
     "fullnameOverride": {
-      "type": "string",
-      "maxLength": 40
+      "maxLength": 40,
+      "type": "string"
+    },
+    "metadata": {
+      "properties": {
+        "annotations": {
+          "additionalProperties": true,
+          "properties": {
+            "service.helm.timescale.com/backup-enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/backup-method": {
+              "type": "string"
+            },
+            "service.helm.timescale.com/generate-certificates": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/generate-passwords": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/network-policy-enabled": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/rbac-create": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/serviceaccount-create": {
+              "type": "boolean"
+            },
+            "service.helm.timescale.com/timescaledb-tune-enabled": {
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
     },
     "nameOverride": {
-      "type": "string",
-      "maxLength": 40
+      "maxLength": 40,
+      "type": "string"
     },
     "readinessProbe": {
       "type": "object"
@@ -116,11 +149,6 @@
     },
     "spec": {
       "additionalProperties": false,
-      "required": [
-        "nodes",
-        "configurations"
-      ],
-      "type": "object",
       "properties": {
         "accessNode": {
           "minLength": 1,
@@ -129,33 +157,65 @@
             "null"
           ]
         },
-        "users": {
-          "$ref": "#/components/schemas/User"
+        "configurations": {
+          "additionalProperties": {
+            "properties": {
+              "image": {
+                "example": "timescaledev/timescaledb-ha:pg11-ts1.6-postgis",
+                "minLength": 3,
+                "type": "string"
+              },
+              "postgresql": {
+                "properties": {
+                  "parameters": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "example": {
+                      "work_mem": "24MB"
+                    },
+                    "type": "object"
+                  },
+                  "version": {
+                    "example": "11",
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "replicas": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "type": "object"
         },
         "databases": {
           "additionalProperties": {
             "additionalProperties": {
               "type": "string"
             },
-            "type": "object",
             "properties": {
-              "locale": {
-                "minLength": 1,
-                "type": "string",
-                "example": "C"
-              },
               "encoding": {
+                "example": "UTF8",
                 "minLength": 3,
-                "type": "string",
-                "example": "UTF8"
+                "type": "string"
+              },
+              "locale": {
+                "example": "C",
+                "minLength": 1,
+                "type": "string"
               }
-            }
+            },
+            "type": "object"
           },
           "type": "object"
         },
         "debug": {
           "additionalProperties": false,
-          "type": "object",
           "properties": {
             "execStartPre": {
               "type": [
@@ -163,110 +223,50 @@
                 "null"
               ]
             }
-          }
+          },
+          "type": "object"
         },
         "nodes": {
           "additionalProperties": {
             "additionalProperties": false,
-            "type": "object",
             "properties": {
-              "configuration": {
-                "type": "string",
-                "example": "default"
-              },
               "certificate": {
                 "additionalProperties": false,
                 "properties": {
                   "secretKeyRef": {
                     "additionalProperties": false,
-                    "required": [
-                      "name"
-                    ],
                     "properties": {
                       "name": {
                         "minLength": 1,
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "name"
+                    ]
                   }
                 }
+              },
+              "configuration": {
+                "example": "default",
+                "type": "string"
               }
-            }
+            },
+            "type": "object"
           },
           "type": "object"
         },
-        "configurations": {
-          "additionalProperties": {
-            "additionalProperties": false,
-            "type": "object",
-            "properties": {
-              "image": {
-                "minLength": 3,
-                "type": "string",
-                "example": "timescaledev/timescaledb-ha:pg11-ts1.6-postgis"
-              },
-              "postgresql": {
-                "type": "object",
-                "properties": {
-                  "version": {
-                    "minimum": 11,
-                    "type": "integer"
-                  },
-                  "parameters": {
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "type": "object",
-                    "example": {
-                      "work_mem": "24MB"
-                    }
-                  }
-                }
-              },
-              "replicas": {
-                "minimum": 1,
-                "type": "integer"
-              }
-            }
-          },
-          "type": "object"
+        "users": {
+          "$ref": "#/components/schemas/User"
         }
-      }
-    },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "annotations": {
-          "additionalProperties": true,
-          "type": "object",
-          "properties": {
-            "service.helm.timescale.com/generate-certificates": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/timescaledb-tune-enabled": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/network-policy-enabled": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/generate-passwords": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/rbac-create": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/serviceaccount-create": {
-              "type": "boolean"
-            },
-            "service.helm.timescale.com/backup-method": {
-              "type": "string"
-            },
-            "service.helm.timescale.com/backup-enabled": {
-              "type": "boolean"
-            }
-          }
-        }
-      }
+      },
+      "required": [
+        "nodes",
+        "configurations"
+      ],
+      "type": "object"
     }
-  }
+  },
+  "title": "Values",
+  "type": "object"
 }

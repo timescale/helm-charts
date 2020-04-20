@@ -66,13 +66,6 @@ components:
                   key: admin
                   name: selfManagedSecret
       type: object
-    Volume:
-      additionalProperties:
-        properties:
-          size: string
-        required:
-        - size
-      type: object
 properties:
   fullnameOverride:
     maxLength: 40
@@ -115,23 +108,11 @@ properties:
         type:
         - string
         - 'null'  # Not specifying an access node is only allowed if there is 1 node under the "nodes" key
-      annotations:
-        additionalProperties:
-          type: string
-        type: object
       # These configurations are referred to by the nodes in the top-level nodes key.
       # No overloading (dataNode inherits default) for example is done, each configuration is self-contained,
       configurations:
         additionalProperties:
-          additionalProperties: false
           properties:
-            dataVolumes:
-              additionalProperties:
-                properties:
-                  size:
-                    type: string
-                  type: object
-              type: object
             image:
               example: timescaledev/timescaledb-ha:pg11-ts1.6-postgis
               minLength: 3
