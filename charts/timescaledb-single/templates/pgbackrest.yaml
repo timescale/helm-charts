@@ -62,6 +62,8 @@ spec:
           containers:
             - name: {{ template "timescaledb.fullname" $ }}-{{ .type }}
               image: curlimages/curl
+              securityContext:
+                runAsUser: 100
               command: ["/usr/bin/curl"]
               args:
               - --connect-timeout

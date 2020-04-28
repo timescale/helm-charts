@@ -19,6 +19,13 @@ image:
   tag: pg11-ts1.6
   pullPolicy: IfNotPresent
 
+# It is not recommended to run containers as root in order to limit attack surface
+# in case of container compromise. timescaledev/timescaledb-ha containers have user ID 1000 for running as non-root.
+# https://kubernetes.io/blog/2018/07/18/11-ways-not-to-get-hacked/#8-run-containers-as-a-non-root-user
+securityContext:
+  enabled: false
+  runAsUser: 1000
+
 # Credentials used by PostgreSQL and Patroni
 # https://github.com/zalando/patroni/blob/master/docs/SETTINGS.rst#postgresql
 credentials:

@@ -41,6 +41,10 @@ spec:
 {{- if .Values.timescaledbTune.enabled }}
       - name: tstune
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        {{- if .Values.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.securityContext.runAsUser }}
+        {{- end }}
         env:
         - name: TSTUNE_FILE
           value: {{ template "tstune_config" . }}
@@ -122,6 +126,10 @@ spec:
       containers:
       - name: timescaledb
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        {{- if .Values.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.securityContext.runAsUser }}
+        {{- end }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         lifecycle:
           preStop:
@@ -309,6 +317,10 @@ spec:
 {{- if or .Values.backup.enabled .Values.backup.enable }}
       - name: pgbackrest
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        {{- if .Values.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.securityContext.runAsUser }}
+        {{- end }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
           - {{ template "scripts_dir" . }}/pgbackrest_bootstrap.sh
