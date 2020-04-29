@@ -51,7 +51,7 @@ to create a set of Kubernetes Secret objects that will contain:
 
 This repo has a simple script that uses [Kustomize](https://kustomize.io/)
 to help you with this 
-(See the [Administration Guide](admin-guide.md#configure) for more details): 
+(See the [Administration Guide](admin-guide.md#creating-the-secrets) for more details): 
 ```console
 ./generate_kustomization.sh my-release
 ```
@@ -84,7 +84,7 @@ First add the repository with:
 helm repo add timescale 'https://charts.timescale.com'
 ```
 > **NOTICE**: Before installing the chart, you need to make sure that the required Kubernetes Secrets are created. 
-You can do this with our helper script. Look at the [Administrator Guide](admin-guide.md#secrets) for more details.
+You can do this with our helper script. Look at the [Administrator Guide](admin-guide.md#creating-the-secrets) for more details.
 
 The fastest way is to use the helper script packed with the 
 chart itself.
