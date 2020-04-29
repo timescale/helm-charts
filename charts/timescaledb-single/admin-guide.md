@@ -77,7 +77,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 
 The chart expects that the Secret objects referenced in `secretNames.credentials`, `secretNames.certificate` and  `secretNames.pgbackrest` are already created when deploying. The values in these secrets will be used as ENV variables to securely configure the deployment.
 
-We've included a helper script `generate_kustomization.sh` to help generate a [kustomization](https://kustomize.io) for a single deployment. The script generate configuration for:
+We've included a helper script `generate_kustomization.sh` to help generate a [kustomization](https://kustomize.io) for a single deployment. The script generates configuration for:
 * strong random passwords for the database
 * a self-signed SSL certificate (for demo and dev purposes)
 * backup (if enabled)
