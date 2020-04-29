@@ -48,9 +48,6 @@ backup:
     repo1-retention-full: 2
     repo1-type: s3
     repo1-cipher-type: "none"
-    repo1-s3-region: us-east-2
-    repo1-s3-endpoint: s3.amazonaws.com
-    repo1-s3-bucket: my_example_s3_bucket_for_backups
 
   # Overriding the archive-push/archive-get sections is most useful in
   # very high througput situations. Look at values/high_throuhgput_example.yaml for more details
@@ -67,16 +64,17 @@ backup:
       type: incr
       schedule: "12 02 * * 1-6"
   # Extra custom environment variables for the backup container.
-  # This points to an already existing secret in the namespace
   envFrom:
   #- secretRef:
-  #    name: pgbackrest-secrets
+  #    name: extra-pgbackrest-secrets
 
   # Alternatively, you can expose individual environment variables:
   # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
+  # Although not impossible, care should be taken not to include secrets
+  # in these parameters. Use Kubernetes Secrets to specify S3 Keys, Secrets etc.
   env:
-    #- name: PGBACKREST_REPO1_S3_KEY
-    #  value: examplekeyid
+    #- name: PGBACKREST_REPO1_S3_BUCKET
+    #  value: my_example_s3_bucket_for_backups
     #- name: PGBACKREST_REPO1_S3_KEY_SECRET
     #  valueFrom:
     #    secretKeyRef:
