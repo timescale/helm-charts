@@ -5,6 +5,17 @@ Please see the included NOTICE for copyright information and LICENSE for a copy 
 
 # TimescaleDB Single
 
+##### Table of Contents
+- [Introduction](#introduction)
+- [Installing](#installing)
+  - [Installing from the Timescale Helm Repo](#installing-from-the-timescale-helm-repo)
+- [Connecting to TimescaleDBs](#connecting-to-timescaledbs)
+  - [Connecting from inside the Cluster](#connecting-from-inside-the-cluster)
+- [Create backups to S3](#create-backups-to-s3)
+- [Cleanup](#cleanup)
+- [Further reading](#further-reading)
+
+## Introduction
 This directory contains a Helm chart to deploy a three
 node [TimescaleDB](https://github.com/timescale/timescaledb/) cluster in a
 High Availability (HA) configuration on Kubernetes. This chart will do the following:
@@ -33,12 +44,14 @@ When configured for Backups to S3:
 
 To install the chart with the release name `my-release`, first you need
 to create a set of Kubernetes Secret objects that will contain:
+
 * The credentials for the superuser, admin and stand-by users
-* SSL Certificates
+* TLS Certificates
 * pgbackrest config (optional)
 
 This repo has a simple script that uses [Kustomize](https://kustomize.io/)
-to help you with this: 
+to help you with this 
+(See the [Administration Guide](admin-guide.md#configure) for more details): 
 ```console
 ./generate_kustomization.sh my-release
 ```
@@ -62,6 +75,53 @@ helm install --name my-release -f myvalues.yaml charts/timescaledb-single
 
 For details about what parameters you can set, have a look at the [Administrator Guide](admin-guide.md#configure)
 
+### Installing from the Timescale Helm Repo
+
+We have a Helm Repository that you can use, instead of cloning this Git repo. 
+
+First add the repository with:
+```console
+helm repo add timescale 'https://charts.timescale.com'
+```
+> **NOTICE**: Before installing the chart, you need to make sure that the required Kubernetes Secrets are created. 
+You can do this with our helper script. Look at the [Administrator Guide](admin-guide.md#secrets) for more details.
+
+The fastest way is to use the helper script packed with the 
+chart itself.
+* First pull the chart and unpack it:
+
+  ```console
+  helm pull timescale/timescaledb-single --untar
+  ```
+
+* Then run the `generate_kustomization.sh` script:
+
+  ```console
+  cd ./timescaledb-single
+  bash ./generate_kustomization.sh my_release
+  ```
+
+  The script will generate configuration for
+  * strong random passwords for the database
+  * a self-signed SSL certificate (for demo and dev purposes)
+  * backup (if enabled)
+
+* You can then apply these configurations with:
+
+  ```console
+  kubectl apply -k "kustomize/my_release"
+  ```
+
+* And install the chart:
+
+  ```console
+  helm install --name my-release .
+  ```
+
+To keep the repo up to date with new versions you can do:
+```console
+helm repo update
+``` 
 ## Connecting to TimescaleDBs
 
 To connect to the TimescaleDB instance, we first need to know to which host we need to connect. Use `kubectl` to get that information:
