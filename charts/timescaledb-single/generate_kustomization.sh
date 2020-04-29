@@ -40,7 +40,7 @@ generate_credentials() {
 
     for key in PATRONI_SUPERUSER_PASSWORD PATRONI_REPLICATION_PASSWORD PATRONI_admin_PASSWORD
     do
-        echo "${key}=$(< /dev/urandom tr -dc A-Za-z0-9 | head -c32)" >> "$1"
+        echo "${key}=$(< /dev/urandom LC_CTYPE=C tr -dc A-Za-z0-9 | head -c32)" >> "$1"
     done
 }
 
@@ -132,4 +132,5 @@ To preview the deployment of the secrets:
 To install these secrets, execute:
 
     kubectl apply -k "${KUSTOMIZE_DIR}"
+
 __EOT__

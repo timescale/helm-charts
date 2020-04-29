@@ -26,6 +26,9 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
 | `image.tag`                       | The version of the image to pull            | `pg11-ts1.6`                                        |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
+| `secretNames.credentials`         | Existing secret that contains env vars that influence Patroni (e.g. PATRONI_SUPERUSER_PASSWORD) | `RELEASE-credentials` | 
+| `secretNames.certificate`         | Existing kubernetes.io/tls secret containing a tls.key and tls.crt | `RELEASE-certificate` |
+| `secretNames.pgbackrest`          | Existing secret that contains env vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET) | `RELEASE-pgbackgrest` |
 | `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |
 | `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults |
 | `backup.pgBackRest:archive-push`  | [pgBackRest global:archive-push configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza) | empty |

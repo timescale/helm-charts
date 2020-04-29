@@ -31,8 +31,19 @@ When configured for Backups to S3:
 
 ## Installing
 
-To install the chart with the release name `my-release`:
+To install the chart with the release name `my-release`, first you need
+to create a set of Kubernetes Secret objects that will contain:
+* The credentials for the superuser, admin and stand-by users
+* SSL Certificates
+* pgbackrest config (optional)
 
+This repo has a simple script that uses [Kustomize](https://kustomize.io/)
+to help you with this: 
+```console
+./generate_kustomization.sh my-release
+```
+
+Then you can install the chart with:
 ```console
 helm install --name my-release charts/timescaledb-single
 ```
@@ -63,17 +74,17 @@ my-release   LoadBalancer   10.100.149.189    verylongname.example.com   5432:31
 ```
 
 Using the External IP for the service (which will route through the LoadBalancer to the Master), you
-can connect via `psql` using the following (default example superuser password is `tea`)
+can connect via `psql` using the superuser `postgres` by:
+* decoding the password you generated with kustomize
+```console
+PGPOSTGRESPASSWORD=$(kubectl get secret --namespace default my-release-credentials -o jsonpath="{.data.PATRONI_SUPERUSER_PASSWORD}" | base64 --decode)
+```
+* Connecting with psql
+```console
+PGPASSWORD=$PGPOSTGRESPASSWORD psql -h verylongname.example.com -U postgres
+```
 
 > NOTICE: You may have to wait a few minutes before you can resolve the DNS record
-
-```console
-psql -h verylongname.example.com -U postgres
-```
-```
-Password for user postgres:
-postgres=#
-```
 
 From here, you can start creating users and databases, for example, using the above `psql` session:
 ```sql
