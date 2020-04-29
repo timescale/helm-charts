@@ -8,6 +8,8 @@ Please see the included NOTICE for copyright information and LICENSE for a copy 
 ##### Table of Contents
 - [Connecting](#connecting)
 - [Configuration](#configuration)
+  - [Creating the Secrets](#creating-the-secrets)
+  - [Examples](#examples)
 - [Backups](#backups)
 - [Cleanup](#cleanup)
 - [Callbacks](#callbacks)
@@ -27,7 +29,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.tag`                       | The version of the image to pull            | `pg11-ts1.6`                                        |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `secretNames.credentials`         | Existing secret that contains env vars that influence Patroni (e.g. PATRONI_SUPERUSER_PASSWORD) | `RELEASE-credentials` | 
-| `secretNames.certificate`         | Existing kubernetes.io/tls secret containing a tls.key and tls.crt | `RELEASE-certificate` |
+| `secretNames.certificate`         | Existing `type:kubernetes.io/tls` secret containing a tls.key and tls.crt | `RELEASE-certificate` |
 | `secretNames.pgbackrest`          | Existing secret that contains env vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET) | `RELEASE-pgbackgrest` |
 | `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |
 | `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults |
@@ -70,6 +72,59 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |
 | `timescaledbTune.enabled`         | If true, runs `timescaledb-tune` before starting PostgreSQL | `false`                             |
+
+### Creating the Secrets
+
+The chart expects that the Secret objects referenced in `secretNames.credentials`, `secretNames.certificate` and  `secretNames.pgbackrest` are already created when deploying. The values in these secrets will be used as ENV variables to securely configure the deployment.
+
+We've included a helper script `generate_kustomization.sh` to help generate a [kustomization](https://kustomize.io) for a single deployment. The script generate configuration for:
+* strong random passwords for the database
+* a self-signed SSL certificate (for demo and dev purposes)
+* backup (if enabled)
+
+The script is interactive and (if you wish to enable backups) will ask you to enter your values 
+for the pgBackRest S3 config (like bucket, region, endpoint, key and secret).
+
+
+#### Credentials 
+
+This Secret should contain the EVN vars that will influence Patroni. It should at least contain the passwords for the 3 different database users this chart creates: postgres (superuser), admin, and standby (replication). For example, the data of the secret can be:
+  ```yaml
+  data:
+    PATRONI_SUPERUSER_PASSWORD=base64-encoded-strong-pass
+    PATRONI_REPLICATION_PASSWORD=base64-encoded-strong-pass
+    PATRONI_admin_PASSWORD=base64-encoded-strong-pass
+  ```
+
+#### Certificate
+
+This Secret should be of `type: kubernetes.io/tls` with two items: `tls.crt` and `tls.key`. The certificate is used for the database connections.
+
+> **NOTICE**: The `generate_kustomization.sh` script generates self-signed certificates that should 
+only be used for development and demo purposes. 
+The certificate should be replaced by a signed certificate, signed by a Certificate Authority (CA) that you trust.
+
+#### pgBackRest 
+
+This Secret is optional, and required only when backups are enabled (`backup.enabled=true`). 
+It should contain the ENV vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET)
+
+The values in this Secret should specify sensitive variables like S3_KEY and S3_KEY_SECRET.
+For example:
+  ```yaml
+  data:
+    PGBACKREST_REPO1_S3_BUCKET: my_example_s3_bucket_for_backups
+    PGBACKREST_REPO1_S3_ENDPOINT: s3.amazonaws.com
+    PGBACKREST_REPO1_S3_REGION: us-east-2
+    PGBACKREST_REPO1_S3_KEY: examplekeyid
+    PGBACKREST_REPO1_S3_KEY_SECRET: examplesecret+D48GXfDdtlnlSdmB
+  ```
+
+For a list of all the pgBackRest command configuration options that you can set take a look 
+at: https://pgbackrest.org/command.html#introduction 
+  > Any option may be set in an environment variable using the PGBACKREST_ prefix and the option name in all caps replacing - with _, e.g. pg1-path becomes PGBACKREST_PG1_PATH and stanza becomes PGBACKREST_STANZA...
+  >
+  > ... more at the link
 
 ### Examples
 - Override value using commandline parameters
@@ -137,7 +192,7 @@ Removing a deployment can be done by deleting a Helm deployment, however, removi
 the Persistent Volume Claims (pvc) belonging to the cluster.
 
 To fully purge a deployment in Kubernetes, you should do the following:
-```console
+```sh
 # Delete the Helm deployment
 helm delete my-release
 # Delete pvc 
@@ -203,7 +258,7 @@ Once the restore is done, it will connect to the `master` and use streaming repl
 Assuming that you have deployed a 3-pod TimescaleDB, we can trigger the restore test by increasing the `replicaCount` from 3 to 4.
 This should create a new pod, which we can inspect to verify that the restore was done correctly.
 
-```console
+```sh
 helm upgrade my-release -f myvalues.yaml charts/timescaledb-single --set replicaCount=4
 # Wait a short while for the Pod to be scheduled and available
 kubectl logs pod/my-release-timescaledb-3 -c timescaledb
