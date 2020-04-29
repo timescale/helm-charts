@@ -106,11 +106,24 @@ __EOT__
     done
 }
 
-generate_credentials "${KUSTOMIZE_DIR}/credentials.conf"
-generate_certificate "${KUSTOMIZE_DIR}" "${DEPLOYMENT}"
-generate_pgbackrest "${KUSTOMIZE_DIR}/pgbackrest.conf"
+print_install_instructions() {
+    cat <<__EOT__
 
-cat <<__EOT__
+To install these secrets, execute:
+
+    kubectl apply -k "${KUSTOMIZE_DIR}"
+
+__EOT__
+}
+
+install_secrets() {
+    echo "Installing secrets..."
+    kubectl apply -k "${KUSTOMIZE_DIR}"
+}
+
+print_info() {
+    cat <<__EOT__
+
 Generated a kustomization named ${DEPLOYMENT} in directory ${KUSTOMIZE_DIR}.
 
 
@@ -128,9 +141,36 @@ To preview the deployment of the secrets:
 
     kubectl kustomize "${KUSTOMIZE_DIR}"
 
-
-To install these secrets, execute:
-
-    kubectl apply -k "${KUSTOMIZE_DIR}"
-
 __EOT__
+}
+
+generate_credentials "${KUSTOMIZE_DIR}/credentials.conf"
+generate_certificate "${KUSTOMIZE_DIR}" "${DEPLOYMENT}"
+generate_pgbackrest "${KUSTOMIZE_DIR}/pgbackrest.conf"
+
+print_info
+
+if [ -n "${SKIP_INSTALL}" ]
+then
+    print_install_instructions
+    exit 0
+fi
+
+while true
+do
+    echo "Or you may want to install the secrets directly? (y/n)"
+    read response
+    case "$response" in
+        y*) break ;;
+        Y*) break ;;
+        n*) 
+            print_install_instructions
+            exit 0 ;;
+        N*) 
+            print_install_instructions
+            exit 0 ;;
+        *) ;;
+    esac
+done
+
+install_secrets

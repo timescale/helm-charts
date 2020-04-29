@@ -106,11 +106,9 @@ chart itself.
   * a self-signed SSL certificate (for demo and dev purposes)
   * backup (if enabled)
 
-* You can then apply these configurations with:
-
-  ```console
-  kubectl apply -k "kustomize/my_release"
-  ```
+  It will prompt if you want it install the secrets directly, 
+  or print out how to do it after (p)reviewing the generated
+  files.
 
 * And install the chart:
 

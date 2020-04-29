@@ -84,6 +84,7 @@ We've included a helper script `generate_kustomization.sh` to help generate a [k
 
 The script is interactive and (if you wish to enable backups) will ask you to enter your values 
 for the pgBackRest S3 config (like bucket, region, endpoint, key and secret).
+It will also ask if you want the script to install the secrets directly.
 
 
 #### Credentials 
