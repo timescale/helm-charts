@@ -27,7 +27,7 @@ metadata:
     "helm.sh/hook": post-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
-  activeDeadlineSeconds: 60
+  activeDeadlineSeconds: 120
   template:
     metadata:
       labels:
@@ -40,16 +40,13 @@ spec:
       containers:
       - name: {{ template "timescaledb.fullname" . }}-patch-patroni-config
         image: curlimages/curl
-        command: ["/usr/bin/curl"]
+        command: ["/bin/sh"]
+        # Patching the Patroni configuration is good, however it should not block an upgrade from going through
+        # Therefore we ensure we always exit with an exitcode 0, so that Helm is satisfied with this upgrade job
         args:
-        - --connect-timeout
-        - '10'
-        - --include
-        - --silent
-        - --show-error
-        - --fail
-        - --request
-        - PATCH
-        - --data
-        - {{ .Values.patroni.bootstrap.dcs | toJson | quote }}
-        - "http://{{ template "clusterName" . }}-config:8008/config"
+        - '-c'
+        - |
+          /usr/bin/curl --connect-timeout 30 --include --request PATCH --data \
+          {{ .Values.patroni.bootstrap.dcs | toJson | quote }} \
+          "http://{{ template "clusterName" . }}-config:8008/config"
+          exit 0
