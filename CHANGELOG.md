@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 ### Fixed
+  * Move app/chart/release labels under label key in networkpolicy template
 
 ## [v0.5.5] - 2020-03-30
 
