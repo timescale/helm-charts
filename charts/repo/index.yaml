@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   timescaledb-multinode:
   - apiVersion: v1
-    created: "2020-05-05T16:53:27.395688778+01:00"
+    created: "2020-05-05T19:51:37.606894041+02:00"
     description: TimescaleDB Multinode Deployment.
     digest: a6c664a75489e069cdd2d36dff87ca6d2b3a38a3edf16de4234418b354e40eea
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -19,7 +19,23 @@ entries:
     version: 0.3.0
   timescaledb-single:
   - apiVersion: v1
-    created: "2020-05-05T16:53:27.402308531+01:00"
+    created: "2020-05-05T19:51:37.620055754+02:00"
+    description: TimescaleDB HA Deployment.
+    digest: b87fcc3b280bc81fea71f2abfcba14197eff0ed5c61f75241125dea16371c89c
+    home: https://github.com/timescale/timescaledb-kubernetes
+    maintainers:
+    - email: support@timescale.com
+      name: TimescaleDB
+    name: timescaledb-single
+    sources:
+    - https://github.com/timescale/timescaledb-kubernetes
+    - https://github.com/timescale/timescaledb-docker-ha
+    - https://github.com/zalando/patroni
+    urls:
+    - timescaledb-single-0.5.7.tgz
+    version: 0.5.7
+  - apiVersion: v1
+    created: "2020-05-05T19:51:37.618234563+02:00"
     description: TimescaleDB HA Deployment.
     digest: 3dd927b1b16d81952bb55721b6fc6c093bc8be765a19fd4174dd6ce1f8ab50fc
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -35,7 +51,7 @@ entries:
     - timescaledb-single-0.5.6.tgz
     version: 0.5.6
   - apiVersion: v1
-    created: "2020-05-05T16:53:27.401379534+01:00"
+    created: "2020-05-05T19:51:37.616294833+02:00"
     description: TimescaleDB HA Deployment.
     digest: 27098601d61f727ac71c2bfb67a1240c99188fc56ab4d0a0375cf5abc09547dc
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -51,7 +67,7 @@ entries:
     - timescaledb-single-0.5.5.tgz
     version: 0.5.5
   - apiVersion: v1
-    created: "2020-05-05T16:53:27.400431206+01:00"
+    created: "2020-05-05T19:51:37.614379276+02:00"
     description: TimescaleDB HA Deployment.
     digest: 5bd289b789c7fae00b98ae9d1ce0b86e6b8463fbe4fbdaf20d59b60aca137580
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -67,7 +83,7 @@ entries:
     - timescaledb-single-0.5.4.tgz
     version: 0.5.4
   - apiVersion: v1
-    created: "2020-05-05T16:53:27.399465195+01:00"
+    created: "2020-05-05T19:51:37.612817763+02:00"
     description: TimescaleDB HA Deployment.
     digest: 6cd19bcb822c9610ad13fbe49b03c3bd9d5f4655920b44e41f937487ecf86d9d
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -83,7 +99,7 @@ entries:
     - timescaledb-single-0.5.3.tgz
     version: 0.5.3
   - apiVersion: v1
-    created: "2020-05-05T16:53:27.398417408+01:00"
+    created: "2020-05-05T19:51:37.611182181+02:00"
     description: TimescaleDB HA Deployment.
     digest: 9e2570426e0445a2e4f079fe757bbaadbc95a764c12ce10903f426d3b69cfde9
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -99,7 +115,7 @@ entries:
     - timescaledb-single-0.5.2.tgz
     version: 0.5.2
   - apiVersion: v1
-    created: "2020-05-05T16:53:27.397733848+01:00"
+    created: "2020-05-05T19:51:37.610280769+02:00"
     description: TimescaleDB HA Deployment.
     digest: 128a7f0738f176a2abe6b7e1c3a1173ac6c4a77f7816704add3f0664609915aa
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -115,7 +131,7 @@ entries:
     - timescaledb-single-0.5.1.tgz
     version: 0.5.1
   - apiVersion: v1
-    created: "2020-05-05T16:53:27.397053864+01:00"
+    created: "2020-05-05T19:51:37.609129867+02:00"
     description: TimescaleDB HA Deployment.
     digest: f4e0e05c989f04c78d9bd0a5b7ab2c6e1d2227af72ad05f7451a3e01b462bba0
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -131,7 +147,7 @@ entries:
     - timescaledb-single-0.5.0.tgz
     version: 0.5.0
   - apiVersion: v1
-    created: "2020-05-05T16:53:27.396361918+01:00"
+    created: "2020-05-05T19:51:37.607711351+02:00"
     description: TimescaleDB HA Deployment.
     digest: 2ae9d4a4ba25caf626e837244bf092721439e822d486f2c17f238b479012dedb
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -146,4 +162,4 @@ entries:
     urls:
     - timescaledb-single-0.4.0.tgz
     version: 0.4.0
-generated: "2020-05-05T16:53:27.395199445+01:00"
+generated: "2020-05-05T19:51:37.606279294+02:00"
