@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
+## [v0.5.7] - 2020-05-05
+
+### Fixed
+  * Do not cascade failure of patching Patroni to the Helm upgrade
+
 ## [v0.5.6] - 2020-05-05
 
 ### Fixed
