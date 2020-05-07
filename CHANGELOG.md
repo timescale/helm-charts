@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 ### Fixed
+ * Sequence of events to trigger the first backup/stanza-create
 
 ## [v0.5.7] - 2020-05-05
 
