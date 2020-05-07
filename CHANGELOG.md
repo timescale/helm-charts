@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
- * Support for PostgreSQL 12
- * Default to PostgreSQL 11, TimescaleDB 1.7
 ### Changed
 ### Removed
+### Fixed
+
+## [v0.5.8] - 2020-05-07
+
+### Added
+ * Support for PostgreSQL 12
+ * Default to PostgreSQL 11, TimescaleDB 1.7
 ### Fixed
  * Sequence of events to trigger the first backup/stanza-create
 
