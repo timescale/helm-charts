@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+ * Support for PostgreSQL 12
+ * Default to PostgreSQL 11, TimescaleDB 1.7
 ### Changed
 ### Removed
 ### Fixed
