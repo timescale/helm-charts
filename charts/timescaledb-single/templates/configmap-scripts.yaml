@@ -48,11 +48,17 @@ data:
         sleep 3
     done
 
+    # We'll be lazy; we wait for another while to allow the database to promote
+    # to primary if it's the only one running
+    sleep 10
+
     # If we are the primary, we want to create/validate the backup stanza
     if [ "$(psql -c "SELECT pg_is_in_recovery()::text" -AtXq)" == "false" ]; then
         pgbackrest check || {
             log "Creating pgBackrest stanza"
             pgbackrest --stanza=poddb stanza-create --log-level-stderr=info || exit 1
+            log "Creating initial backup"
+            pgbackrest --type=full backup || exit 1
         }
     fi
 
@@ -101,8 +107,6 @@ data:
 
   post_init.sh: |
     #!/bin/bash
-    PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
-
     source "{{ template "pod_environment_file" }}"
 
     function log {
@@ -131,20 +135,6 @@ data:
         CREATE TABLESPACE :"tablespace" LOCATION :'directory';
     __SQL__
     done
-
-    if [ "${PGBACKREST_BACKUP_ENABLED}" == "1" ]; then
-      log "Waiting for pgBackRest API to become responsive"
-      while sleep 1; do
-          if [ $SECONDS -gt 10 ]; then
-              log "pgBackRest API did not respond within $SECONDS seconds, will not trigger a backup"
-              exit 0
-          fi
-          timeout 1 bash -c "echo > /dev/tcp/localhost/8081" 2>/dev/null && break
-      done
-
-      log "Triggering pgBackRest backup"
-      curl -i -X POST http://localhost:8081/backups
-    fi
 
     # We always exit 0 this script, otherwise the database initialization fails.
     exit 0
