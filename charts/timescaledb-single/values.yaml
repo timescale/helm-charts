@@ -12,11 +12,14 @@ nameOverride: timescaledb
 # https://patroni.readthedocs.io/en/latest/SETTINGS.html#global-universal
 clusterName:
 
+# The major PostgreSQL version to use
+version: 11
+
 image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescaledev/timescaledb-ha
-  tag: pg11-ts1.6
+  tag: pg11-ts1.7
   pullPolicy: IfNotPresent
 
 # These secrets should exist before the Helm is used to deploy this TimescaleDB.
@@ -48,6 +51,8 @@ backup:
     repo1-retention-full: 2
     repo1-type: s3
     repo1-cipher-type: "none"
+    repo1-s3-region: us-east-2
+    repo1-s3-endpoint: s3.amazonaws.com
 
   # Overriding the archive-push/archive-get sections is most useful in
   # very high througput situations. Look at values/high_throuhgput_example.yaml for more details

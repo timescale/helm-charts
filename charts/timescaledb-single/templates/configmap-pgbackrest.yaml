@@ -29,9 +29,11 @@ data:
     pg1-path={{ template "data_directory" . }}
     pg1-socket-path={{ template "socket_directory" . }}
 
+{{- if lt .Values.version 12.0 }}
     recovery-option=standby_mode=on
     recovery-option=recovery_target_timeline=latest
     recovery-option=recovery_target_action=shutdown
+{{- end }}
 
     link-all=y
 
