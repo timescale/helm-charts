@@ -25,8 +25,9 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `clusterName`                     | Override the name of the PostgreSQL cluster | Equal to the Helm release name                      |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
 | `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
+| `version`                         | The major PostgreSQL version to use         | empty, defaults to the Docker image default         |
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
-| `image.tag`                       | The version of the image to pull            | `pg11-ts1.6`                                        |
+| `image.tag`                       | The version of the image to pull            | `pg11-ts1.7`                                        |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `secretNames.credentials`         | Existing secret that contains env vars that influence Patroni (e.g. PATRONI_SUPERUSER_PASSWORD) | `RELEASE-credentials` | 
 | `secretNames.certificate`         | Existing `type:kubernetes.io/tls` secret containing a tls.key and tls.crt | `RELEASE-certificate` |

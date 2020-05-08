@@ -12,8 +12,9 @@ nameOverride: timescaledb
 # https://patroni.readthedocs.io/en/latest/SETTINGS.html#global-universal
 clusterName:
 
-# The major PostgreSQL version to use
-version: 11
+# The major PostgreSQL version to use, defaults to the default version of the Docker image
+# However, in pg_upgrade scenarios, you may need to specify an explicit version
+version:
 
 image:
   # Image was built from

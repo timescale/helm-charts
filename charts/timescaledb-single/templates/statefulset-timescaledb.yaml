@@ -228,6 +228,10 @@ spec:
           # the backup. This can be removed once we do not directly invoke pgBackRest
           # from inside the TimescaleDB container anymore
         {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 8 }}{{- end }}
+        {{- if .Values.version }}
+        - name: PATH
+          value: /usr/lib/postgresql/{{ .Values.version }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        {{- end }}
         envFrom:
         - secretRef:
             name: {{ template "secrets_credentials" . }}
