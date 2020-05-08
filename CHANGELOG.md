@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Ability to randomly create credentials, called `unsafe`
 ### Changed
 ### Removed
+ * Recovery configuration options for pgBackRest
 ### Fixed
 
 ## [v0.5.8] - 2020-05-07
