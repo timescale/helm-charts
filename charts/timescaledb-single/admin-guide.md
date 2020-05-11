@@ -88,6 +88,11 @@ The script is interactive and (if you wish to enable backups) will ask you to en
 for the pgBackRest S3 config (like bucket, region, endpoint, key and secret).
 It will also ask if you want the script to install the secrets directly.
 
+```sh
+charts/timescaledb-single/generate_kustomization.sh <release name>
+```
+
+The script can install the secrets immediately, it creates the following secrets:
 
 #### Credentials 
 
@@ -663,3 +668,11 @@ sharedMemory:
 For some further background:
 - [Support Posix Shared Memory across containers in a pod](https://github.com/kubernetes/kubernetes/issues/28272)
 - [Increase POSIX Shared Memory for Kubernetes](https://docs.okd.io/latest/dev_guide/shared_memory.html)
+
+### `MountVolume.SetUp failed for volume "<volume name>": secret "<release>-secret" not found`
+
+This error points to missing Secrets.Since release 0.6.0 the Secrets are no longer part of this Helm Chart and should
+be managed separately.
+
+* When upgrading a 0.5 deployment to 0.6: [Upgrade Guide](upgrade-guide.md#migrate-the-secrets)
+* When creating a new deployment, or if the old Secrets are no longer available: [Create the Secrets](#creating-the-secrets)
