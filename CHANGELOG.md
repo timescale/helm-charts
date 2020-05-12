@@ -9,10 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  * Ability to randomly create credentials, called `unsafe`
 ### Changed
+### Removed
+ * Recovery configuration options for pgBackRest
+### Fixed
+
+## [v0.6.0] - 2020-05-12
+
+### Added
+ * Ability to randomly create credentials, called `unsafe`
+ * Upgrade guide to aid in migrating Secrets from a 0.5 or 0.4 deployment to a 0.6 deployment
+### Changed
  * Remove Helm annotations from the Backup Job/Pods
 ### Removed
  * Recovery configuration options for pgBackRest
 ### Fixed
+ * Failing to update Patroni no longer cascades to failing the Helm
 
 ## [v0.5.8] - 2020-05-07
 

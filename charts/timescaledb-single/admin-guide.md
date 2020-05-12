@@ -671,7 +671,7 @@ For some further background:
 
 ### `MountVolume.SetUp failed for volume "<volume name>": secret "<release>-secret" not found`
 
-This error points to missing Secrets.Since release 0.6.0 the Secrets are no longer part of this Helm Chart and should
+This error points to missing Secrets. Since release 0.6.0 the Secrets are no longer part of this Helm Chart and should
 be managed separately.
 
 * When upgrading a 0.5 deployment to 0.6: [Upgrade Guide](upgrade-guide.md#migrate-the-secrets)
