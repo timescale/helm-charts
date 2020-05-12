@@ -426,6 +426,11 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
+# Setting unsafe to true will generate some random credentials. This is meant
+# for development or first evaluation of the Helm Charts. It should *not* be
+# used for anything beyong the evaluation phase.
+unsafe: false
+
 debug:
   # This setting is mainly for during development, debugging or troubleshooting.
   # This command will be executed *before* the main container starts. In the
