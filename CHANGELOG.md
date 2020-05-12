@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  * Ability to randomly create credentials, called `unsafe`
 ### Changed
+ * Remove Helm annotations from the Backup Job/Pods
 ### Removed
  * Recovery configuration options for pgBackRest
 ### Fixed

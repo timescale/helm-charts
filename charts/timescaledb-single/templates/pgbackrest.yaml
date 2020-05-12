@@ -42,9 +42,6 @@ spec:
     metadata:
       labels:
         app: {{ template "timescaledb.fullname" $ }}
-        chart: {{ template "timescaledb.chart" $ }}
-        release: {{ $.Release.Name }}
-        heritage: {{ $.Release.Service }}
         backup-type: {{ .type }}
         cluster-name: {{ template "clusterName" $ }}
     spec:
@@ -53,10 +50,8 @@ spec:
         metadata:
           labels:
             app: {{ template "timescaledb.fullname" $ }}
-            chart: {{ template "timescaledb.chart" $ }}
-            release: {{ $.Release.Name }}
-            heritage: {{ $.Release.Service }}
             backup-type: {{ .type }}
+            cluster-name: {{ template "clusterName" $ }}
         spec:
           restartPolicy: OnFailure
           containers:
