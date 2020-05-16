@@ -245,6 +245,7 @@ spec:
         ports:
         - containerPort: 8008
         - containerPort: 5432
+          name: postgresql
         {{- if .Values.readinessProbe.enabled }}
         readinessProbe:
           exec:
