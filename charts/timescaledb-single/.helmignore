@@ -1,5 +1,2 @@
 *.png
-*.crt
-*.key
-pgbackrest.conf
-credentials.conf
+    
