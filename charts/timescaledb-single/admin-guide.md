@@ -121,12 +121,20 @@ The values in this Secret should specify sensitive variables like S3_KEY and S3_
 For example:
   ```yaml
   data:
-    PGBACKREST_REPO1_S3_BUCKET: my_example_s3_bucket_for_backups
-    PGBACKREST_REPO1_S3_ENDPOINT: s3.amazonaws.com
-    PGBACKREST_REPO1_S3_REGION: us-east-2
-    PGBACKREST_REPO1_S3_KEY: examplekeyid
-    PGBACKREST_REPO1_S3_KEY_SECRET: examplesecret+D48GXfDdtlnlSdmB
+    PGBACKREST_REPO1_S3_BUCKET: <base64 encoded my_example_s3_bucket_for_backups>
+    PGBACKREST_REPO1_S3_ENDPOINT: <base64 encoded s3.amazonaws.com>
+    PGBACKREST_REPO1_S3_REGION: <base64 encoded us-east-2>
+    PGBACKREST_REPO1_S3_KEY: <base64 encoded examplekeyid>
+    PGBACKREST_REPO1_S3_KEY_SECRET: <base64 encoded examplesecret+D48GXfDdtlnlSdmB>
   ```
+
+Another example, if you want to include encryption of your backups by pgBackRest, is to include these parameters:
+
+```yaml
+  data:
+    PGBACKREST_REPO1_CIPHER_TYPE: <base64 encoded aes-256-cbc>
+    PGBACKREST_REPO1_CIPHER_PASS: <base64 encoded encryption passphrase>
+```
 
 For a list of all the pgBackRest command configuration options that you can set take a look 
 at: https://pgbackrest.org/command.html#introduction 
