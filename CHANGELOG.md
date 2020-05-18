@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
- * Ability to randomly create credentials, called `unsafe`
-### Changed
+## Changed
 ### Removed
- * Recovery configuration options for pgBackRest
 ### Fixed
+
+## [v0.6.1] - 2020-05-18
+
+### Added
+ * Name for PostgreSQL container port, allows for easier `kubectl port-forward`
+ * Backup parameter examples around encryption
+### Fixed
+ * Include kustomize/example directory in the Helm artifacts. This includes new tarballs for recent releases.
+ * Allow `generate_kustomization.sh` to run on MacOS
 
 ## [v0.6.0] - 2020-05-12
 
