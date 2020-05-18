@@ -6,6 +6,7 @@
 # The purpose of this script is to create a kustomization specifically for a
 # single deployment. It does this by copying the example kustomization,
 # renaming the relevant bits, and generating (random) credentials and certificates
+export LC_ALL=C
 
 if test "$1" = "";
 then
@@ -17,6 +18,7 @@ Example:
 $0 my-deployment
 $0 my-deployment /secrets/my-deployment/
 __EOT__
+    exit 1
 fi
 DEPLOYMENT="$1"
 shift
