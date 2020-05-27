@@ -175,6 +175,8 @@ spec:
                 unset "${UNKNOWNVAR}"
             done
 
+            touch {{ template "tstune_config" . | quote }}
+
             echo "*:*:*:postgres:${PATRONI_SUPERUSER_PASSWORD}" >> ${HOME}/.pgpass
             chmod 0600 ${HOME}/.pgpass
 
