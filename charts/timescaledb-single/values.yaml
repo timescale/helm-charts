@@ -133,11 +133,26 @@ patroni:
           archive_command: "/etc/timescaledb/scripts/pgbackrest_archive.sh %p"
           archive_mode: 'on'
           archive_timeout: 1800s
+          #
+          # Autovacuuming is very important to PostgreSQL. For TimescaleDB, in
+          # most usecases the vacuuming part is of less importance (there are no deleted tuples to prune)
+          # however, the autoanalyze bit (updating the statistics of the chunks) is important to help
+          # in planning queries. Therefore we do some tuning of autovacuum to address these
+          # TimescaleDB specific concerns.
+          # We'd rather have autovacuum do things early, as this increases the changes that autovacuum
+          # will find the buffers it needs in shared_buffers, instead of having to fetch them from disk.
+          # 
           autovacuum_analyze_scale_factor: 0.02
+          # This allows us to auto-analyze at most 120 (pretty much empty) chunks every 5 seconds
+          # This will ensure that we can have up-to-date statistics on inserts very, very quickly
+          autovacuum_naptime: 5s
           autovacuum_max_workers: 10
+          # We don't want vacuum work to be building up, therefore we increase
+          # the cost limit so that the work to be done for vacuum will be done quickly.
+          autovacuum_vacuum_cost_limit: 500
           autovacuum_vacuum_scale_factor: 0.05
+          log_autovacuum_min_duration: 1min
           hot_standby: 'on'
-          log_autovacuum_min_duration: 0
           log_checkpoints: 'on'
           log_connections: 'on'
           log_disconnections: 'on'
