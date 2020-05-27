@@ -21,7 +21,7 @@ image:
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescaledev/timescaledb-ha
   tag: pg11-ts1.7
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # These secrets should exist before the Helm is used to deploy this TimescaleDB.
 # You can use generate_kustomization.sh to help in creating these secrets, or have
@@ -353,7 +353,7 @@ prometheus:
   image:
     repository: wrouesnel/postgres_exporter
     tag: v0.7.0
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   # Extra custom environment variables for prometheus.
   # These should be an EnvVar, as this allows you to inject secrets into the environment
   # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvar-v1-core
