@@ -34,19 +34,19 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `secretNames.pgbackrest`          | Existing secret that contains env vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET) | `RELEASE-pgbackgrest` |
 | `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |
 | `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults |
-| `backup.pgBackRest:archive-push`  | [pgBackRest global:archive-push configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza) | empty |
-| `backup.pgBackRest:archive-get`   | [pgBackRest global:archive-get configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)  | empty |
+| `backup.pgBackRest:archive-push`  | [pgBackRest global:archive-push configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza) |  |
+| `backup.pgBackRest:archive-get`   | [pgBackRest global:archive-get configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)  |  |
 | `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)          | `[]`                                                |
 | `envFrom`                         | Extra custom environment variables, expressed as [EnvFrom](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envfromsource-v1-core)          | `[]`                                                |
 | `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
 | `callbacks.configMap`          | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks). You can use templates in the name. | `nil`                         |
-| `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
+| `resources`                       | Any resources you wish to assign to the pod |                                                     |
 | `sharedMemory.useMount`           | Mount `/dev/shm` as a Memory disk           | `false`                                             |
-| `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
-| `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
+| `nodeSelector`                    | Node label to use for scheduling            |                                                     |
+| `tolerations`                     | List of node taints to tolerate             |                                                     |
 | `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname and (availability) zone |
-| `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
+| `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. |                                         |
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
 | `loadBalancer.enabled`            | If enabled, creates a LB for the primary    | `true`                                              |
 | `loadBalancer.annotations`        | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
@@ -64,7 +64,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume. If disabled, WAL will be on the Data Volume | `true`     |
 | `persistentVolumes.wal.mountPath` | Persistent Wal Volume mount root path       | `/var/lib/postgresql/wal/`                          |
 | `persistentVolumes.<name>.accessModes` | Persistent Volume access modes         | `[ReadWriteOnce]`                                   |
-| `persistentVolumes.<name>.annotations` | Annotations for Persistent Volume Claim| `{}`                                                |
+| `persistentVolumes.<name>.annotations` | Annotations for Persistent Volume Claim|                                                     |
 | `persistentVolumes.<name>.size`   | Persistent Volume size                      | `2Gi`                                               |
 | `persistentVolumes.<name>.storageClass`| Persistent Volume Storage Class        | `volume.alpha.kubernetes.io/storage-class: default` |
 | `persistentVolumes.<name>.subPath`| Subdirectory of Persistent Volume to mount  | `""`                                                |
