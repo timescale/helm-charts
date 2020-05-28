@@ -301,7 +301,7 @@ spec:
           readOnly: true
 {{ end }}
         resources:
-{{ toYaml (.Values.resources | default dict) | indent 10 }}
+{{ toYaml .Values.resources | indent 10 }}
 
 {{- if or .Values.backup.enabled .Values.backup.enable }}
       - name: pgbackrest
