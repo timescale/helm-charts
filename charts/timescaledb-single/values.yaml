@@ -57,8 +57,8 @@ backup:
 
   # Overriding the archive-push/archive-get sections is most useful in
   # very high througput situations. Look at values/high_throuhgput_example.yaml for more details
-  pgBackRest:archive-push:
-  pgBackRest:archive-get:
+  pgBackRest:archive-push: {}
+  pgBackRest:archive-get: {}
   jobs:
       # name: needs to adhere to the kubernetes restrictions
       # type: can be full, incr or diff, see https://pgbackrest.org/user-guide.html
@@ -286,7 +286,7 @@ persistentVolumes:
     # storageClass: "-"
     subPath: ""
     mountPath: "/var/lib/postgresql"
-    annotations:
+    annotations: {}
     accessModes:
       - ReadWriteOnce
   # WAL will be a subdirectory of the data volume, which means enabling a separate
@@ -299,7 +299,7 @@ persistentVolumes:
     # When changing this mountPath ensure you also change the following key to reflect this:
     # patroni.postgresql.basebackup.[].waldir
     mountPath: "/var/lib/postgresql/wal"
-    annotations:
+    annotations: {}
     accessModes:
       - ReadWriteOnce
   # Any tablespace mentioned here requires a volume that will be associated with it.
@@ -312,7 +312,7 @@ persistentVolumes:
     #   storageClass: gp2
 
 
-resources:
+resources: {}
   # If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
@@ -349,7 +349,7 @@ timescaledbTune:
   # Therefore you probably want to set explicit overrides in patroni.bootstrap.dcs.postgresql.parameters,
   # as those will take effect as soon as possible.
   # https://github.com/timescale/timescaledb-tune
-  args:
+  args: {}
     # max-conns: 120
     # cpus: 5
     # memory: 4GB
@@ -369,7 +369,7 @@ networkPolicy:
   #      port: 11111
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-nodeSelector:
+nodeSelector: {}
 
 # Prometheus exporter for PostgreSQL server metrics.
 # https://github.com/wrouesnel/postgres_exporter
@@ -409,10 +409,10 @@ prometheus:
 
 # Annotations that are applied to each pod in the stateful set
 # https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-podAnnotations:
+podAnnotations: {}
 
 # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-tolerations:
+tolerations: []
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 affinityTemplate: |
@@ -434,7 +434,7 @@ affinityTemplate: |
             app: {{ template "timescaledb.fullname" . }}
             release: {{ .Release.Name | quote }}
             cluster-name: {{ template "clusterName" . }}
-affinity:
+affinity: {}
 
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
