@@ -332,7 +332,7 @@ sharedMemory:
 # Any PostgreSQL parameter that is explicitly set in the Patroni configuration will override
 # the auto-tuned variables.
 timescaledbTune:
-  enabled: False
+  enabled: True
   # For full flexibility, we allow you to override any timescaledb-tune parameter below.
   # However, these parameters only take effect on newly scheduled pods and their settings are
   # only visibible inside those new pods.
