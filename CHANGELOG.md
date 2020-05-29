@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-## Changed
+### Changed
 ### Removed
 ### Fixed
+
+## [v0.6.2] - 2020-05-29
+
+### Added
+ * Allow the full Service Spec for the primary and replica Service to be customized in `values.yaml`
+### Changed
+ * `timescaledb-tune` is now enabled by default
+ * Default autovacuum parameters are changed to better support many chunks
+ * Default the pull policy for the Docker Images to `Always`. This is mainly useful during development
+### Fixed
+ * Prevent noise in the diagnostic logs about missing files and very short vacuum runs
 
 ## [v0.6.1] - 2020-05-18
 
