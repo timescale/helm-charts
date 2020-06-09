@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 ### Changed
+ * Use 2.0.0-beta5-pg12 Docker Image for multinode
 ### Removed
 ### Fixed
 
