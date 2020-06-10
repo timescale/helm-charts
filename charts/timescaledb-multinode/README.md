@@ -22,21 +22,21 @@ When deploying on AWS EKS:
 To install the chart as a release and name it `my-release`:
 
 ```console
-helm install --name my-release .
+helm upgrade --install my-release .
 ```
 
-You can override parameters using the `--set key=value[,key=value]` argument to `helm install`,
+You can override parameters using the `--set key=value[,key=value]` argument to `helm upgrade --install`,
 e.g., to install the chart with randomly generated passwords:
 
 ```console
 random_password () { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32; }
-helm install --name my-release . \
+helm upgrade --install my-release . \
     --set credentials.accessNode.superuser="$(random_password)"
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 ```console
-helm install --name my-release -f myvalues.yaml .
+helm upgrade --install my-release -f myvalues.yaml .
 ```
 
 For details about what parameters you can set, have a look at the [Administrator Guide](admin-guide.md#configure)
@@ -55,7 +55,7 @@ IMAGE_NAME=mytsdb TAG_NAME=build-1 ../scripts/docker-build.sh
 If you don't specify an image name and tag name, like above, make note of the name and the tag of the new image that gets built. Then launch multinode TimescaleDB using the new image:
 
 ```console
-helm install --name my-release --set image.repository=mytsdb --set image.tag=build-1 .
+helm upgrade --install my-release --set image.repository=mytsdb --set image.tag=build-1 .
 ```
 
 ## Connecting to TimescaleDBs

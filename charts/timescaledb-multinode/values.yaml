@@ -10,8 +10,8 @@ nameOverride: timescaledb
 image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
-  repository: timescale/timescaledb
-  tag: 2.0.0-beta5-pg12
+  repository: timescaledev/timescaledb
+  tag: pg12-ts2.0.0-beta5
   pullPolicy: IfNotPresent
 
 # Credentials used by PostgreSQL
