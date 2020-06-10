@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 ### Changed
- * Use 2.0.0-beta5-pg12 Docker Image for multinode
 ### Removed
 ### Fixed
+
+## [v0.6.3 - 2020-06-10]
+
+### Changed
+ * Use 2.0.0-beta5-pg12 Docker Image for multinode
+### Fixed
+ * initdb calls in the multinode chart
 
 ## [v0.6.2] - 2020-05-29
 
