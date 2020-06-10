@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.6.3 - 2020-06-10]
 
 ### Changed
- * Use 2.0.0-beta5-pg12 Docker Image for multinode
+ * Use PG12 2.0.0-beta5 Docker Image for multinode
 ### Fixed
  * initdb calls in the multinode chart
 
