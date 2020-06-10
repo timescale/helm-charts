@@ -59,12 +59,12 @@ spec:
           - '-c'
           # By calling the original entrypoint with the first argument being postgres
           # we ensure we do everything that is required to init a PostgreSQL instance.
-          # By supplying --version however, we ensure the instance isn't started, but merely
-          # a version number is displayed, allowing us to do some more initialization
+          # By supplying --single however, we ensure the postmaster is running in the
+          # foreground, allowing us to do some more initialization
           - |
             set -e
             install -o postgres -g postgres -m 0700 -d "${PGDATA}"
-            /docker-entrypoint.sh postgres --version
+            /docker-entrypoint.sh postgres --single < /dev/null
             grep -qxF "include 'postgresql_helm_customizations.conf'" "${PGDATA}/postgresql.conf" \
                 || echo "include 'postgresql_helm_customizations.conf'" >> "${PGDATA}/postgresql.conf"
             echo "Writing custom PostgreSQL Parameters to ${PGDATA}/postgresql_helm_customizations.conf"
