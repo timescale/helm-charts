@@ -30,13 +30,6 @@ then
     KUSTOMIZE_DIR="${KUSTOMIZE_ROOT}/${DEPLOYMENT}"
 fi
 
-test -d "${KUSTOMIZE_DIR}" \
-    && echo "The directory \"${KUSTOMIZE_DIR}\" already exists. This tool will not overwrite a current kustomization." \
-    && exit 1
-
-mkdir -p "${KUSTOMIZE_DIR}"
-sed "s/example/${DEPLOYMENT}/" "${KUSTOMIZE_ROOT}/example/kustomization.yaml" > "${KUSTOMIZE_DIR}/kustomization.yaml"
-
 generate_credentials() {
     touch "$1"
 
@@ -145,6 +138,17 @@ To preview the deployment of the secrets:
 
 __EOT__
 }
+
+test -d "${KUSTOMIZE_DIR}" \
+    && echo "The directory \"${KUSTOMIZE_DIR}\" already exists. This tool will not overwrite a current kustomization." \
+    && echo "Using existing secrets..." \
+    && install_secrets \
+    && echo "Done" \
+    && exit 0
+
+mkdir -p "${KUSTOMIZE_DIR}"
+sed "s/example/${DEPLOYMENT}/" "${KUSTOMIZE_ROOT}/example/kustomization.yaml" > "${KUSTOMIZE_DIR}/kustomization.yaml"
+
 
 generate_credentials "${KUSTOMIZE_DIR}/credentials.conf"
 generate_certificate "${KUSTOMIZE_DIR}" "${DEPLOYMENT}"
