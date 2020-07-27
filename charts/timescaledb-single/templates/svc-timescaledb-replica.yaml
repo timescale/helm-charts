@@ -25,6 +25,12 @@ spec:
   type: ClusterIP
 {{- end }}
   ports:
+{{- if .Values.pgBouncer.enabled }}
+  - name: pgbouncer
+    port: {{ .Values.pgBouncer.port }}
+    targetPort: pgbouncer
+    protocol: TCP
+{{- end }}
   - name: postgresql
     # This always defaults to 5432, even if `!replicaLoadBalancer.enabled`.
     port: {{ .Values.replicaLoadBalancer.port }}

@@ -182,10 +182,6 @@ patroni:
     role_label: role
     scope_label: cluster-name
     use_endpoints: true
-    ports:
-    - name: postgresql
-      port: 5432
-      targetPort: 5432
   postgresql:
     create_replica_methods:
     - pgbackrest
@@ -212,8 +208,9 @@ patroni:
         username: postgres
     listen: 0.0.0.0:5432
     pg_hba:
+    - local     all             postgres                              peer
+    - local     all             all                                   md5
     - hostnossl all,replication all                all                reject
-    - local     all             all                                   peer
     - hostssl   all             all                127.0.0.1/32       md5
     - hostssl   all             all                ::1/128            md5
     - hostssl   replication     standby            all                md5
@@ -353,6 +350,19 @@ timescaledbTune:
     # max-conns: 120
     # cpus: 5
     # memory: 4GB
+
+# pgBouncer does connection pooling for PostgreSQL
+# https://www.pgbouncer.org/
+# enabling pgBouncer will run an extra container in every Pod, serving a pgBouncer
+# pass-through instance
+pgBouncer:
+  enabled: False
+  port: 6432
+  config:
+    server_reset_query: DISCARD ALL
+    max_client_conn: 500
+    default_pool_size: 12
+    pool_mode: transaction
 
 networkPolicy:
   enabled: False
