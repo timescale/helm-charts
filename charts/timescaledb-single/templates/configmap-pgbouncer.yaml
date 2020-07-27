@@ -1,0 +1,52 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+{{- if .Values.pgBouncer.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "timescaledb.fullname" . }}-pgbouncer
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  pg_hba.conf: |
+    local     all postgres                   peer
+    host      all postgres,standby 0.0.0.0/0 reject
+    host      all postgres,standby ::0/0     reject
+    hostssl   all all              0.0.0.0/0 md5
+    hostssl   all all              ::0/0     md5
+    hostnossl all all              0.0.0.0/0 reject
+    hostnossl all all              ::0/0     reject
+# The last item specified in the configuration is the one that takes effect with pgBouncer.
+# Therefore, for those items that we deem to be part of how this Helm Chart works, we specify
+# them *after* having listed all the user specified values.
+  pgbouncer-sidecar.ini: |
+    [databases]
+    * =
+    [pgbouncer]
+    {{- $config := .Values.pgBouncer.config | default dict }}
+    {{- range $key := keys $config | sortAlpha }}
+    {{ $key }} = {{ index $config $key }}
+    {{- end }}
+    pidfile = /var/run/postgresql/pgbouncer.pid
+    listen_addr = *
+    listen_port = 6432
+    unix_socket_dir = /var/run/postgresql
+    unix_socket_mode = 0755
+    # We want to protect the superusers as much as we can, we therefore disallow superusers to connect
+    # on many levels, even at this point.
+    # We add the application_name in there to ensure the connections for using pass through authentication
+    # are easily identified
+    auth_query = SELECT rolname, rolpassword FROM pg_catalog.set_config('application_name', 'pgbouncer authentication', false) CROSS JOIN pg_catalog.pg_authid WHERE rolname = $1 AND NOT rolsuper AND NOT rolreplication AND NOT rolbypassrls
+    auth_type = hba
+    auth_hba_file = /etc/pgbouncer/pg_hba.conf
+    auth_user = postgres
+    client_tls_sslmode=require
+    client_tls_key_file = /etc/certificate/tls.key
+    client_tls_cert_file = /etc/certificate/tls.crt
+...
+{{ end }}

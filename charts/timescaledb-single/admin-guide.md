@@ -55,6 +55,9 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `persistentVolumes.tablespaces`   | A mapping of tablespaces and Volumes        | `nil`, see [multiple-tablespaces.yaml](values/multiple-tablespaces.yaml) for a full example |
 | `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume. If disabled, WAL will be on the Data Volume | `true`     |
 | `persistentVolumes.wal.mountPath` | Persistent Wal Volume mount root path       | `/var/lib/postgresql/wal/`                          |
+| `pgBouncer.config`                | Additional pgBouncer [configuration](https://www.pgbouncer.org/config.html) items | A reasonable set of defaults |
+| `pgBouncer.enabled`               | If enabled, run a [pgBouncer](https://www.pgbouncer.org/) sidecar | `false`                       |
+| `pgBouncer.port`                  | The port on which the Load Balancer should listen for pgBouncer requests | `6432`                 |
 | `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/wrouesnel/postgres_exporter) sidecar | `false` |
 | `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
 | `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |
@@ -575,6 +578,27 @@ kubectl exec \
 (7 rows)
 
 ```
+
+## pgBouncer
+To support some forms of connection pooling, a [pgBouncer](https://www.pgbouncer.org/) container can be added to the pod,
+by setting `pgBouncer.enabled` to true.
+
+Having a lot of connections doing work at the same time is very expensive, and to quote the
+[PostgreSQL Wiki](https://wiki.postgresql.org/wiki/Number_Of_Database_Connections)
+
+> Contrary to many people's initial intuitive impulses, you will often see a transaction reach completion sooner if you queue
+> it when it is ready but the system is busy enough to have saturated resources and start it later when resources become available.
+>
+> Pg will usually complete the same 10,000 transactions faster by doing them 5, 10 or 20 at a time than by doing them 500 at a time.
+
+So when it comes to a lot of (re)connects from the application, or a lot of simultaneous active connections, using connection pooling
+should be seriously considered, as reducing the number of connections may improve your througput quite a lot.
+
+Connection pooling requires configuration, both on the application side and the database side, and there isn't a one size fits
+all. For more information, have a look at the [FAQ](https://www.pgbouncer.org/faq.html) of pgBouncer.
+
+The way pgBouncer works in this Helm Chart is by allowing you to connect to any database, with regular users, using their
+regular database credentials.
 
 ## Troubleshooting
 

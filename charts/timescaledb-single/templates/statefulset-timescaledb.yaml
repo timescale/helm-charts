@@ -204,6 +204,12 @@ spec:
           value: "$(PATRONI_KUBERNETES_POD_IP):5432"
         - name: PATRONI_RESTAPI_CONNECT_ADDRESS
           value: "$(PATRONI_KUBERNETES_POD_IP):8008"
+        - name: PATRONI_KUBERNETES_PORTS
+          {{- if .Values.pgBouncer.enabled }}
+          value: '[{"name": "postgresql", "port": 5432}, {"name": "pgbouncer", "port": 6432}]'
+          {{- else }}
+          value: '[{"name": "postgresql", "port": 5432}]'
+          {{- end }}
         - name: PATRONI_NAME
           valueFrom:
             fieldRef:
@@ -302,6 +308,41 @@ spec:
 {{ end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+
+{{- if .Values.pgBouncer.enabled }}
+      - name: pgbouncer
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              # Only shutdown pgBouncer if PostgreSQL is no longer listening
+              - |
+                while test -S {{ template "socket_directory" . }}/.s.PGSQL.5432; do sleep 1; done
+        volumeMounts:
+          - mountPath: /etc/certificate
+            name: certificate
+            readOnly: true
+          - name: socket-directory
+            mountPath: {{ template "socket_directory" . }}
+            readOnly: false
+          - mountPath: {{ template "scripts_dir" . }}
+            name: timescaledb-scripts
+            readOnly: true
+          - mountPath: /etc/pgbouncer/
+            name: pgbouncer
+            readOnly: true
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - containerPort: 6432
+        command:
+        - /usr/bin/env
+        - -i
+        - /usr/sbin/pgbouncer
+        - /etc/pgbouncer/pgbouncer-sidecar.ini
+{{- end }}
 
 {{- if or .Values.backup.enabled .Values.backup.enable }}
       - name: pgbackrest
@@ -417,6 +458,11 @@ spec:
         emptyDir:
           medium: Memory
       {{- end }}
+      - name: pgbouncer
+        configMap:
+          name: {{ template "timescaledb.fullname" . }}-pgbouncer
+          defaultMode: 416 # 0640 permissions
+          optional: true
       - name: pgbackrest
         configMap:
           name: {{ template "timescaledb.fullname" . }}-pgbackrest
