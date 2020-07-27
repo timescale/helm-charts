@@ -417,12 +417,11 @@ spec:
         emptyDir:
           medium: Memory
       {{- end }}
-      {{- if or .Values.backup.enabled .Values.backup.enable }}
       - name: pgbackrest
         configMap:
           name: {{ template "timescaledb.fullname" . }}-pgbackrest
           defaultMode: 416 # 0640 permissions
-      {{- end }}
+          optional: true
       - name: certificate
         secret:
           secretName:  {{ template "secrets_certificate" . }}

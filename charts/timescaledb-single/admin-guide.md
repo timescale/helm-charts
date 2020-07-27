@@ -21,61 +21,61 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 
 |       Parameter                   |           Description                       |                         Default                     |
 |-----------------------------------|---------------------------------------------|-----------------------------------------------------|
-| `nameOverride`                    | Override the name of the chart              | `timescaledb`                                       |
+| `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
+| `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname and (availability) zone |
+| `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |
+| `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
+| `backup.pgBackRest:archive-get`   | [pgBackRest global:archive-get configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)  | empty |
+| `backup.pgBackRest:archive-push`  | [pgBackRest global:archive-push configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza) | empty |
+| `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults |
+| `callbacks.configMap`             | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks). You can use templates in the name. | `nil`                         |
 | `clusterName`                     | Override the name of the PostgreSQL cluster | Equal to the Helm release name                      |
+| `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)   | `[]`                                                |
+| `envFrom`                         | Extra custom environment variables, expressed as [EnvFrom](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envfromsource-v1-core) | `[]`                                                |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
-| `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
-| `version`                         | The major PostgreSQL version to use         | empty, defaults to the Docker image default         |
+| `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
 | `image.tag`                       | The version of the image to pull            | `pg11-ts1.7`                                        |
-| `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
-| `secretNames.credentials`         | Existing secret that contains env vars that influence Patroni (e.g. PATRONI_SUPERUSER_PASSWORD) | `RELEASE-credentials` | 
-| `secretNames.certificate`         | Existing `type:kubernetes.io/tls` secret containing a tls.key and tls.crt | `RELEASE-certificate` |
-| `secretNames.pgbackrest`          | Existing secret that contains env vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET) | `RELEASE-pgbackgrest` |
-| `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |
-| `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults |
-| `backup.pgBackRest:archive-push`  | [pgBackRest global:archive-push configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza) | empty |
-| `backup.pgBackRest:archive-get`   | [pgBackRest global:archive-get configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)  | empty |
-| `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
-| `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)          | `[]`                                                |
-| `envFrom`                         | Extra custom environment variables, expressed as [EnvFrom](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envfromsource-v1-core)          | `[]`                                                |
-| `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
-| `callbacks.configMap`          | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks). You can use templates in the name. | `nil`                         |
-| `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
-| `sharedMemory.useMount`           | Mount `/dev/shm` as a Memory disk           | `false`                                             |
-| `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
-| `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
-| `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname and (availability) zone |
-| `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
-| `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
-| `loadBalancer.enabled`            | If enabled, creates a LB for the primary    | `true`                                              |
 | `loadBalancer.annotations`        | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
+| `loadBalancer.enabled`            | If enabled, creates a LB for the primary    | `true`                                              |
 | `loadBalancer.extraSpec`          | Extra configuration for service spec        | `nil`                                               |
-| `networkPolicy.enabled`           | If enabled, creates a NetworkPolicy for controlling network access | `false`
-| `networkPolicy.ingress`           | A list of Ingress rules to extend the base NetworkPolicy | `nil`
+| `nameOverride`                    | Override the name of the chart              | `timescaledb`                                       |
+| `networkPolicy.enabled`           | If enabled, creates a NetworkPolicy for controlling network access | `false`                      |
+| `networkPolicy.ingress`           | A list of Ingress rules to extend the base NetworkPolicy | `nil`                                  |
 | `networkPolicy.prometheusApp`     | Name of Prometheus app to allow it to scrape exporters | `prometheus`
-| `replicaLoadBalancer.enabled`     | If enabled, creates a LB for replica's only | `false`                                             |
-| `replicaLoadBalancer.annotations` | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
-| `replicaLoadBalancer.extraSpec`   | Extra configuration for replica service spec | `nil`                                              |
-| `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/wrouesnel/postgres_exporter) sidecar | `false` |
-| `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |
-| `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.7.0`                                            |
-| `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
-| `persistentVolumes.data.enabled`  | If enabled, use a Persistent Data Volume    | `true`                                              |
-| `persistentVolumes.data.mountPath`| Persistent Data Volume mount root path      | `/var/lib/postgresql/`                              |
-| `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume. If disabled, WAL will be on the Data Volume | `true`     |
-| `persistentVolumes.wal.mountPath` | Persistent Wal Volume mount root path       | `/var/lib/postgresql/wal/`                          |
+| `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
+| `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
 | `persistentVolumes.<name>.accessModes` | Persistent Volume access modes         | `[ReadWriteOnce]`                                   |
 | `persistentVolumes.<name>.annotations` | Annotations for Persistent Volume Claim| `{}`                                                |
 | `persistentVolumes.<name>.size`   | Persistent Volume size                      | `2Gi`                                               |
 | `persistentVolumes.<name>.storageClass`| Persistent Volume Storage Class        | `volume.alpha.kubernetes.io/storage-class: default` |
 | `persistentVolumes.<name>.subPath`| Subdirectory of Persistent Volume to mount  | `""`                                                |
+| `persistentVolumes.data.enabled`  | If enabled, use a Persistent Data Volume    | `true`                                              |
+| `persistentVolumes.data.mountPath`| Persistent Data Volume mount root path      | `/var/lib/postgresql/`                              |
 | `persistentVolumes.tablespaces`   | A mapping of tablespaces and Volumes        | `nil`, see [multiple-tablespaces.yaml](values/multiple-tablespaces.yaml) for a full example |
+| `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume. If disabled, WAL will be on the Data Volume | `true`     |
+| `persistentVolumes.wal.mountPath` | Persistent Wal Volume mount root path       | `/var/lib/postgresql/wal/`                          |
+| `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/wrouesnel/postgres_exporter) sidecar | `false` |
+| `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
+| `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |
+| `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.7.0`                                            |
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
+| `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
+| `replicaLoadBalancer.annotations` | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
+| `replicaLoadBalancer.enabled`     | If enabled, creates a LB for replica's only | `false`                                             |
+| `replicaLoadBalancer.extraSpec`   | Extra configuration for replica service spec | `nil`                                              |
+| `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
+| `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
+| `secretNames.certificate`         | Existing `type:kubernetes.io/tls` secret containing a tls.key and tls.crt | `RELEASE-certificate` |
+| `secretNames.credentials`         | Existing secret that contains env vars that influence Patroni (e.g. PATRONI_SUPERUSER_PASSWORD) | `RELEASE-credentials` | 
+| `secretNames.pgbackrest`          | Existing secret that contains env vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET) | `RELEASE-pgbackgrest` |
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |
+| `sharedMemory.useMount`           | Mount `/dev/shm` as a Memory disk           | `false`                                             |
 | `timescaledbTune.enabled`         | If true, runs `timescaledb-tune` before starting PostgreSQL | `false`                             |
+| `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
 | `unsafe`                          | If true, will generate random a random certificate and random credentials, removing the need for the pre-installation steps with secrets | `false`. This should only be `true` for throw-away (evaluation) deployments |
+| `version`                         | The major PostgreSQL version to use         | empty, defaults to the Docker image default         |
 
 ### Creating the Secrets
 
