@@ -218,7 +218,7 @@ To fully purge a deployment in Kubernetes, you should do the following:
 helm delete my-release
 # Delete pvc
 RELEASE=my-release
-kubectl delete $(kubectl get pvc -l release=$RELEASE -o name)
+kubectl delete $(kubectl get pvc,ep,service -l release=$RELEASE -o name)
 ```
 
 ### Optional: Delete the s3 backups
@@ -710,3 +710,23 @@ be managed separately.
 
 * When upgrading a 0.5 deployment to 0.6: [Upgrade Guide](upgrade-guide.md#migrate-the-secrets)
 * When creating a new deployment, or if the old Secrets are no longer available: [Create the Secrets](#creating-the-secrets)
+
+### Incorrect pgBackRest stanza
+
+When you get these kinds of error messages:
+
+- `backup and archive info files exist but do not match the database`
+- `system-id 6854866061727555639 do not match stanza version 12, system-id 6854865382723022903`
+- `archive command failed with exit code 44`
+
+It means that the backup stanza that was configured for your cluster contains backups of a different cluster.
+This can happen if you reuse an old deployment name, or if you share a bucket between Kubernetes clusters.
+
+The backup files that are already there belong to the previous/other deployment; we do not want to overwrite/remove
+these backups automatically.
+
+To resolve this, you could:
+
+- If the existing backups are useless/stale, you can delete the backups.
+- Point the backup to a different S3 bucket, or S3 path, by configuring the `PGBACKREST_REPO1_PATH` or `PGBACKREST_REPO1_S3_BUCKET`
+- [Cleanup](#cleanup) this deployment, and create this deployment using [Bootstrap from Backup](#bootstrap-from-backup)
