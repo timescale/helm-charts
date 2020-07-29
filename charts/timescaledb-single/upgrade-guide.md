@@ -4,6 +4,7 @@ Before you upgrade your deployment, you should ensure you have
 followed the version specific upgrade guides.
 
 ##### Upgrade guides
+- [0.6 to 0.7](#upgrading-from-06x-to-07x)
 - [0.5 to 0.6](#upgrading-from-05x-to-06x)
 - [0.4 to 0.5](#upgrading-from-04x-to-05x)
 
@@ -15,6 +16,22 @@ After you have followed the upgrade guide you should be able to upgrade your dep
 helm upgrade --install my-release ./charts/timescaledb-single -f values/my-release.yaml
 ```
 
+# Upgrading from 0.6 to 0.7
+The default Docker Image now points to PostgreSQL 12 instead of PostgreSQL 11,
+the default image however does contain the PostgreSQL 11 binaries as well.
+
+If you want to run PostgreSQL 11 on the 0.7 Helm Charts you should set version to 11 in
+your `values.yaml`:
+
+```yaml
+version: 11
+```
+
+Doing a [`pg_upgrade`](https://www.postgresql.org/docs/12/pgupgrade.html) is (for now) out of scope
+for these Helm Charts.
+
+If you upgrade from Helm Charts version 0.5, you should also follow the upgrade
+guide [0.5 to 0.6](#upgrading-from-05x-to-06x)
 
 # Upgrading from 0.5 to 0.6
 
