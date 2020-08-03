@@ -101,7 +101,7 @@ The script can install the secrets immediately, it creates the following secrets
 
 #### Credentials 
 
-This Secret should contain the EVN vars that will influence Patroni. It should at least contain the passwords for the 3 different database users this chart creates: postgres (superuser), admin, and standby (replication). For example, the data of the secret can be:
+This Secret should contain the ENV vars that will influence Patroni. It should at least contain the passwords for the 3 different database users this chart creates: postgres (superuser), admin, and standby (replication). For example, the data of the secret can be:
   ```yaml
   data:
     PATRONI_SUPERUSER_PASSWORD=base64-encoded-strong-pass
