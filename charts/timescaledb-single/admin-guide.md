@@ -75,7 +75,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |
 | `sharedMemory.useMount`           | Mount `/dev/shm` as a Memory disk           | `false`                                             |
-| `timescaledbTune.enabled`         | If true, runs `timescaledb-tune` before starting PostgreSQL | `false`                             |
+| `timescaledbTune.enabled`         | If true, runs `timescaledb-tune` before starting PostgreSQL | `true`                              |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
 | `unsafe`                          | If true, will generate random a random certificate and random credentials, removing the need for the pre-installation steps with secrets | `false`. This should only be `true` for throw-away (evaluation) deployments |
 | `version`                         | The major PostgreSQL version to use         | empty, defaults to the Docker image default         |
