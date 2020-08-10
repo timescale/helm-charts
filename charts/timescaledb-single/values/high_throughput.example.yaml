@@ -74,10 +74,6 @@ patroni:
           # remote_apply will throttle the replica's, see also the comment at patroni.bootstrap.synchronous_mode
           synchronous_commit: remote_apply
 
-# Enabling tuning allows us to use this configuration on many types of instances, therefore we enable it
-timescaledbTune:
-  enabled: true
-
 backup:
   enabled: true
 
