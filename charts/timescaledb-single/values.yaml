@@ -46,6 +46,7 @@ backup:
     # https://pgbackrest.org/configuration.html
     # Although not impossible, care should be taken not to include secrets
     # in these parameters. Use Kubernetes Secrets to specify S3 Keys, Secrets etc.
+    compress-type: lz4
     process-max: 4
     start-fast: "y"
     repo1-retention-diff: 2

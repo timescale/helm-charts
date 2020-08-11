@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Allow clusters to be initialized from a backup
 ### Changed
  * Use the PostgreSQL 12 Docker Image by default
+ * Use `lz4` compression method by default for pgBackRest
 ### Removed
 ### Fixed
 
