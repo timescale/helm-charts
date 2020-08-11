@@ -27,7 +27,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
 | `backup.pgBackRest:archive-get`   | [pgBackRest global:archive-get configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)  | empty |
 | `backup.pgBackRest:archive-push`  | [pgBackRest global:archive-push configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza) | empty |
-| `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults |
+| `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults, using `lz4` compression |
 | `callbacks.configMap`             | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks). You can use templates in the name. | `nil`                         |
 | `clusterName`                     | Override the name of the PostgreSQL cluster | Equal to the Helm release name                      |
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)   | `[]`                                                |
