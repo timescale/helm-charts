@@ -90,6 +90,10 @@ ${HOME}/.pgbackrest_environment
 {{ printf "%s/timescaledb.conf" (include "socket_directory" .) }}
 {{- end -}}
 
+{{- define "wal_status_file" -}}
+{{ printf "%s/wal_status" (include "socket_directory" .) }}
+{{- end -}}
+
 {{- define "secrets_credentials" -}}
 {{ .Values.secretNames.credentials | default (printf "%s-credentials" (include "clusterName" .)) }}
 {{- end -}}

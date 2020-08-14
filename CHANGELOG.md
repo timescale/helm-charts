@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
  * GitHub actions linting the Helm Charts as well as shellcheck the shell scripts
+ * Prevent full WAL disks (experimental, disabled by default)
 ### Changed
 ### Removed
 ### Fixed
