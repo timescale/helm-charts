@@ -783,3 +783,15 @@ To resolve this, you could:
 - If the existing backups are useless/stale, you can delete the backups.
 - Point the backup to a different S3 bucket, or S3 path, by configuring the `PGBACKREST_REPO1_PATH` or `PGBACKREST_REPO1_S3_BUCKET`
 - [Cleanup](#cleanup) this deployment, and create this deployment using [Bootstrap from Backup](#bootstrap-from-backup)
+
+### `database files are incompatible with server`
+If the default major PostgreSQL server has changed in the Helm Charts, you may run into
+this issue when upgrading. An example of what would be shown in the logs is:
+
+```
+FATAL:  database files are incompatible with server
+DETAIL:  The data directory was initialized by PostgreSQL version 11, which is not compatible with this version 12.3
+```
+
+These Helm charts do not support a major `pg_upgrade`, however you can explicitly set the major PostgreSQL version
+in the `values.yaml`, for more details, follow the [Upgrade Guide](admin-guide.md#upgrading-from-06x-to-07x)

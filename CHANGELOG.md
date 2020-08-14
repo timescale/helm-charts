@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.7.0 - 2020-08-14]
+
+The reason for the bump in minor version is that the default PostgreSQL version is changed from 11 to 12,
+which is an incompatible change for older deployments.
 
 ### Added
  * The possibility to run a [`pgBouncer`](https://www.pgbouncer.org/) container in every Pod.
@@ -12,8 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  * Use the PostgreSQL 12 Docker Image by default
  * Use `lz4` compression method by default for pgBackRest
-### Removed
-### Fixed
 
 ## [v0.6.3 - 2020-06-10]
 
