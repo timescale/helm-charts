@@ -176,6 +176,7 @@ spec:
             done
 
             touch {{ template "tstune_config" . | quote }}
+            touch {{ template "wal_status_file" . | quote }}
 
             echo "*:*:*:postgres:${PATRONI_SUPERUSER_PASSWORD}" >> ${HOME}/.pgpass
             chmod 0600 ${HOME}/.pgpass

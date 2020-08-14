@@ -26,7 +26,6 @@ jobs:
 
       - name: Run shellcheck on all scripts
         run: make shellcheck
-        if: false # We will enable this once all the scripts are passing
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.0.0

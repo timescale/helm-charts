@@ -326,6 +326,19 @@ persistentVolumes:
     #   size: 5Gi
     #   storageClass: gp2
 
+# EXPERIMENTAL, please do *not* enable on production environments
+# if enabled, fullWalPrevention will switch the default transaction mode from read write
+# to read only if thresholds are breached.
+fullWalPrevention:
+  enabled: false
+  checkFrequency: 30
+  # To prevent the default transaction mode from switching constantly, we have separate
+  # thresholds for switching to read-only and read-write
+  thresholds:
+    readOnlyFreePercent: 5
+    readOnlyFreeMB: 64
+    readWriteFreePercent: 8
+    readWriteFreeMB: 128
 
 resources: {}
   # If you do want to specify resources, uncomment the following
