@@ -27,3 +27,13 @@ publish-single:
 clean:
 	@if [ "$(ROGUE_KUSTOMIZE_FILES)" != "" ]; then rm -v $(ROGUE_KUSTOMIZE_FILES); fi
 	@if [ "$(ROGUE_KUSTOMIZE_DIRS)" != "" ]; then rmdir -v $(ROGUE_KUSTOMIZE_DIRS); fi
+
+.PHONY: lint
+lint: refresh-ci-values
+	@docker run -it --rm --name ct --volume $$(pwd):/data quay.io/helmpack/chart-testing:v3.0.0 sh -c "ct lint --validate-maintainers=false --charts /data/charts/timescaledb-single /data/charts/timescaledb-multinode"
+
+.PHONY: refresh-ci-values
+refresh-ci-values:
+	@rm -f ./charts/timescaledb-single/ci/*.yaml
+	@cd ./charts/timescaledb-single/ci; for v in ../values/*.yaml; do ln -s $$v $$(basename $$v)-values.yaml; done; cd -
+
