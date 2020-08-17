@@ -80,7 +80,7 @@ backup:
   # For High Throughput clusters, the archiver will likely not be able to keep up if running synchronously.
   # Therefore, we'll need to enable asynchronous archiving.
   #
-  # Not using asynchronous archiving may cause failures far in the future, for example, on a 
+  # Not using asynchronous archiving may cause failures far in the future, for example, on a
   # cluster with a WAL Volume of 500GB, and an archiver lagging 200MB/minute, the primary pod will only
   # fail after 2500 minutes, or almost 2 days.
   pgBackRest:archive-push:
