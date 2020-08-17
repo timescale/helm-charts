@@ -1,0 +1,26 @@
+name: "Helm Lint"
+on:
+- push
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Fetch history
+        run: git fetch --prune --unshallow
+
+      - name: Copy example values files to the expected Helm Linter locations
+        run: |
+          rm -f /charts/timescaledb/ci/*.yaml
+          mkdir -p ./charts/timescaledb-single/ci
+          cd ./charts/timescaledb-single/ci/
+          for f in ../values/*.yaml; do ln -s $f $(basename $f)-values.yaml; done
+
+      - name: Run chart-testing (lint)
+        id: lint
+        uses: helm/chart-testing-action@v1.0.0
+        with:
+          command: lint

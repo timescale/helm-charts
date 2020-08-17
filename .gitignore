@@ -3,3 +3,4 @@
 **/*.key
 **/pgbackrest.conf
 **/credentials.conf
+**/ci
