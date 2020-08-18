@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+ * GitHub actions linting the Helm Charts as well as shellcheck the shell scripts
+### Changed
+### Removed
+### Fixed
+
+
 ## [v0.7.0 - 2020-08-14]
 
 The reason for the bump in minor version is that the default PostgreSQL version is changed from 11 to 12,
