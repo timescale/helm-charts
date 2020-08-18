@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 # This file and its contents are licensed under the Apache License 2.0.
 # Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
@@ -58,7 +59,7 @@ generate_pgbackrest () {
     while true
     do
         echo "Do you want to configure the backup of your database to S3 (compatible) storage? (y/n)"
-        read response
+        read response -r
         case "$response" in
             y*) break ;;
             Y*) break ;;
@@ -87,19 +88,19 @@ __EOT__
     echo
 
     echo "What is the name of the S3 bucket?"
-    read BUCKET
+    read -r BUCKET
 
     echo "What is the name of the S3 endpoint? (leave blank for default)"
-    read ENDPOINT
+    read -r ENDPOINT
 
     echo "What is the region of the S3 endpoint? (leave blank for default)"
-    read REGION
+    read -r REGION
 
     echo "What is the S3 Key to use?"
-    read KEY
+    read -r KEY
 
     echo "What is the S3 Secret to use?"
-    read KEY_SECRET
+    read -r KEY_SECRET
 
     for key in BUCKET ENDPOINT REGION KEY KEY_SECRET
     do
@@ -161,7 +162,7 @@ fi
 while true
 do
     echo "Or you may want to install the secrets directly? (y/n)"
-    read response
+    read -r response
     case "$response" in
         y*) break ;;
         Y*) break ;;
