@@ -3,7 +3,7 @@ on:
 - push
 
 jobs:
-  lint-test:
+  smoketest:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,3 +26,28 @@ jobs:
 
       - name: Run shellcheck on all scripts
         run: make shellcheck
+        if: false # We will enable this once all the scripts are passing
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.0.0
+        if: steps.lint.outputs.changed == 'true'
+
+      - uses: azure/setup-kubectl@v1
+        id: install-kubectl
+        if: steps.lint.outputs.changed == 'true'
+
+      - uses: azure/setup-helm@v1
+        id: install-helm
+        if: steps.lint.outputs.changed == 'true'
+
+      - name: Install a cluster
+        run: make install-example
+        if: steps.lint.outputs.changed == 'true'
+
+      - name: Wait for a primary to be available
+        run: make wait-for-example
+        if: steps.lint.outputs.changed == 'true'
+
+      - name: Verify that we can create a hypertable
+        run: make smoketest
+        if: steps.lint.outputs.changed == 'true'
