@@ -27,30 +27,30 @@ data:
     [ "${PGBACKREST_BACKUP_ENABLED}" == "0" ] && exit 0
 
     source "{{ template "pgbackrest_environment_file" }}"
-    exec pgbackrest --stanza=poddb archive-push $1
+    exec pgbackrest --stanza=poddb archive-push "$1"
   pgbackrest_archive_get.sh: |
-    #!/bin/bash
+    #!/bin/sh
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
-    [ "${PGBACKREST_BACKUP_ENABLED}" == "0" ] && exit 1
+    [ ${PGBACKREST_BACKUP_ENABLED} -ne 0 ] || exit 0
 
-    source "{{ template "pgbackrest_environment_file" }}"
-    exec pgbackrest --stanza=poddb archive-get ${1} "${2}"
+    . "{{ template "pgbackrest_environment_file" }}"
+    exec pgbackrest --stanza=poddb archive-get "${1}" "${2}"
   pgbackrest_bootstrap.sh: |
-    #!/bin/bash
+    #!/bin/sh
     set -e
 
-    function log {
+    log() {
         echo "$(date '+%Y-%m-%d %H:%M:%S') - bootstrap - $1"
     }
 
-    function terminate() {
+    terminate() {
         log "Stopping"
         exit 1
     }
     # If we don't catch these signals, and we're still waiting for PostgreSQL
     # to be ready, we will not respond at all to a regular shutdown request,
     # therefore, we explicitly terminate if we receive these signals.
-    trap terminate SIGTERM SIGQUIT
+    trap terminate TERM QUIT
 
     while ! pg_isready -q; do
         log "Waiting for PostgreSQL to become available"
@@ -62,7 +62,7 @@ data:
     sleep 10
 
     # If we are the primary, we want to create/validate the backup stanza
-    if [ "$(psql -c "SELECT pg_is_in_recovery()::text" -AtXq)" == "false" ]; then
+    if [ "$(psql -c "SELECT pg_is_in_recovery()::text" -AtXq)" = "false" ]; then
         pgbackrest check || {
             log "Creating pgBackrest stanza"
             pgbackrest --stanza=poddb stanza-create --log-level-stderr=info || exit 1
@@ -74,11 +74,11 @@ data:
     log "Starting pgBackrest api to listen for backup requests"
     exec python3 /scripts/pgbackrest-rest.py --stanza=poddb --loglevel=debug
   pgbackrest_restore.sh: |
-    #!/bin/bash
+    #!/bin/sh
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
-    [ "${PGBACKREST_BACKUP_ENABLED}" == "0" ] && exit 1
+    [ ${PGBACKREST_BACKUP_ENABLED} -ne 0 ] || exit 0
 
-    source "{{ template "pod_environment_file" }}"
+    . "{{ template "pod_environment_file" }}"
 
     PGDATA={{ include "data_directory" . | quote }}
     WALDIR={{ include "wal_directory" . | quote }}
@@ -91,11 +91,11 @@ data:
 
     exec pgbackrest --force --delta --log-level-console=detail restore
   restore_or_initdb.sh: |
-    #!/bin/bash
+    #!/bin/sh
 
-    source "{{ template "pod_environment_file" }}"
+    . "{{ template "pod_environment_file" }}"
 
-    function log {
+    log() {
         echo "$(date '+%Y-%m-%d %H:%M:%S') - restore_or_initdb - $1"
     }
 
@@ -107,13 +107,13 @@ data:
     [ -d "${PGDATA}" ] || install -o postgres -g postgres -d -m 0700 "${PGDATA}"
     [ -d "${WALDIR}" ] || install -o postgres -g postgres -d -m 0700 "${WALDIR}"
 
-    if [ "${BOOTSTRAP_FROM_BACKUP}" == "1" ]; then
+    if [ "${BOOTSTRAP_FROM_BACKUP}" = "1" ]; then
         log "Attempting restore from backup"
         # we want to override the environment with the environment
-        export $(env -i envdir {{ template "pgbackrest_bootstrap_environment_dir" . | quote }} env) > /dev/null
+        export "$(env -i envdir {{ template "pgbackrest_bootstrap_environment_dir" . | quote }} env)" > /dev/null
         export PGBACKREST_REPO1_PATH={{ index .Values.bootstrapFromBackup "repo1-path" | quote }}
 
-        if [ "${PGBACKREST_REPO1_PATH}" == "" ]; then
+        if [ -z "${PGBACKREST_REPO1_PATH}" ]; then
             log "Unconfigured repository path"
             cat << "__EOT__"
 
@@ -143,13 +143,13 @@ data:
         log "Listing available backup information"
         pgbackrest info
         EXITCODE=$?
-        if [ "${EXITCODE}" != "0" ]; then
+        if [ ${EXITCODE} -ne 0 ]; then
             exit $EXITCODE
         fi
 
         pgbackrest --log-level-console=detail restore
         EXITCODE=$?
-        if [ "${EXITCODE}" == "0" ]; then
+        if [ ${EXITCODE} -eq 0 ]; then
             log "pgBackRest restore finished succesfully, starting instance in recovery"
             # We want to ensure we do not overwrite a current backup repository with archives, therefore
             # we block archiving from succeeding until Patroni can takeover
@@ -168,7 +168,7 @@ data:
             while true; do
               MAX_BACKUP_WAL="$(pgbackrest info --output=json | python3 -c "import json,sys;obj=json.load(sys.stdin); print(obj[0]['archive'][0]['max']);")"
               log "Testing whether WAL file ${MAX_BACKUP_WAL} has been restored ..."
-              [ $(find "${PGDATA}/pg_wal/${MAX_BACKUP_WAL}" -type f) ] && break;
+              [ -f "${PGDATA}/pg_wal/${MAX_BACKUP_WAL}" ] && break
               sleep 30;
             done
 
@@ -187,19 +187,28 @@ data:
         initdb_args=""
         for value in "$@"
         do
-            [[ $value == --scope* ]] || [[ $value == --datadir* ]] || initdb_args="${initdb_args} $value"
+            case $value in
+                "--scope"*)
+                    ;;
+                "--datadir"*)
+                    ;;
+                *)
+                    initdb_args="${initdb_args} $value"
+                    ;;
+            esac
         done
 
         log "Invoking initdb"
+        # shellcheck disable=SC2086
         initdb --auth-local=peer --auth-host=md5 --pgdata="${PGDATA}" --waldir="${WALDIR}" ${initdb_args}
     fi
 
     echo "include_if_exists = '{{ template "tstune_config". }}'" >> "${PGDATA}/postgresql.conf"
   post_init.sh: |
-    #!/bin/bash
-    source "{{ template "pod_environment_file" }}"
+    #!/bin/sh
+    . "{{ template "pod_environment_file" }}"
 
-    function log {
+    log() {
         echo "$(date '+%Y-%m-%d %H:%M:%S') - post_init - $1"
     }
 
@@ -229,17 +238,17 @@ data:
     # We always exit 0 this script, otherwise the database initialization fails.
     exit 0
   patroni_callback.sh: |
-    #!/bin/bash
+    #!/bin/sh
     set -e
 
-    source "{{ template "pod_environment_file" }}"
+    . "{{ template "pod_environment_file" }}"
 
     for suffix in "$1" all
     do
       CALLBACK="{{ template "callbacks_dir" .}}/${suffix}"
       if [ -f "${CALLBACK}" ]
       then
-        "${CALLBACK}" $@
+        "${CALLBACK}" "$@"
       fi
     done
 {{/*
