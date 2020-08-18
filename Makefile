@@ -58,3 +58,27 @@ shellcheck-single:
 		done ; \
 		rm $(CI_SINGLE_DIR)/temp.* ; \
 	done
+
+.PHONY: install-example-secrets
+install-example-secrets:
+	@kubectl kustomize "$(SINGLE_CHART_DIR)/kustomize/example" | kubectl apply -f -
+
+.PHONY: install-example
+install-example: install-example-secrets
+	@helm upgrade --install example $(SINGLE_CHART_DIR) -f $(SINGLE_CHART_DIR)/values.yaml --set replicaCount=2
+
+.PHONY: wait-for-example
+wait-for-example:
+	@for i in $$(seq 1 30); do \
+		PRIMARYPOD="$$(kubectl get pod -l cluster-name=example,role=master -o name)" ; \
+		if [ "$${PRIMARYPOD}" != "" ]; then echo "Primary pod is: $${PRIMARYPOD}"; exit 0; fi ; \
+		echo "Waiting for primary pod to become available" ; \
+		sleep 5 ; \
+	done ; \
+	exit 1
+
+.PHONY: smoketest
+smoketest: wait-for-example
+	@kubectl exec -i $$(kubectl get pod -l cluster-name=example,role=master -o name) -c timescaledb -- \
+		psql --no-psqlrc --command \
+		"CREATE SCHEMA IF NOT EXISTS smoketest; DROP TABLE IF EXISTS smoketest.demo; CREATE TABLE smoketest.demo(inserted timestamptz not null); SELECT now() AS smoketest, * FROM create_hypertable('smoketest.demo', 'inserted');"
