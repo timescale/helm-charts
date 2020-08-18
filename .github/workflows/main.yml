@@ -13,14 +13,17 @@ jobs:
         run: git fetch --prune --unshallow
 
       - name: Copy example values files to the expected Helm Linter locations
-        run: |
-          rm -f /charts/timescaledb/ci/*.yaml
-          mkdir -p ./charts/timescaledb-single/ci
-          cd ./charts/timescaledb-single/ci/
-          for f in ../values/*.yaml; do ln -s $f $(basename $f)-values.yaml; done
+        run: make refresh-ci-values
 
-      - name: Run chart-testing (lint)
+      - name: Run linter on Helm Charts
         id: lint
         uses: helm/chart-testing-action@v1.0.0
         with:
           command: lint
+
+      - name: Install shellcheck
+        run: sudo apt-get install shellcheck
+
+      - name: Run shellcheck on all scripts
+        run: make shellcheck
+        if: false # We will enable this once all the scripts are passing
