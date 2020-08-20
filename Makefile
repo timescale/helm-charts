@@ -102,6 +102,7 @@ prepare-ci:
 	@kubectl create namespace $(K8S_NAMESPACE) || true
 	@kubectl config set-context --current --namespace $(K8S_NAMESPACE)
 	@kubectl apply -f tests/custom_pgbouncer_user_list.yaml
+	@kubectl apply -f tests/custom-init-scripts.yaml
 	@kubectl kustomize "$(SINGLE_CHART_DIR)/kustomize/example" | kubectl apply --namespace $(K8S_NAMESPACE) -f -
 	@for storageclass in gp2 slow; do \
 		kubectl get storageclass/$${storageclass} > /dev/null 2> /dev/null || \

@@ -40,6 +40,23 @@ required:
 - unsafe
 additionalProperties: false
 properties:
+  postInit:
+    description: |
+      postInit allows you to configure additional scripts that will be run once
+      directly after initialization of the database. It takes a list of VolumeProjection,
+      every .sh, .sql, and .sql.gz script will be executed in sorted order and they should
+      return exitcode 0 on success.
+    type:
+    - array
+    - "null"
+    items:
+      type: object
+      additionalProperties: false
+      properties:
+        configMap:
+          type: object
+        secret:
+          type: object
   timescaledbTune:
     description: |
       timescaledb-tune will be run with the Pod resources requests or - if not set - its limits.

@@ -519,6 +519,102 @@ stanza: poddb
             backup reference list: 20190904-071709F
 ```
 
+## Post Init Scripts
+To run custom post-init steps, you can configure `postInit`, which
+takes a array of [VolumeProjection](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#volumeprojection-v1-core)s,
+each of which can contain multiple items.
+
+You should ensure that every script returns exitcode 0 on success, otherwise the initialization will fail.
+
+
+> ... The script receives a connection string URL (with the cluster superuser as a user name) ...
+[Patroni Bootstrap Documentation](https://patroni.readthedocs.io/en/latest/SETTINGS.html?highlight=post_init#bootstrap-configuration)
+
+> NOTICE: Post Init is only executed after initialization of the cluster. This is a once-in-a-lifetime occurence.
+
+### Examples
+
+#### I want to create 2 new databases post init ####
+
+*file: create_extra_dbs.sh*
+```bash
+#!/bin/bash
+
+psql -d "$1" <<__SQL__
+CREATE ROLE test;
+CREATE DATABASE test OWNER test;
+
+CREATE ROLE test2;
+CREATE DATABASE test2 OWNER test;
+__SQL__
+```
+
+*Create a ConfigMap from this file*:
+```console
+kubectl create configmap timescale-post-init --from-file=create_extra_dbs.sh
+```
+
+*Configure the postInit section*
+```
+postInit:
+  - configMap:
+      name: timescale-post-init
+```
+
+#### I also want to set the password for these users
+*file: set_test_passwords.sh*
+```bash
+#!/bin/bash
+psql -d "$1" --file=- --set ON_ERROR_STOP=1 << __SQL__
+SET log_statement TO none;      -- prevent these passwords from being logged
+ALTER USER test  WITH PASSWORD 'hard2guess';
+ALTER USER test2 WITH PASSWORD 'harder2guess';
+__SQL__
+```
+
+*Create a Secret from this file*:
+```console
+kubectl create secret generic timescale-post-init-pw --from-file=set_test_passwords.sh
+```
+
+*Configure the postInit section*
+```
+# file: post_init_example.yaml
+postInit:
+  - configMap:
+      name: timescale-post-init
+  - secret:
+      name: timescale-post-init-pw
+```
+
+If you now create a new deployment, you should see something like the following in the log output of your deployment:
+
+1. [Create the Secrets](#creating-the-secrets)
+2. Install this deployment
+    ```console
+    helm upgrade --install postinittest ./charts/timescaledb-single -f post_init_example.yaml
+    ```
+3. Wait for the Pod's to be ready
+    ```console
+    kubectl get pod -l cluster-name=postinittest
+    kubectl logs pod/postinittest-timescaledb-0 -c timescaledb
+    ```
+4. Verify that the scripts were run successfully
+    ```sql
+    SELECT datname FROM pg_database WHERE datdba = 'test'::regrole;
+    ```
+    ```text
+     datname
+    ---------
+     test
+     test2
+     (2 rows)
+    ```
+--------
+ test
+(1 row)
+    ```
+
 ## Callbacks
 Patroni will trigger some callbacks on certain events. These are:
 

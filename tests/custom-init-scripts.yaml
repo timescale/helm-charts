@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-init-scripts
+binaryData:
+  compressed.sql.gz: H4sICAeq/V8AA2NvbXByZXNzZWQuc3FsAAt29XF1DlFQT87PLShKLS5OTVG35gIAkPZuzBUAAAA=
+data:
+  plain.sql: |
+    SELECT 'uncompressed'
+  shell_test.sh: |+
+    #!/bin/sh
+    echo "Test, args: $*"
+  skip_me.png: empty file
