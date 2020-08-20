@@ -241,6 +241,19 @@ callbacks:
   # If set, this configMap will be used for the Patroni callbacks.
   configMap:  # example-patroni-callbacks
 
+postInit:
+  # A list of sources, that contain post init scripts.
+  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#projectedvolumesource-v1-core
+  # These scripts are all projected to the same directory and will be executed
+  # in sorted order only once: After a cluster initialization
+  # Some examples:
+  - configMap:
+      name: custom-init-scripts
+      optional: true
+  - secret:
+      name: custom-secret-scripts
+      optional: true
+
 loadBalancer:
   # If not enabled, we still expose the primary using a so called Headless Service
   # https://kubernetes.io/docs/concepts/services-networking/service/#headless-services

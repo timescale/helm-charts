@@ -86,6 +86,10 @@ ${HOME}/.pgbackrest_environment
 /etc/timescaledb/scripts
 {{- end -}}
 
+{{- define "post_init_dir" -}}
+/etc/timescaledb/post_init.d
+{{- end -}}
+
 {{- define "wal_directory" -}}
 {{ printf "%s/pg_wal" .Values.persistentVolumes.wal.mountPath }}
 {{- end -}}
