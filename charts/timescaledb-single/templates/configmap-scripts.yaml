@@ -206,7 +206,8 @@ data:
     if [ "${BOOTSTRAP_FROM_BACKUP}" = "1" ]; then
         log "Attempting restore from backup"
         # we want to override the environment with the environment
-        export "$(env -i envdir {{ template "pgbackrest_bootstrap_environment_dir" . | quote }} env)" > /dev/null
+        # shellcheck disable=SC2046
+        export $(env -i envdir {{ template "pgbackrest_bootstrap_environment_dir" . | quote }} env) > /dev/null
         export PGBACKREST_REPO1_PATH={{ index .Values.bootstrapFromBackup "repo1-path" | quote }}
 
         if [ -z "${PGBACKREST_REPO1_PATH}" ]; then
