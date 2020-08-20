@@ -1,0 +1,7 @@
+# A configuration file for https://github.com/helm/chart-testing-action
+# This file is required to be in the repository root and named ct.yaml
+---
+# We do not want to bump the Chart version for every single commit,
+# but only once we release
+check-version-increment: false
+
