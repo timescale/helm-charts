@@ -1,9 +1,9 @@
-name: "Helm Lint"
+name: "Test Helm Charts"
 on:
 - push
 
 jobs:
-  smoketest:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,27 +26,31 @@ jobs:
 
       - name: Run shellcheck on all scripts
         run: make shellcheck
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Fetch history
+        run: git fetch --prune --unshallow
+
+      - name: Test if Chart.yaml has been touched
+        id: single_chart_changed
+        run: echo "::set-output name=changes::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} charts/timescaledb-single/Chart.yaml)"
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.0.0
-        if: steps.lint.outputs.changed == 'true'
+        if: steps.single_chart_changed.outputs.changes != ''
 
       - uses: azure/setup-kubectl@v1
         id: install-kubectl
-        if: steps.lint.outputs.changed == 'true'
+        if: steps.single_chart_changed.outputs.changes != ''
 
       - uses: azure/setup-helm@v1
         id: install-helm
-        if: steps.lint.outputs.changed == 'true'
+        if: steps.single_chart_changed.outputs.changes != ''
 
-      - name: Install a cluster
-        run: make install-example
-        if: steps.lint.outputs.changed == 'true'
-
-      - name: Wait for a primary to be available
-        run: make wait-for-example
-        if: steps.lint.outputs.changed == 'true'
-
-      - name: Verify that we can create a hypertable
-        run: make smoketest
-        if: steps.lint.outputs.changed == 'true'
+      - name: Test all available values files clusters
+        run: make test
+        if: steps.single_chart_changed.outputs.changes != ''

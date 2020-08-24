@@ -3,6 +3,11 @@ ROGUE_KUSTOMIZE_DIRS := $(shell find charts/timescaledb-single/kustomize/  -mind
 SINGLE_CHART_DIR := charts/timescaledb-single
 CI_SINGLE_DIR := $(SINGLE_CHART_DIR)/ci/
 SINGLE_VALUES_FILES := $(SINGLE_CHART_DIR)/values.yaml $(wildcard $(SINGLE_CHART_DIR)/values/*.yaml)
+DEPLOYMENTS := $(SINGLE_VALUES_FILES)
+K8S_NAMESPACE ?= citest
+
+export PULL_TIMEOUT ?= 600s
+export DEPLOYMENT_TIMEOUT ?= 180s
 
 .PHONY: publish
 publish: publish-multinode publish-single
@@ -44,6 +49,7 @@ refresh-ci-values: clean-ci
 clean-ci:
 	@rm -rf ./$(CI_SINGLE_DIR)
 	@mkdir -p ./$(CI_SINGLE_DIR)/
+	@kubectl delete namespace $(K8S_NAMESPACE) 2>/dev/null || true
 
 .PHONY: shellcheck shellcheck-single
 shellcheck: shellcheck-single
@@ -59,26 +65,32 @@ shellcheck-single:
 		rm $(CI_SINGLE_DIR)/temp.* ; \
 	done
 
-.PHONY: install-example-secrets
-install-example-secrets:
-	@kubectl kustomize "$(SINGLE_CHART_DIR)/kustomize/example" | kubectl apply -f -
-
 .PHONY: install-example
-install-example: install-example-secrets
-	@helm upgrade --install example $(SINGLE_CHART_DIR) -f $(SINGLE_CHART_DIR)/values.yaml --set replicaCount=2
-
-.PHONY: wait-for-example
-wait-for-example:
-	@for i in $$(seq 1 30); do \
-		PRIMARYPOD="$$(kubectl get pod -l cluster-name=example,role=master -o name)" ; \
-		if [ "$${PRIMARYPOD}" != "" ]; then echo "Primary pod is: $${PRIMARYPOD}"; exit 0; fi ; \
-		echo "Waiting for primary pod to become available" ; \
-		sleep 5 ; \
-	done ; \
-	exit 1
+install-example: prepare-ci
+	DELETE_DEPLOYMENT=0 TEST_REPLICA=0 ./tests/verify_deployment.sh $(SINGLE_CHART_DIR)/values.yaml example
 
 .PHONY: smoketest
-smoketest: wait-for-example
-	@kubectl exec -i $$(kubectl get pod -l cluster-name=example,role=master -o name) -c timescaledb -- \
-		psql --no-psqlrc --command \
-		"CREATE SCHEMA IF NOT EXISTS smoketest; DROP TABLE IF EXISTS smoketest.demo; CREATE TABLE smoketest.demo(inserted timestamptz not null); SELECT now() AS smoketest, * FROM create_hypertable('smoketest.demo', 'inserted');"
+smoketest: prepare-ci
+	./tests/verify_deployment.sh $(SINGLE_CHART_DIR)/values.yaml smoketest
+
+# We test sequentially, as in GitHub actions we do not have a lot of CPU available,
+# so scheduling the pods concurrently does not work
+.PHONY: test
+test: prepare-ci
+	for f in $(SINGLE_VALUES_FILES); do \
+		./tests/verify_deployment.sh $${f} || exit 1; \
+	done
+
+.PHONY: prepare-ci
+prepare-ci:
+	@kubectl create namespace $(K8S_NAMESPACE) || true
+	@kubectl config set-context --current --namespace $(K8S_NAMESPACE)
+	@kubectl kustomize "$(SINGLE_CHART_DIR)/kustomize/example" | kubectl apply --namespace $(K8S_NAMESPACE) -f -
+	@for storageclass in gp2 slow; do \
+		kubectl get storageclass/$${storageclass} > /dev/null 2> /dev/null || \
+		kubectl get storageclass -o json \
+			| jq '[.items[] | select(.metadata.annotations."storageclass.kubernetes.io/is-default-class"=="true")] | .[0]' \
+			| jq ". | del(.metadata.annotations.\"storageclass.kubernetes.io/is-default-class\") | .metadata.name=\"$${storageclass}\"" \
+			| kubectl create -f - ; \
+	done ; \
+	exit 0

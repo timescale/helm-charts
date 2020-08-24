@@ -1,0 +1,34 @@
+replicaCount: 2
+secretNames:
+  credentials: example-credentials
+  certificate: example-certificate
+  pgbackrest: example-pgbackrest
+
+patroni:
+  postgresql:
+    parameters:
+      shared_buffers: 4MB # We're not testing Postgres, we're testing the Charts
+      min_wal_size: 600MB # We need to be able to have at least 2 256MB WAL segments
+
+persistentVolumes:
+  data:
+    size: 1G
+  wal:
+    size: 1G
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+backup:
+  enabled: false
+
+# We disable the readinessProbe to speed up the provisioning of the replica
+# Normally, having the deployment increase the pod count gradually is great,
+# during testing however, we're happy to go as quickly as possible.
+readinessProbe:
+  enabled: false
