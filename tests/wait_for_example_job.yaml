@@ -1,0 +1,93 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: example
+spec:
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      name: example
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: waiter
+        image: timescaledev/timescaledb-ha:pg12-ts1.7-latest
+        resources:
+          limits:
+            cpu: 100m
+            memory: 24Mi
+          requests:
+            cpu: 100m
+            memory: 24Mi
+        env:
+        - {name: TEST_REPLICA, value: "1"}
+        - name: PGHOST
+          value: example
+        - name: PGUSER
+          value: postgres
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: example-credentials
+              key: PATRONI_SUPERUSER_PASSWORD
+        command:
+        - /bin/sh
+        - '-c'
+        - |
+
+          log() {
+              echo "$(date --iso-8601=seconds) - $1"
+          }
+
+          terminate() {
+              exit 1
+          }
+          trap terminate TERM QUIT
+
+          while sleep 10; do
+              # This will throw an error if the primary does not yet accept writes
+              psql -X -f - --set ON_ERROR_STOP=1 -c "CREATE TEMPORARY TABLE a AS SELECT 1" > /dev/null 2>&1 && break
+              log "Waiting for deployment \"${PGHOST}\" (primary) to become available"
+          done
+
+
+          NOW="$(date --iso-8601=seconds)"
+          psql -Xq -f - --set ON_ERROR_STOP=1 <<__SQL__
+              \x on
+              CREATE SCHEMA IF NOT EXISTS citest;
+              DROP TABLE IF EXISTS citest.demo;
+              CREATE TABLE citest.demo(inserted timestamptz not null);
+              SELECT * FROM create_hypertable('citest.demo', 'inserted');
+              INSERT INTO citest.demo VALUES ('${NOW}') RETURNING *;
+          __SQL__
+          EXITCODE=$?
+          if [ "${EXITCODE}" -ne 0 ]; then exit "${EXITCODE}"; fi
+
+
+          if [ "${TEST_REPLICA}" -eq 1 ]; then
+              export PGHOST="${PGHOST}-replica"
+
+              while sleep 3; do
+                  # This will throw a divide by zero error as long as the record has not been replicated
+                  psql -X -f - --set ON_ERROR_STOP=1 -c "SELECT 1/count(*) FROM citest.demo WHERE inserted = '${NOW}'" > /dev/null 2>&1 && break
+                  log "Waiting for deployment \"${PGHOST}\" (replica) to become available"
+              done
+
+              psql -Xq -f - --set ON_ERROR_STOP=1 <<__SQL__
+                  \x on
+                  SELECT now(), * FROM pg_stat_wal_receiver;
+                  SELECT * FROM citest.demo WHERE inserted = '${NOW}';
+                  SELECT count(*) > 0 AS replica_ok FROM citest.demo WHERE inserted = '${NOW}'
+                  \gset
+                  \if :replica_ok
+                      SELECT 'Replica caught up with primary';
+                  \else
+                      SELECT 'Could not find the test record on the replica';
+                      SELECT 1/0; -- this will cause the script to exit with a failure
+                  \endif
+          __SQL__
+              EXITCODE=$?
+              if [ "${EXITCODE}" -ne 0 ]; then exit "${EXITCODE}"; fi
+          fi
+
+          log "Everything seems fine with deployment ${PGHOST}"
