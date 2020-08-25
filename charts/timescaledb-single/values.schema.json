@@ -1,0 +1,7 @@
+{
+  "properties": {},
+  "required": [
+    "option"
+  ],
+  "schema": "http://json-schema.org/draft-07/schema"
+}
