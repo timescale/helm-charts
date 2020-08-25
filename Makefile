@@ -36,8 +36,16 @@ clean: clean-ci
 	@if [ "$(ROGUE_KUSTOMIZE_FILES)" != "" ]; then rm -v $(ROGUE_KUSTOMIZE_FILES); fi
 	@if [ "$(ROGUE_KUSTOMIZE_DIRS)" != "" ]; then rmdir -v $(ROGUE_KUSTOMIZE_DIRS); fi
 
+.PHONY: assert-schema-equals
+assert-schema-equals:
+	@cat $(SINGLE_CHART_DIR)/values.schema.yaml | python3 ./yaml2json.py | jq '.[0]' | git --no-pager diff --no-index - $(SINGLE_CHART_DIR)/values.schema.json
+
+.PHONY: json-schema
+json-schema:
+	cat $(SINGLE_CHART_DIR)/values.schema.yaml | python3 ./yaml2json.py | jq '.[0]' > $(SINGLE_CHART_DIR)/values.schema.json
+
 .PHONY: lint
-lint: refresh-ci-values
+lint: assert-schema-equals refresh-ci-values
 	@docker run -it --rm --name ct --volume $$(pwd):/data quay.io/helmpack/chart-testing:v3.0.0 sh -c "ct lint --validate-maintainers=false --charts /data/charts/timescaledb-single /data/charts/timescaledb-multinode"
 
 # We're not symlinking the files, as that generates *a ton* of Helm noise
