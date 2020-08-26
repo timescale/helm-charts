@@ -1,7 +1,756 @@
 {
-  "properties": {},
+  "additionalProperties": false,
+  "definitions": {
+    "loadBalancer": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "port": {
+          "maximum": 65535,
+          "minimum": 1000,
+          "type": "integer"
+        },
+        "spec": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "percent": {
+      "maximum": 100,
+      "mimimum": 0,
+      "type": "integer"
+    },
+    "volume": {
+      "additionalProperties": false,
+      "properties": {
+        "accessModes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "mountPath": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string"
+        },
+        "storageClass": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "subPath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "affinity": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "affinityTemplate": {
+      "type": "string"
+    },
+    "backup": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "env": {
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "envFrom": {
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "jobs": {
+          "type": "array"
+        },
+        "pgBackRest": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "pgBackRest:archive-get": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "pgBackRest:archive-push": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "enabled",
+        "pgBackRest",
+        "jobs"
+      ],
+      "type": "object"
+    },
+    "bootstrapFromBackup": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "repo1-path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "secretName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "callbacks": {
+      "additionalProperties": false,
+      "properties": {
+        "configMap": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "clusterName": {
+      "maxLength": 30,
+      "minLength": 1,
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "debug": {
+      "additionalProperties": false,
+      "properties": {
+        "execStartPre": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "env": {
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "envFrom": {
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "fullWalPrevention": {
+      "additionalProperties": false,
+      "properties": {
+        "checkFrequency": {
+          "maximum": 900,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "thresholds": {
+          "additionalProperties": false,
+          "properties": {
+            "readOnlyFreeMB": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "readOnlyFreePercent": {
+              "$ref": "#/definitions/percent"
+            },
+            "readWriteFreeMB": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "readWriteFreePercent": {
+              "$ref": "#/definitions/percent"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "enum": [
+            "Always",
+            "Never",
+            "IfNotPresent"
+          ],
+          "type": "string"
+        },
+        "repository": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "tag": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "loadBalancer": {
+      "$ref": "#/definitions/loadBalancer"
+    },
+    "nameOverride": {
+      "minLength": 1,
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "networkPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "ingress": {
+          "items": {
+            "type": "object"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "prometheusApp": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelector": {
+      "type": "object"
+    },
+    "patroni": {
+      "properties": {
+        "bootstrap": {
+          "properties": {
+            "dcs": {
+              "properties": {
+                "loop_wait": {
+                  "default": 10,
+                  "maximum": 120,
+                  "minimum": 5,
+                  "type": "integer"
+                },
+                "master_start_timeout": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "maximum_lag_on_failover": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "postgresql": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "parameters": {
+                      "type": "object"
+                    },
+                    "restore_command": {
+                      "type": "string"
+                    },
+                    "use_pg_rewind": {
+                      "type": "boolean"
+                    },
+                    "use_slots": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "retry_timeout": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "synchronous_mode": {
+                  "type": "boolean"
+                },
+                "synchronous_mode_strict": {
+                  "type": "boolean"
+                },
+                "ttl": {
+                  "minimum": 10,
+                  "type": "integer"
+                },
+                "use_pg_rewind": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "method": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "post_init": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "restore_or_initdb": {
+              "additionalProperties": false,
+              "properties": {
+                "command": {
+                  "type": "string"
+                },
+                "keep_existing_recovery_conf": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "kubernetes": {
+          "additionalProperties": {
+            "type": [
+              "string",
+              "boolean"
+            ]
+          },
+          "properties": {
+            "use_endpoints": {
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "log": {
+          "type": "object"
+        },
+        "postgresql": {
+          "properties": {
+            "authentication": {
+              "additionalProperties": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "type": "object"
+            },
+            "basebackup": {
+              "items": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            },
+            "callbacks": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "create_replica_methods": {
+              "additionalProperties": false,
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "listen": {
+              "enum": [
+                "0.0.0.0:5432"
+              ],
+              "type": "string"
+            },
+            "pg_hba": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "pgbackrest": {
+              "properties": {
+                "command": {
+                  "type": "string"
+                },
+                "keep_data": {
+                  "type": "boolean"
+                },
+                "no_master": {
+                  "type": "boolean"
+                },
+                "no_params": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "recovery_conf": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "use_unix_socket": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "restapi": {
+          "properties": {
+            "listen": {
+              "enum": [
+                "0.0.0.0:8008"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "persistentVolumes": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/volume"
+        },
+        "tablespaces": {
+          "additionalProperties": {
+            "$ref": "#/definitions/volume"
+          },
+          "type": "object"
+        },
+        "wal": {
+          "$ref": "#/definitions/volume"
+        }
+      },
+      "type": "object"
+    },
+    "pgBouncer": {
+      "additionalProperties": false,
+      "description": "pgBouncer does connection pooling for PostgreSQL\nhttps://www.pgbouncer.org/\nenabling pgBouncer will run an extra container in every Pod, serving a pgBouncer\npass-through instance\n",
+      "properties": {
+        "config": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "enabled": {
+          "default": false,
+          "type": "boolean"
+        },
+        "port": {
+          "default": 6432,
+          "enum": [
+            6432
+          ],
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "podAnnotations": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "prometheus": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "env": {
+          "items": {
+            "type": "object"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "image": {
+          "type": "object"
+        },
+        "volumeMounts": {
+          "items": {
+            "type": "object"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "volumes": {
+          "items": {
+            "type": "object"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "rbac": {
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "readinessProbe": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "failureThreshold": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "initialDelaySeconds": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "periodSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "successThreshold": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "timeoutSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "replicaCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "replicaLoadBalancer": {
+      "$ref": "#/definitions/loadBalancer"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "requests": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "schedulerName": {
+      "type": "string"
+    },
+    "secretNames": {
+      "additionalProperties": false,
+      "properties": {
+        "certificate": {
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "credentials": {
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pgbackrest": {
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "sharedMemory": {
+      "additionalProperties": false,
+      "properties": {
+        "useMount": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "timescaledbTune": {
+      "additionalProperties": false,
+      "description": "timescaledb-tune will be run with the Pod resources requests or - if not set - its limits.\nThis should give a reasonably tuned PostgreSQL instance.\nAny PostgreSQL parameter that is explicitly set in the Patroni configuration will override\nthe auto-tuned variables.\n",
+      "properties": {
+        "args": {
+          "default": {},
+          "description": "For full flexibility, we allow you to override any timescaledb-tune parameter below.\nHowever, these parameters only take effect on newly scheduled pods and their settings are\nonly visibible inside those new pods.\nTherefore you probably want to set explicit overrides in patroni.bootstrap.dcs.postgresql.parameters,\nas those will take effect as soon as possible.\nhttps://github.com/timescale/timescaledb-tune\n",
+          "examples": [
+            {
+              "cpus": "5",
+              "max_conns": "120",
+              "memory": "4GB"
+            }
+          ],
+          "type": "object"
+        },
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "tolerations": {
+      "type": "array"
+    },
+    "unsafe": {
+      "type": "boolean"
+    },
+    "version": {
+      "maximum": 14,
+      "minimum": 11,
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
   "required": [
-    "option"
+    "affinity",
+    "affinityTemplate",
+    "backup",
+    "bootstrapFromBackup",
+    "callbacks",
+    "debug",
+    "fullWalPrevention",
+    "image",
+    "loadBalancer",
+    "nameOverride",
+    "networkPolicy",
+    "nodeSelector",
+    "patroni",
+    "persistentVolumes",
+    "pgBouncer",
+    "podAnnotations",
+    "prometheus",
+    "rbac",
+    "readinessProbe",
+    "replicaCount",
+    "replicaLoadBalancer",
+    "resources",
+    "secretNames",
+    "serviceAccount",
+    "sharedMemory",
+    "timescaledbTune",
+    "tolerations",
+    "unsafe"
   ],
-  "schema": "http://json-schema.org/draft-07/schema"
+  "schema": "http://json-schema.org/draft-07/schema#"
 }
