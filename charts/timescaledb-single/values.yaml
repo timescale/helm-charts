@@ -390,6 +390,13 @@ pgBouncer:
   enabled: false
   port: 6432
   config:
+  # DANGER: The below settings are considered to be safe to set, and we recommend
+  # you do set these to appropriate values for you.
+  # However, for flexibility, we do allow the override of any pg_bouncer setting
+  # many of which are vital to the operation of this helm chart.
+  # The values we do not suggest altering are set in the template
+  # https://github.com/timescale/timescaledb-kubernetes/blob/master/charts/timescaledb-single/templates/configmap-pgbouncer.yaml#L35-L50
+  # Only override these settings if you are confident of  what you are doing.
     server_reset_query: DISCARD ALL
     max_client_conn: 500
     default_pool_size: 12
