@@ -1,6 +1,7 @@
 ROGUE_KUSTOMIZE_FILES := $(shell find charts/timescaledb-single/kustomize/ -mindepth 2 -type f ! -path '*kustomize/example*')
 ROGUE_KUSTOMIZE_DIRS := $(shell find charts/timescaledb-single/kustomize/  -mindepth 1 -type d ! -path '*kustomize/example*')
 SINGLE_CHART_DIR := charts/timescaledb-single
+MULTI_CHART_DIR := charts/timescaledb-multinode
 CI_SINGLE_DIR := $(SINGLE_CHART_DIR)/ci/
 SINGLE_VALUES_FILES := $(SINGLE_CHART_DIR)/values.yaml $(wildcard $(SINGLE_CHART_DIR)/values/*.yaml)
 DEPLOYMENTS := $(SINGLE_VALUES_FILES)
@@ -45,13 +46,20 @@ json-schema:
 	cat $(SINGLE_CHART_DIR)/values.schema.yaml | python3 ./yaml2json.py | jq '.[0]' > $(SINGLE_CHART_DIR)/values.schema.json
 
 .PHONY: lint
-lint: assert-schema-equals refresh-ci-values
-	@docker run -it --rm --name ct --volume $$(pwd):/data quay.io/helmpack/chart-testing:v3.0.0 sh -c "ct lint --validate-maintainers=false --charts /data/charts/timescaledb-single /data/charts/timescaledb-multinode"
+lint: assert-schema-equals
+	@for file in $(SINGLE_VALUES_FILES); do \
+		echo "Linting timescaledb-single using file: $$file" ; \
+		helm lint $(SINGLE_CHART_DIR) -f "$$file" --set backup.enabled=true --set pgBouncer.enabled=true --set prometheus.enabled=true --set unsafe=true || exit 1 ; \
+	done
+	@helm lint $(MULTI_CHART_DIR)
 
 # We're not symlinking the files, as that generates *a ton* of Helm noise
 .PHONY: refresh-ci-values
 refresh-ci-values: clean-ci
-	@cp $(SINGLE_VALUES_FILES) $(CI_SINGLE_DIR)
+	@mkdir -p ./$(CI_SINGLE_DIR)/
+	@for file in $(SINGLE_VALUES_FILES); do \
+		cp "$$file" "$(CI_SINGLE_DIR)/$$(basename $$file)-values.yaml"; \
+	done
 
 .PHONY: clean-ci
 clean-ci:

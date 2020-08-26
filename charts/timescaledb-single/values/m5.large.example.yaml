@@ -12,12 +12,14 @@ resources:
     memory: 6Gi
 
 patroni:
-  postgresql:
-    parameters:
-      max_wal_size: 16GB  # 80% of the Volume Size
-      min_wal_size: 10GB
-      shared_buffers: 2GB  # 25% of available ec2 instance memory
-      work_mem: 64MB
+  bootstrap:
+    dcs:
+      postgresql:
+        parameters:
+          max_wal_size: 16GB  # 80% of the Volume Size
+          min_wal_size: 10GB
+          shared_buffers: 2GB  # 25% of available ec2 instance memory
+          work_mem: 64MB
 
 persistentVolumes:
   data:
