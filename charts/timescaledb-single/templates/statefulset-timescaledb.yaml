@@ -341,6 +341,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
           - containerPort: 6432
+            name: pgbouncer
         command:
         - /usr/bin/env
         - -i
