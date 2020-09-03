@@ -337,6 +337,11 @@ spec:
           - mountPath: /etc/pgbouncer/
             name: pgbouncer
             readOnly: true
+{{- if .Values.pgBouncer.userListSecretName }}
+          - mountPath: /etc/pgbouncer/userlist/userlist.txt
+            name: pgbouncer-userlist
+            readOnly: true
+{{- end }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
@@ -468,6 +473,11 @@ spec:
           name: {{ template "timescaledb.fullname" . }}-pgbouncer
           defaultMode: 416 # 0640 permissions
           optional: true
+      - name: pgbouncer-userlist
+        secret:
+          secretName: {{ .Values.pgBouncer.userListSecretName }}
+          defaultMode: 416 # 0640 permissions
+          optional: True
       - name: pgbackrest
         configMap:
           name: {{ template "timescaledb.fullname" . }}-pgbackrest
