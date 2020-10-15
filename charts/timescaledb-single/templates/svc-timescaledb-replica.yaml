@@ -11,6 +11,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
+    component: postgres
     role: replica
   annotations:
 {{ .Values.replicaLoadBalancer.annotations | toYaml | indent 4 }}
