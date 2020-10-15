@@ -10,6 +10,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9187"
