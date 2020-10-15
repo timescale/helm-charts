@@ -15,7 +15,8 @@ metadata:
     prometheus.io/port: "9187"
 spec:
   ports:
-    - port: 9187
+    - name: metrics
+      port: 9187
   selector:
     app: {{ template "timescaledb.fullname" . }}
 {{ end }}

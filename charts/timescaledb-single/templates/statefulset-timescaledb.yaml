@@ -255,6 +255,7 @@ spec:
         {{- end }}
         ports:
         - containerPort: 8008
+          name: patroni
         - containerPort: 5432
           name: postgresql
         {{- if .Values.readinessProbe.enabled }}
@@ -357,6 +358,7 @@ spec:
           - {{ template "scripts_dir" . }}/pgbackrest_bootstrap.sh
         ports:
         - containerPort: 8081
+          name: pgbackrest
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
@@ -407,6 +409,7 @@ spec:
           runAsUser: 1000
         ports:
         - containerPort: 9187
+          name: postgres-exporter
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
