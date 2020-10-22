@@ -14,13 +14,8 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   pg_hba.conf: |
-    local     all postgres                   peer
-    host      all postgres,standby 0.0.0.0/0 reject
-    host      all postgres,standby ::0/0     reject
-    hostssl   all all              0.0.0.0/0 md5
-    hostssl   all all              ::0/0     md5
-    hostnossl all all              0.0.0.0/0 reject
-    hostnossl all all              ::0/0     reject
+{{ .Values.patroni.postgresql.pg_hba | toYaml | indent 4 }}
+
   pgbouncer-sidecar.ini: |
     [databases]
     * =
