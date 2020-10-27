@@ -14,7 +14,7 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   pg_hba.conf: |
-{{ .Values.patroni.postgresql.pg_hba | toYaml | indent 4 }}
+{{ tpl .Values.pgBouncer.pg_hba . | indent 4 }}
 
   pgbouncer-sidecar.ini: |
     [databases]
