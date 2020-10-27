@@ -401,6 +401,14 @@ pgBouncer:
     max_client_conn: 500
     default_pool_size: 12
     pool_mode: transaction
+  pg_hba: |
+    local     all postgres                   peer
+    host      all postgres,standby 0.0.0.0/0 reject
+    host      all postgres,standby ::0/0     reject
+    hostssl   all all              0.0.0.0/0 md5
+    hostssl   all all              ::0/0     md5
+    hostnossl all all              0.0.0.0/0 reject
+    hostnossl all all              ::0/0     reject
 
 networkPolicy:
   enabled: false
