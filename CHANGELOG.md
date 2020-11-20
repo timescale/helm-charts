@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * GitHub actions linting the Helm Charts as well as shellcheck the shell scripts
  * Prevent full WAL disks (experimental, disabled by default)
 ### Changed
+ * Update multinode Chart to work with TimescaleDB 2.0.0-rc3
 ### Removed
 ### Fixed
 
