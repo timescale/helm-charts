@@ -167,6 +167,8 @@ spec:
             # We store the current environment, as initscripts, callbacks, archive_commands etc. may require
             # to have the environment available to them
             set -o posix
+            export PATRONI_RESTAPI_CONNECT_ADDRESS=$PATRONI_KUBERNETES_POD_IP:8008
+            export PATRONI_POSTGRESQL_CONNECT_ADDRESS=$PATRONI_KUBERNETES_POD_IP:5432
             export -p > "{{ template "pod_environment_file" }}"
             export -p | grep PGBACKREST > "{{ template "pgbackrest_environment_file" }}"
 
