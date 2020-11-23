@@ -19,8 +19,8 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `nameOverride`                    | Override the name of the chart              | `timescaledb`                                       |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
 | `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
-| `image.repository`                | The image to pull                           | `timescaledev/timescaledb`                          |
-| `image.tag`                       | The version of the image to pull            | `v0.2.2-pg11-multinode`                             |
+| `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
+| `image.tag`                       | The version of the image to pull            | `pg12-ts2.0.0-rc3`                                  |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `credentials.accessNode.superuser`| Password of the superuser for the Access Node | `tea`                                             |
 | `credentials.dataNode.superuser`  | Password of the superuser for the Data Nodes  | `coffee`                                          |
@@ -46,13 +46,13 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 ### Examples
 - Override value using commandline parameters
     ```console
-    helm upgrade --install my-release . --set image.tag=v0.2.3-pg11-multinode --set image.pullPolicy=Always
+    helm upgrade --install my-release . --set image.tag=pg12-ts2.0.0-rc3 --set image.pullPolicy=Always
     ```
 - Override values using `myvalues.yaml`
     ```yaml
     # Filename: myvalues.yaml
     image:
-      tag: v0.2.3-pg11
+      tag: pg12-ts2.0.0-rc3
       pullPolicy: Always
     postgresql:
       databases:
@@ -117,4 +117,18 @@ The logs for the Access Node of TimescaleDB can be accessed as follows:
 
 ```console
 kubectl logs $(kubectl get pod -l release=my-release,timescaleNodeType=access) timescaledb
+```
+
+### Verify multinode topology
+```console
+$ kubectl exec -ti $(kubectl get pod -l timescaleNodeType=access -o name) -c timescaledb -- psql -d example -c 'select node_name from timescaledb_information.data_nodes'
+```
+```text
+           node_name
+-------------------------------
+ my-release-timescaledb-data-0
+ my-release-timescaledb-data-1
+ my-release-timescaledb-data-2
+(3 rows)
+
 ```
