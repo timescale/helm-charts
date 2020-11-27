@@ -33,7 +33,9 @@ data:
     auth_type = hba
     auth_hba_file = /etc/pgbouncer/pg_hba.conf
     auth_user = postgres
+    {{- if not .Values.pgBouncer.config.client_tls_sslmode }}
     client_tls_sslmode=require
+    {{- end }}
     client_tls_key_file = /etc/certificate/tls.key
     client_tls_cert_file = /etc/certificate/tls.crt
     # Loading these last, to allow for overriding of any of the above defaults. Since the 
