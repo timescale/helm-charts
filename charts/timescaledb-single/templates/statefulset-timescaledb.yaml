@@ -113,6 +113,8 @@ spec:
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
 {{- end }}
       # Issuing the final checkpoints on a busy database may take considerable time.
       # Unfinished checkpoints will require more time during startup, so the tradeoff
