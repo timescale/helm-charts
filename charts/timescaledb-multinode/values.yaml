@@ -121,3 +121,19 @@ serviceAccount:
   # The name of the ServiceAccount to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+
+
+# Access service configuration
+service:
+  annotations: {}
+  #  service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "4000"
+  extraLabels: {}
+
+  ## List of IP addresses at which the service is available
+  ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+  ##
+  externalIPs: []
+
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  type: ClusterIP
