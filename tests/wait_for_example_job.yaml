@@ -11,7 +11,7 @@ spec:
       restartPolicy: OnFailure
       containers:
       - name: waiter
-        image: timescaledev/timescaledb-ha:pg12-ts1.7-latest
+        image: timescaledev/timescaledb-ha:pg12-ts2.0-latest
         resources:
           limits:
             cpu: 100m
