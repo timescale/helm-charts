@@ -30,9 +30,14 @@ spec:
       securityContext:
         # The postgres user inside the TimescaleDB image has uid=1000.
         # This configuration ensures the permissions of the mounts are suitable
-        fsGroup: 1000
+        fsGroup: {{ template "postgres.uid" }}
+        runAsGroup:  {{ template "postgres.uid" }}
+        runAsNonRoot: true
+        runAsUser:  {{ template "postgres.uid" }}
       initContainers:
       - name: initdb
+        securityContext:
+          allowPrivilegeEscalation: false
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
@@ -79,6 +84,8 @@ spec:
           subPath: "{{ .Values.persistentVolume.subPath }}"
       containers:
       - name: timescaledb
+        securityContext:
+          allowPrivilegeEscalation: false
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         # We start postgres with a fully cleared environment
