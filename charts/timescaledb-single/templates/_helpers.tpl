@@ -66,6 +66,10 @@ ${HOME}/.pgbackrest_environment
 /etc/pgbackrest/bootstrap
 {{- end -}}
 
+{{- define "postgres.uid" -}}
+{{- default .Values.uid "1000" -}}
+{{- end -}}
+
 {{- define "data_directory" -}}
 {{ printf "%s/data" .Values.persistentVolumes.data.mountPath }}
 {{- end -}}
