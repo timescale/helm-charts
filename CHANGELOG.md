@@ -4,15 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.8.0 - 2020-01-12]
 
 ### Added
+ * Validate `values` schema
+ * Ability to run custom `post_init` scripts
  * GitHub actions linting the Helm Charts as well as shellcheck the shell scripts
  * Prevent full WAL disks (experimental, disabled by default)
+ * Allow pgBouncer customization (pg_hba, user list)
 ### Changed
- * Update multinode Chart to work with TimescaleDB 2.0.0-rc3
+ * Update multinode Chart to work with TimescaleDB 2.0.0
+ * Use Parallel [podManagementPolicy](https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#statefulsetspec-v1-apps) for faster scale-up/down.
+ * Explicitly set [(Pod)securityContext](https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#podsecuritycontext-v1-core)
+
 ### Removed
 ### Fixed
+ * Add name to all the used ports
 
 ## [v0.7.1 - 2020-09-01]
 
