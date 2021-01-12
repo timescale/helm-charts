@@ -37,6 +37,10 @@ If release name contains chart name it will be used as a full name.
 {{ template "timescaledb.fullname" . }}-access
 {{- end -}}
 
+{{- define "postgres.uid" -}}
+{{- default .Values.uid "1000" -}}
+{{- end -}}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}

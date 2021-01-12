@@ -10,12 +10,17 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app: {{ template "timescaledb.fullname" . }}
+    chart: {{ template "timescaledb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: postgres-exporter
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9187"
 spec:
   ports:
-    - port: 9187
+    - name: metrics
+      port: 9187
   selector:
     app: {{ template "timescaledb.fullname" . }}
 {{ end }}
