@@ -11,7 +11,7 @@ image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescaledev/timescaledb-ha
-  tag: pg12-ts2.0.0-rc3
+  tag: pg12-ts2.0.0-p0
   pullPolicy: IfNotPresent
 
 # Credentials used by PostgreSQL

@@ -35,7 +35,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
-| `image.tag`                       | The version of the image to pull            | `pg12-ts1.7-latest`                                 |
+| `image.tag`                       | The version of the image to pull            | `pg12-ts2.0-latest`
 | `loadBalancer.annotations`        | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
 | `loadBalancer.enabled`            | If enabled, creates a LB for the primary    | `true`                                              |
 | `loadBalancer.extraSpec`          | Extra configuration for service spec        | `nil`                                               |
@@ -150,13 +150,13 @@ at: https://pgbackrest.org/command.html#introduction
 ### Examples
 - Override value using commandline parameters
     ```console
-    helm upgrade --install my-release charts/timescaledb-single --set image.tag=pg12.3-ts1.7.2-p2 --set image.pullPolicy=Always
+    helm upgrade --install my-release charts/timescaledb-single --set image.tag=pg12.5-ts2.0.0-p0 --set image.pullPolicy=Always
     ```
 - Override values using `myvalues.yaml`git
     ```yaml
     # Filename: myvalues.yaml
     image:
-      tag: pg12.3-ts1.7.2-p2
+      tag: pg12.5-ts2.0.0-p0
       pullPolicy: Always
     patroni:
       postgresql:
