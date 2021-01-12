@@ -1,0 +1,18 @@
+pgBouncer:
+  enabled: true
+  port: 6432
+  config:
+    server_reset_query: DISCARD ALL
+    max_client_conn: 500
+    default_pool_size: 12
+    pool_mode: transaction
+    auth_file: /etc/pgbouncer/userlist/userlist.txt
+  pg_hba:
+  - local     all all postgres                   peer
+  - host      all postgres,standby 0.0.0.0/0 reject
+  - host      all postgres,standby ::0/0     reject
+  - hostssl   all all              0.0.0.0/0 md5
+  - hostssl   all all              ::0/0     md5
+  - hostnossl all all              0.0.0.0/0 reject
+  - hostnossl all all              ::0/0     reject
+  userListSecretName: pgbouncer-userlist
