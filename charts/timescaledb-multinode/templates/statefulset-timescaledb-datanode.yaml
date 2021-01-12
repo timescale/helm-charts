@@ -13,6 +13,7 @@ metadata:
 spec:
   serviceName: {{ template "timescaledb.dataname" . }}
   replicas: {{ .Values.dataNodes }}
+  podManagementPolicy: Parallel
   selector:
     matchLabels:
       app: {{ template "timescaledb.fullname" . }}
