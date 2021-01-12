@@ -25,6 +25,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
+    component: patroni
 spec:
   selector:
     app: {{ template "timescaledb.fullname" . }}

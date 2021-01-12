@@ -401,6 +401,21 @@ pgBouncer:
     max_client_conn: 500
     default_pool_size: 12
     pool_mode: transaction
+  pg_hba: |
+    local     all postgres                   peer
+    host      all postgres,standby 0.0.0.0/0 reject
+    host      all postgres,standby ::0/0     reject
+    hostssl   all all              0.0.0.0/0 md5
+    hostssl   all all              ::0/0     md5
+    hostnossl all all              0.0.0.0/0 reject
+    hostnossl all all              ::0/0     reject
+  # Secret should contain user/password pairs in the format expected by pgbouncer
+  # https://www.pgbouncer.org/config.html#authentication-file-format
+  # example:
+  # userlist.txt: |
+  #   "username" "hashedpassword"
+  #   "username2" "hashedpassword2"
+  userListSecretName:
 
 networkPolicy:
   enabled: false

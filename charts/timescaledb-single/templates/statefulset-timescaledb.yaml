@@ -37,10 +37,15 @@ spec:
       securityContext:
         # The postgres user inside the TimescaleDB image has uid=1000.
         # This configuration ensures the permissions of the mounts are suitable
-        fsGroup: 1000
+        fsGroup: {{ template "postgres.uid" }}
+        runAsGroup: {{ template "postgres.uid" }}
+        runAsNonRoot: true
+        runAsUser: {{ template "postgres.uid" }}
       initContainers:
 {{- if .Values.timescaledbTune.enabled }}
       - name: tstune
+        securityContext:
+          allowPrivilegeEscalation: false
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         env:
         - name: TSTUNE_FILE
@@ -113,6 +118,8 @@ spec:
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
 {{- end }}
       # Issuing the final checkpoints on a busy database may take considerable time.
       # Unfinished checkpoints will require more time during startup, so the tradeoff
@@ -122,6 +129,8 @@ spec:
       terminationGracePeriodSeconds: 600
       containers:
       - name: timescaledb
+        securityContext:
+          allowPrivilegeEscalation: false
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         lifecycle:
@@ -256,6 +265,7 @@ spec:
         {{- end }}
         ports:
         - containerPort: 8008
+          name: patroni
         - containerPort: 5432
           name: postgresql
         {{- if .Values.readinessProbe.enabled }}
@@ -316,6 +326,8 @@ spec:
 
 {{- if .Values.pgBouncer.enabled }}
       - name: pgbouncer
+        securityContext:
+          allowPrivilegeEscalation: false
         lifecycle:
           preStop:
             exec:
@@ -338,6 +350,11 @@ spec:
           - mountPath: /etc/pgbouncer/
             name: pgbouncer
             readOnly: true
+{{- if .Values.pgBouncer.userListSecretName }}
+          - mountPath: /etc/pgbouncer/userlist/userlist.txt
+            name: pgbouncer-userlist
+            readOnly: true
+{{- end }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
@@ -352,12 +369,15 @@ spec:
 
 {{- if or .Values.backup.enabled .Values.backup.enable }}
       - name: pgbackrest
+        securityContext:
+          allowPrivilegeEscalation: false
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
           - {{ template "scripts_dir" . }}/pgbackrest_bootstrap.sh
         ports:
         - containerPort: 8081
+          name: pgbackrest
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
@@ -405,9 +425,10 @@ spec:
         image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
         imagePullPolicy: {{ .Values.prometheus.image.pullPolicy }}
         securityContext:
-          runAsUser: 1000
+          allowPrivilegeEscalation: false
         ports:
         - containerPort: 9187
+          name: postgres-exporter
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
@@ -469,6 +490,11 @@ spec:
           name: {{ template "timescaledb.fullname" . }}-pgbouncer
           defaultMode: 416 # 0640 permissions
           optional: true
+      - name: pgbouncer-userlist
+        secret:
+          secretName: {{ .Values.pgBouncer.userListSecretName }}
+          defaultMode: 416 # 0640 permissions
+          optional: True
       - name: pgbackrest
         configMap:
           name: {{ template "timescaledb.fullname" . }}-pgbackrest

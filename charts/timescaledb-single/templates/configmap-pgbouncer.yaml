@@ -14,13 +14,8 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   pg_hba.conf: |
-    local     all postgres                   peer
-    host      all postgres,standby 0.0.0.0/0 reject
-    host      all postgres,standby ::0/0     reject
-    hostssl   all all              0.0.0.0/0 md5
-    hostssl   all all              ::0/0     md5
-    hostnossl all all              0.0.0.0/0 reject
-    hostnossl all all              ::0/0     reject
+{{ tpl .Values.pgBouncer.pg_hba . | indent 4 }}
+
   pgbouncer-sidecar.ini: |
     [databases]
     * =
@@ -38,10 +33,12 @@ data:
     auth_type = hba
     auth_hba_file = /etc/pgbouncer/pg_hba.conf
     auth_user = postgres
+    {{- if not .Values.pgBouncer.config.client_tls_sslmode }}
     client_tls_sslmode=require
+    {{- end }}
     client_tls_key_file = /etc/certificate/tls.key
     client_tls_cert_file = /etc/certificate/tls.crt
-    # Loading these last, to allow for overriding of any of the above defaults. Since the 
+    # Loading these last, to allow for overriding of any of the above defaults. Since the
     # last instance of an option gets used. Exercise caution overriding any of the above.
     {{- $config := .Values.pgBouncer.config | default dict }}
     {{- range $key := keys $config | sortAlpha }}
