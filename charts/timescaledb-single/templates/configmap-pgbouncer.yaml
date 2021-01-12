@@ -21,17 +21,10 @@ data:
     hostssl   all all              ::0/0     md5
     hostnossl all all              0.0.0.0/0 reject
     hostnossl all all              ::0/0     reject
-# The last item specified in the configuration is the one that takes effect with pgBouncer.
-# Therefore, for those items that we deem to be part of how this Helm Chart works, we specify
-# them *after* having listed all the user specified values.
   pgbouncer-sidecar.ini: |
     [databases]
     * =
     [pgbouncer]
-    {{- $config := .Values.pgBouncer.config | default dict }}
-    {{- range $key := keys $config | sortAlpha }}
-    {{ $key }} = {{ index $config $key }}
-    {{- end }}
     pidfile = /var/run/postgresql/pgbouncer.pid
     listen_addr = *
     listen_port = 6432
@@ -48,5 +41,11 @@ data:
     client_tls_sslmode=require
     client_tls_key_file = /etc/certificate/tls.key
     client_tls_cert_file = /etc/certificate/tls.crt
+    # Loading these last, to allow for overriding of any of the above defaults. Since the 
+    # last instance of an option gets used. Exercise caution overriding any of the above.
+    {{- $config := .Values.pgBouncer.config | default dict }}
+    {{- range $key := keys $config | sortAlpha }}
+    {{ $key }} = {{ index $config $key }}
+    {{- end }}
 ...
 {{ end }}
