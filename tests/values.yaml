@@ -33,8 +33,5 @@ resources:
 backup:
   enabled: false
 
-# We disable the readinessProbe to speed up the provisioning of the replica
-# Normally, having the deployment increase the pod count gradually is great,
-# during testing however, we're happy to go as quickly as possible.
-readinessProbe:
-  enabled: false
+prometheus:
+  enabled: true
