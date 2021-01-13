@@ -431,7 +431,7 @@ spec:
           allowPrivilegeEscalation: false
         ports:
         - containerPort: 9187
-          name: postgres-exporter
+          name: pg-exporter
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
