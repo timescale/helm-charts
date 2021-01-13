@@ -60,6 +60,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `pgBouncer.port`                  | The port on which the Load Balancer should listen for pgBouncer requests | `6432`                 |
 | `pgBouncer.pg_hba`                | The `pg_hba` to be used by pgBouncer        | A `pg_hba` allowing non-superuser ssl-only connections |
 | `pgBouncer.userListSecretName`    | If set, a [user authentication file](https://www.pgbouncer.org/config.html#authentication-file-format) to be used by pgBouncer. | `nil` |
+| `podManagementPolicy`             | Either [`OrderedReady` or `Parallel`](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies) | `OrderedReady` |
 | `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/wrouesnel/postgres_exporter) sidecar | `false` |
 | `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
 | `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |

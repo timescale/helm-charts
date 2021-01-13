@@ -91,3 +91,5 @@ backup:
     process-max: 4
     archive-async: "y"
     archive-get-queue-max: 2GB
+
+podManagementPolicy: Parallel
