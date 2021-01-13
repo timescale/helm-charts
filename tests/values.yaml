@@ -16,6 +16,12 @@ persistentVolumes:
   wal:
     size: 1G
 
+pgBouncer:
+  pg_hba:
+  # These are test values, these should *never* be used like this in a production environment
+  - local all all     trust
+  - host  all all all trust
+
 resources:
   limits:
     cpu: 100m

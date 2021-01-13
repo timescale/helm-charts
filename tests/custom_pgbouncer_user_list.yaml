@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgbouncer-userlist
+type: Opaque
+data:
+  # user1 with password user1
+  # user2 with password user2
+  userlist.txt: ICJ1c2VyMSIgIm1kNTdkMWI1YTQzMjliNjQ3OGU5NzY1MDhhYjlhNDllZTNkIgogInVzZXIyIiAibWQ1NzI4ODFlMjg1Y2RiMGY5MzcwZGNkZjFkYjBkOWE4NjkiCgo=

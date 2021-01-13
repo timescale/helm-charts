@@ -490,11 +490,13 @@ spec:
           name: {{ template "timescaledb.fullname" . }}-pgbouncer
           defaultMode: 416 # 0640 permissions
           optional: true
+{{- if .Values.pgBouncer.userListSecretName }}
       - name: pgbouncer-userlist
         secret:
           secretName: {{ .Values.pgBouncer.userListSecretName }}
           defaultMode: 416 # 0640 permissions
           optional: True
+{{- end }}
       - name: pgbackrest
         configMap:
           name: {{ template "timescaledb.fullname" . }}-pgbackrest
