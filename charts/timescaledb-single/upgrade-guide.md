@@ -4,7 +4,7 @@ Before you upgrade your deployment, you should ensure you have
 followed the version specific upgrade guides.
 
 ##### Upgrade guides
-- [0.7 to 0.8](#upgrading-from-06x-to-07x)
+- [0.7 to 0.8](#upgrading-from-07x-to-08x)
 - [0.6 to 0.7](#upgrading-from-06x-to-07x)
 - [0.5 to 0.6](#upgrading-from-05x-to-06x)
 - [0.4 to 0.5](#upgrading-from-04x-to-05x)
