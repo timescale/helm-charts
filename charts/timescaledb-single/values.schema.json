@@ -510,12 +510,26 @@
           "default": false,
           "type": "boolean"
         },
+        "pg_hba": {
+          "description": "The pg_hba configuration that will be used by pgBouncer\n",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "port": {
           "default": 6432,
           "enum": [
             6432
           ],
           "type": "integer"
+        },
+        "userListSecretName": {
+          "description": "A pointer to a SecretName containing user/password pairs in the format expected by pgbouncer\nhttps://www.pgbouncer.org/config.html#authentication-file-format\n",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "type": "object"

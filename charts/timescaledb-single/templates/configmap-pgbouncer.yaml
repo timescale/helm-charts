@@ -14,8 +14,9 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   pg_hba.conf: |
-{{ tpl .Values.pgBouncer.pg_hba . | indent 4 }}
-
+  {{- range $hba := (.Values.pgBouncer.pg_hba | default (list "local all all peer")) }}
+    {{ $hba }}
+  {{- end }}
   pgbouncer-sidecar.ini: |
     [databases]
     * =
