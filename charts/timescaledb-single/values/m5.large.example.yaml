@@ -27,3 +27,5 @@ persistentVolumes:
   wal:
     enabled: true
     size: 20G
+
+podManagementPolicy: Parallel

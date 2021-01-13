@@ -14,7 +14,7 @@ metadata:
 spec:
   serviceName: {{ template "timescaledb.fullname" . }}
   replicas: {{ .Values.replicaCount }}
-  podManagementPolicy: Parallel
+  podManagementPolicy: {{ .Values.podManagementPolicy }}
   updateStrategy:
     type: RollingUpdate
   selector:

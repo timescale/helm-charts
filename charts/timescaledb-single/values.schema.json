@@ -540,6 +540,11 @@
       },
       "type": "object"
     },
+    "podManagementPolicy": {
+      "type": [
+        "string"
+      ]
+    },
     "postInit": {
       "description": "postInit allows you to configure additional scripts that will be run once\ndirectly after initialization of the database. It takes a list of VolumeProjection,\nevery .sh, .sql, and .sql.gz script will be executed in sorted order and they should\nreturn exitcode 0 on success.\n",
       "items": {
@@ -772,6 +777,7 @@
     "persistentVolumes",
     "pgBouncer",
     "podAnnotations",
+    "podManagementPolicy",
     "prometheus",
     "rbac",
     "readinessProbe",

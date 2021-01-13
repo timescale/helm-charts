@@ -26,6 +26,7 @@ required:
 - persistentVolumes
 - pgBouncer
 - podAnnotations
+- podManagementPolicy
 - prometheus
 - rbac
 - readinessProbe
@@ -40,6 +41,9 @@ required:
 - unsafe
 additionalProperties: false
 properties:
+  podManagementPolicy:
+    type:
+    - string
   postInit:
     description: |
       postInit allows you to configure additional scripts that will be run once
