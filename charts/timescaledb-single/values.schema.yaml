@@ -378,6 +378,19 @@ properties:
       enabling pgBouncer will run an extra container in every Pod, serving a pgBouncer
       pass-through instance
     properties:
+      pg_hba:
+        description: |
+          The pg_hba configuration that will be used by pgBouncer
+        type: array
+        items:
+          type: string
+      userListSecretName:
+        description: |
+          A pointer to a SecretName containing user/password pairs in the format expected by pgbouncer
+          https://www.pgbouncer.org/config.html#authentication-file-format
+        type:
+        - string
+        - "null"
       enabled:
         type: boolean
         default: false
