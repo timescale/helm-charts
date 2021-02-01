@@ -30,6 +30,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
 | `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname  |
 | `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
+| `loadBalancer.enabled`            | If enabled, creates a LB for the access node| `true`                                              |
 | `postgresql.databases`            | List of databases to automatically create a multinode setup for | `["postgres", "example"]`       |
 | `postgresql.parameters`           | [PostgreSQL parameters](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-CONFIGURATION-FILE)) | Some required and preferred settings |
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
