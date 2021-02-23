@@ -28,8 +28,13 @@ spec:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
         cluster-name: {{ template "clusterName" . }}
-{{- if .Values.podAnnotations }}
       annotations:
+        checksum/config-pgbackrest: {{ include (print $.Template.BasePath "/configmap-pgbackrest.yaml") . | sha256sum }}
+        checksum/config-patroni: {{ include (print $.Template.BasePath "/configmap-patroni.yaml") . | sha256sum }}
+{{- if .Values.pgBouncer.enabled }}
+        checksum/config-pgbouncer: {{ include (print $.Template.BasePath "/configmap-pgbouncer.yaml") . | sha256sum }}
+{{- end}}
+{{- if .Values.podAnnotations }}
 {{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
