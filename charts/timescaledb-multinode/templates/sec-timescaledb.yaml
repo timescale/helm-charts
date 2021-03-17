@@ -1,6 +1,7 @@
 # This file and its contents are licensed under the Apache License 2.0.
 # Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 
+{{- if .Values.credentials.fromValues }}
 ---
 apiVersion: v1
 kind: Secret
@@ -29,3 +30,4 @@ type: Opaque
 data:
   password-superuser: {{ .Values.credentials.dataNode.superuser | b64enc }}
 ...
+{{- end }}
