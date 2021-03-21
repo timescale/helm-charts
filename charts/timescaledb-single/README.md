@@ -113,7 +113,7 @@ chart itself.
 * And install the chart:
 
   ```console
-  helm install --name my-release .
+  helm install my-release .
   ```
 
 To keep the repo up to date with new versions you can do:
