@@ -15,6 +15,12 @@ metadata:
   annotations:
 {{ .Values.loadBalancer.annotations | toYaml | indent 4 }}
 spec:
+{{- if not .Values.patroni.kubernetes.use_endpoints }}
+  selector:
+    app: {{ template "timescaledb.fullname" . }}
+    cluster-name: {{ template "clusterName" . }}
+    role: master
+{{- end -}}
 {{- if .Values.loadBalancer.enabled }}
   type: LoadBalancer
 {{- else }}
