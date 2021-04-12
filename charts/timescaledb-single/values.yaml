@@ -19,8 +19,8 @@ version:
 image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
-  repository: timescaledev/timescaledb-ha
-  tag: pg12-ts2.0-latest
+  repository: timescale/timescaledb-ha
+  tag: pg12-ts2.1-latest
   pullPolicy: Always
 
 # These secrets should exist before the Helm is used to deploy this TimescaleDB.

@@ -19,7 +19,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `nameOverride`                    | Override the name of the chart              | `timescaledb`                                       |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
 | `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
-| `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
+| `image.repository`                | The image to pull                           | `timescale/timescaledb-ha`                          |
 | `image.tag`                       | The version of the image to pull            | `pg12.5-ts2.0.0-p0`
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `credentials.accessNode.superuser`| Password of the superuser for the Access Node | `tea`                                             |
