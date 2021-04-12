@@ -35,7 +35,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `image.repository`                | The image to pull                           | `timescale/timescaledb-ha`                       |
-| `image.tag`                       | The version of the image to pull            | `pg12-ts2.0-latest`
+| `image.tag`                       | The version of the image to pull            | `pg13-ts2.1-latest`
 | `loadBalancer.annotations`        | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
 | `loadBalancer.enabled`            | If enabled, creates a LB for the primary    | `true`                                              |
 | `loadBalancer.extraSpec`          | Extra configuration for service spec        | `nil`                                               |
@@ -159,7 +159,7 @@ at: https://pgbackrest.org/command.html#introduction
     ```yaml
     # Filename: myvalues.yaml
     image:
-      tag: pg12.5-ts2.0.0-p0
+      tag: pg13.2-ts2.1.1-p1
       pullPolicy: Always
     patroni:
       postgresql:
