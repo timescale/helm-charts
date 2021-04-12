@@ -34,7 +34,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `envFrom`                         | Extra custom environment variables, expressed as [EnvFrom](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envfromsource-v1-core) | `[]`                                                |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
-| `image.repository`                | The image to pull                           | `timescaledev/timescaledb-ha`                       |
+| `image.repository`                | The image to pull                           | `timescale/timescaledb-ha`                       |
 | `image.tag`                       | The version of the image to pull            | `pg12-ts2.0-latest`
 | `loadBalancer.annotations`        | Pass on annotations to the Load Balancer    | An AWS ELB annotation to increase the idle timeout  |
 | `loadBalancer.enabled`            | If enabled, creates a LB for the primary    | `true`                                              |
