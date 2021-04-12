@@ -4,15 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.8.2 - 2020-01-13]
+## [v0.9.0 - 2020-08-14]
+
+The reason for the bump in minor version is that the default PostgreSQL version is changed from 12 to 13,
+which is an incompatible change for older deployments.
+### Changed
+ * Use the PostgreSQL 13 Docker Image by default
+
+## [v0.8.2 - 2021-01-13]
 ### Fixed
  * Allow `podManagementPolicy` to be specified in the `values.yaml`
 
-## [v0.8.1 - 2020-01-13]
+## [v0.8.1 - 2021-01-13]
 ### Fixed
  * Port name for postgres-exporter fits the k8s constraints
 
-## [v0.8.0 - 2020-01-12]
+## [v0.8.0 - 2021-01-12]
 
 ### Added
  * Validate `values` schema

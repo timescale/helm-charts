@@ -22,7 +22,7 @@ High Availability (HA) configuration on Kubernetes. This chart will do the follo
 
 - Creates three (by default) pods using a Kubernetes [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
 - Each pod has a container created using the [TimescaleDB Docker image](https://github.com/timescale/timescaledb-docker-ha).
-  - TimescaleDB 1.7 and PG 12
+  - TimescaleDB 2.1 and PG 13
 - Each of the containers runs a TimescaleDB instance and [Patroni](https://patroni.readthedocs.io/en/latest/) agent.
 - Each TimescaleDB instance is configured for replication (1 Master + 2 Replicas).
 
