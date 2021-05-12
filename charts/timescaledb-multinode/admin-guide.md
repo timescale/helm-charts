@@ -23,6 +23,8 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.tag`                       | The version of the image to pull            | `pg12.5-ts2.0.0-p0`
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `credentials.accessNode.superuser`| Password of the superuser for the Access Node | `tea`                                             |
+| `accessNode.service.type`         | Setup external access using LoadBalancer or ClusterIP  | `LoadBalancer`                           |
+| `credentials.fromValues`          | Load credentials from values.yaml           | `true`                                              |
 | `credentials.dataNode.superuser`  | Password of the superuser for the Data Nodes  | `coffee`                                          |
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core) | `PGDATA` and some language settings |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
