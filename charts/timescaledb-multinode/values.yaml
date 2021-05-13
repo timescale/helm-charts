@@ -14,8 +14,14 @@ image:
   tag: pg12-ts2.0.0-p0
   pullPolicy: IfNotPresent
 
+#enable external access using LoadBalancer
+accessNode:
+  service:
+    type: LoadBalancer
+
 # Credentials used by PostgreSQL
 credentials:
+  fromValues: true
   accessNode:
     superuser: tea
   dataNode:
