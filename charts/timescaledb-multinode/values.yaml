@@ -95,6 +95,7 @@ postgresql:
       temp_file_limit: 1GB
 
     access_node:
+      max_prepared_transactions: 150
       enable_partitionwise_aggregate: on
       jit: off
 
