@@ -56,7 +56,6 @@ postgresql:
       #   cpu: 100m
       #   memory: 128Mi
     parameters:
-      max_connections: 100
       max_prepared_transactions: 150
       # This is rather small, but as this Helm Chart may be used to spin up
       # 1 access node and 4 data nodes on a single minikube/microk8s this is set
@@ -64,12 +63,6 @@ postgresql:
       shared_buffers: 300MB
       work_mem: 16MB
       timescaledb.passfile: '../.pgpass'
-      log_connections: 'on'
-      log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
-      log_min_duration_statement: '1s'
-      log_statement: ddl
-      log_checkpoints: 'on'
-      log_lock_waits: 'on'
       # These values are set as the default data volume size
       # is small as well.
       min_wal_size: 256MB
@@ -98,6 +91,21 @@ postgresql:
     parameters:
       enable_partitionwise_aggregate: on
       jit: off
+      max_connections: 100
+      shared_buffers: 300MB
+      work_mem: 16MB
+      timescaledb.passfile: '../.pgpass'
+      log_connections: 'on'
+      log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
+      log_min_duration_statement: '1s'
+      log_statement: ddl
+      log_checkpoints: 'on'
+      log_lock_waits: 'on'
+      # These values are set as the default data volume size
+      # is small as well.
+      min_wal_size: 256MB
+      max_wal_size: 512MB
+      temp_file_limit: 1GB
 
     persistentVolume:
       enabled: true
