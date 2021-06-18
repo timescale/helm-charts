@@ -41,39 +41,21 @@ env:
     # a Docker Volume in many Docker images, which means the data is not actually persisted.
     value: /var/lib/postgresql/pgdata
 
-persistentVolume:
-  enabled: true
-  size: 5G
-  ## database data Persistent Volume Storage Class
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
-  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-  ##   GKE, AWS & OpenStack)
-  ##
-  # storageClass: "-"
-  subPath: ""
-  mountPath: "/var/lib/postgresql"
-  annotations: {}
-  accessModes:
-    - ReadWriteOnce
-
-resources: {}
-  # If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
 postgresql:
   databases:
     - postgres
     - example
-  parameters:
-    data_node:
+  data_node:
+    resources: {}
+      # If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+    parameters:
       max_connections: 100
       max_prepared_transactions: 150
       # This is rather small, but as this Helm Chart may be used to spin up
@@ -94,10 +76,37 @@ postgresql:
       max_wal_size: 512MB
       temp_file_limit: 1GB
 
-    access_node:
-      max_prepared_transactions: 150
+    persistentVolume:
+      enabled: true
+      size: 5G
+      ## database data Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      ##
+      # storageClass: "-"
+      subPath: ""
+      mountPath: "/var/lib/postgresql"
+      annotations: {}
+      accessModes:
+        - ReadWriteOnce
+
+  access_node:
+    resources: {}
+    parameters:
       enable_partitionwise_aggregate: on
       jit: off
+
+    persistentVolume:
+      enabled: true
+      size: 5G
+      subPath: ""
+      mountPath: "/var/lib/postgresql"
+      annotations: {}
+      accessModes:
+        - ReadWriteOnce
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
 nodeSelector: {}
