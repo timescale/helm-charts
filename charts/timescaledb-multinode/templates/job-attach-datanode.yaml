@@ -1,8 +1,8 @@
 # This file and its contents are licensed under the Apache License 2.0.
 # Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 
-{{- range $pod, $e := until ( .Values.dataNodes | int) }}
-{{- range $index, $dbname := $.Values.postgresql.databases }}
+{{- range $pod, $e := until ( .Values.data_node.replicas | int) }}
+{{- range $index, $dbname := $.Values.access_node.postgresql.databases }}
 ---
 apiVersion: batch/v1
 kind: Job

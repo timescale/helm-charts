@@ -12,7 +12,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   serviceName: {{ template "timescaledb.dataname" . }}
-  replicas: {{ .Values.dataNodes }}
+  replicas: {{ .Values.data_node.replicas }}
   podManagementPolicy: Parallel
   selector:
     matchLabels:
@@ -44,7 +44,7 @@ spec:
         env:
         - name: POSTGRESQL_CUSTOM_PARAMETERS
           value: |
-            {{- range $key, $value := .Values.postgresql.data_node.parameters }}
+            {{- range $key, $value := .Values.data_node.postgresql.parameters }}
             {{ printf "%s = '%s'" $key ($value | toString) }}
             {{- end }}
         - name: POSTGRES_PASSWORD
@@ -76,8 +76,8 @@ spec:
             echo "DROP EXTENSION timescaledb" | /docker-entrypoint.sh postgres --single -D "${PGDATA}" template1
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.postgresql.data_node.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.postgresql.data_node.persistentVolume.subPath }}"
+          mountPath: "{{ .Values.data_node.postgresql.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.data_node.postgresql.persistentVolume.subPath }}"
       containers:
       - name: timescaledb
         securityContext:
@@ -102,10 +102,10 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.postgresql.data_node.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.postgresql.data_node.persistentVolume.subPath }}"
+          mountPath: "{{ .Values.data_node.postgresql.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.data_node.postgresql.persistentVolume.subPath }}"
         resources:
-{{ toYaml .Values.postgresql.data_node.resources | indent 10 }}
+{{ toYaml .Values.data_node.postgresql.resources | indent 10 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -124,17 +124,17 @@ spec:
       affinity:
 {{ tpl .Values.affinityTemplate . | indent 8 }}
     {{- end }}
-      {{- if not .Values.postgresql.data_node.persistentVolume.enabled }}
+      {{- if not .Values.data_node.postgresql.persistentVolume.enabled }}
       - name: storage-volume
         emptyDir: {}
       {{- end }}
-  {{- if .Values.postgresql.data_node.persistentVolume.enabled }}
+  {{- if .Values.data_node.postgresql.persistentVolume.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: storage-volume
         annotations:
-        {{- if .Values.postgresql.data_node.persistentVolume.annotations }}
-{{ toYaml .Values.postgresql.data_node.persistentVolume.annotations | indent 8 }}
+        {{- if .Values.data_node.postgresql.persistentVolume.annotations }}
+{{ toYaml .Values.data_node.postgresql.persistentVolume.annotations | indent 8 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
@@ -142,15 +142,15 @@ spec:
           heritage: {{ .Release.Service }}
       spec:
         accessModes:
-{{ toYaml .Values.postgresql.data_node.persistentVolume.accessModes | indent 8 }}
+{{ toYaml .Values.data_node.postgresql.persistentVolume.accessModes | indent 8 }}
         resources:
           requests:
-            storage: "{{ .Values.postgresql.data_node.persistentVolume.size }}"
-      {{- if .Values.postgresql.data_node.persistentVolume.storageClass }}
-      {{- if (eq "-" .Values.postgresql.data_node.persistentVolume.storageClass) }}
+            storage: "{{ .Values.data_node.postgresql.persistentVolume.size }}"
+      {{- if .Values.data_node.postgresql.persistentVolume.storageClass }}
+      {{- if (eq "-" .Values.data_node.postgresql.persistentVolume.storageClass) }}
         storageClassName: ""
       {{- else }}
-        storageClassName: "{{ .Values.postgresql.data_node.persistentVolume.storageClass }}"
+        storageClassName: "{{ .Values.data_node.postgresql.persistentVolume.storageClass }}"
       {{- end }}
       {{- end }}
   {{- end }}
