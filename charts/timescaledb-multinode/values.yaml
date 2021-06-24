@@ -34,7 +34,7 @@ env:
     # a Docker Volume in many Docker images, which means the data is not actually persisted.
     value: /var/lib/postgresql/pgdata
 
-access_node:
+accessNode:
   #enable external access using LoadBalancer
   service:
     type: LoadBalancer
@@ -71,7 +71,11 @@ access_node:
       accessModes:
         - ReadWriteOnce
 
-data_node:
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+dataNode:
   replicas: 3
   resources: {}
     # If you do want to specify resources, uncomment the following
@@ -114,24 +118,9 @@ data_node:
       accessModes:
         - ReadWriteOnce
 
-# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-nodeSelector: {}
-
-# https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-tolerations: []
-
-# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-affinityTemplate: |
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 100
-      podAffinityTerm:
-        topologyKey: "kubernetes.io/hostname"
-        labelSelector:
-          matchLabels:
-            app:  {{ template "timescaledb.name" . }}
-            release: {{ .Release.Name | quote }}
-affinity: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
 
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
