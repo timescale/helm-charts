@@ -62,14 +62,14 @@ accessNode:
       max_wal_size: 512MB
       temp_file_limit: 1GB
 
-    persistentVolume:
-      enabled: true
-      size: 5G
-      subPath: ""
-      mountPath: "/var/lib/postgresql"
-      annotations: {}
-      accessModes:
-        - ReadWriteOnce
+  persistentVolume:
+    enabled: true
+    size: 5G
+    subPath: ""
+    mountPath: "/var/lib/postgresql"
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
 
     nodeSelector: {}
     tolerations: []
@@ -101,26 +101,40 @@ dataNode:
       max_wal_size: 512MB
       temp_file_limit: 1GB
 
-    persistentVolume:
-      enabled: true
-      size: 5G
-      ## database data Persistent Volume Storage Class
-      ## If defined, storageClassName: <storageClass>
-      ## If set to "-", storageClassName: "", which disables dynamic provisioning
-      ## If undefined (the default) or set to null, no storageClassName spec is
-      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-      ##   GKE, AWS & OpenStack)
-      ##
-      # storageClass: "-"
-      subPath: ""
-      mountPath: "/var/lib/postgresql"
-      annotations: {}
-      accessModes:
-        - ReadWriteOnce
+  persistentVolume:
+    enabled: true
+    size: 5G
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    # storageClass: "-"
+    subPath: ""
+    mountPath: "/var/lib/postgresql"
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
 
     nodeSelector: {}
     tolerations: []
     affinity: {}
+
+
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinityTemplate: |
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        topologyKey: "kubernetes.io/hostname"
+        labelSelector:
+          matchLabels:
+            app:  {{ template "timescaledb.name" . }}
+            release: {{ .Release.Name | quote }}
+affinity: {}
 
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/

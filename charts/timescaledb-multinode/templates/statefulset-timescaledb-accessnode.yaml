@@ -81,8 +81,8 @@ spec:
             chmod 0600 "${PGDATA}/../.pgpass"
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.accessNode.postgresql.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.accessNode.postgresql.persistentVolume.subPath }}"
+          mountPath: "{{ .Values.accessNode.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.accessNode.persistentVolume.subPath }}"
       containers:
       - name: timescaledb
         securityContext:
@@ -107,8 +107,8 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.accessNode.postgresql.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.accessNode.postgresql.persistentVolume.subPath }}"
+          mountPath: "{{ .Values.accessNode.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.accessNode.persistentVolume.subPath }}"
         resources:
 {{ toYaml .Values.accessNode.postgresql.resources | indent 10 }}
     {{- with .Values.accessNode.nodeSelector }}
@@ -122,19 +122,24 @@ spec:
     {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName }}
     {{- end }}
+    {{- if .Values.affinity }}
       affinity:
 {{ .Values.affinity | toYaml | indent 8 }}
-      {{- if not .Values.accessNode.postgresql.persistentVolume.enabled }}
+    {{- else if .Values.affinityTemplate }}
+      affinity:
+{{ tpl .Values.affinityTemplate . | indent 8 }}
+    {{- end }}
+      {{- if not .Values.accessNode.persistentVolume.enabled }}
       - name: storage-volume
         emptyDir: {}
       {{- end }}
-  {{- if .Values.accessNode.postgresql.persistentVolume.enabled }}
+  {{- if .Values.accessNode.persistentVolume.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: storage-volume
         annotations:
-        {{- if .Values.accessNode.postgresql.persistentVolume.annotations }}
-{{ toYaml .Values.accessNode.postgresql.persistentVolume.annotations | indent 8 }}
+        {{- if .Values.accessNode.persistentVolume.annotations }}
+{{ toYaml .Values.accessNode.persistentVolume.annotations | indent 8 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
@@ -142,15 +147,15 @@ spec:
           heritage: {{ .Release.Service }}
       spec:
         accessModes:
-{{ toYaml .Values.accessNode.postgresql.persistentVolume.accessModes | indent 8 }}
+{{ toYaml .Values.accessNode.persistentVolume.accessModes | indent 8 }}
         resources:
           requests:
-            storage: "{{ .Values.accessNode.postgresql.persistentVolume.size }}"
-      {{- if .Values.accessNode.postgresql.persistentVolume.storageClass }}
-      {{- if (eq "-" .Values.accessNode.postgresql.persistentVolume.storageClass) }}
+            storage: "{{ .Values.accessNode.persistentVolume.size }}"
+      {{- if .Values.accessNode.persistentVolume.storageClass }}
+      {{- if (eq "-" .Values.accessNode.persistentVolume.storageClass) }}
         storageClassName: ""
       {{- else }}
-        storageClassName: "{{ .Values.accessNode.postgresql.persistentVolume.storageClass }}"
+        storageClassName: "{{ .Values.accessNode.persistentVolume.storageClass }}"
       {{- end }}
       {{- end }}
   {{- end }}

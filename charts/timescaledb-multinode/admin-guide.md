@@ -29,7 +29,8 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core) | `PGDATA` and some language settings |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
-| `tolerations`                     | List of node taints to tolerate             | `[]`                                                
+| `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
+| `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname  |
 | `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
 | `postgresql.databases`            | List of databases to automatically create a multinode setup for | `["postgres", "example"]`       |
 | `postgresql.parameters`           | [PostgreSQL parameters](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-CONFIGURATION-FILE)) | Some required and preferred settings |
@@ -122,7 +123,7 @@ kubectl logs $(kubectl get pod -l release=my-release,timescaleNodeType=access) t
 
 ### Verify multinode topology
 ```console
-$ kubectl exec -ti $(kubectl get pod -l timescaleNodeType=access -o name) -c timescaledb -- psql -d example -c 'select node_name from timescaledb_information.dataNodes'
+$ kubectl exec -ti $(kubectl get pod -l timescaleNodeType=access -o name) -c timescaledb -- psql -d example -c 'select node_name from timescaledb_information.data_nodes'
 ```
 ```text
            node_name
