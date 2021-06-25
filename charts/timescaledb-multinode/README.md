@@ -24,6 +24,7 @@ To install the chart as a release and name it `my-release`:
 ```console
 helm upgrade --install my-release .
 ```
+Configurations can be defined seprately for each node type - access node and data node.
 
 You can override parameters using the `--set key=value[,key=value]` argument to `helm upgrade --install`,
 e.g., to install the chart with randomly generated passwords:
@@ -38,6 +39,7 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 ```console
 helm upgrade --install my-release -f myvalues.yaml .
 ```
+
 ### Secret override
 
 Instead of setting secrets in values.yaml, they can be manually generated. The following example is for timescaledb-access node and timescaledb-data node.

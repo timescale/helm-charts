@@ -1,8 +1,6 @@
 # This file and its contents are licensed under the Apache License 2.0.
 # Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 
-dataNodes: 3
-
 # To prevent very long names, we override the name, otherwise it would default to
 # timescaledb-multinode (the name of the chart)
 nameOverride: timescaledb
@@ -13,11 +11,6 @@ image:
   repository: timescale/timescaledb-ha
   tag: pg12-ts2.0.0-p0
   pullPolicy: IfNotPresent
-
-#enable external access using LoadBalancer
-accessNode:
-  service:
-    type: LoadBalancer
 
 # Credentials used by PostgreSQL
 credentials:
@@ -41,63 +34,94 @@ env:
     # a Docker Volume in many Docker images, which means the data is not actually persisted.
     value: /var/lib/postgresql/pgdata
 
-persistentVolume:
-  enabled: true
-  size: 5G
-  ## database data Persistent Volume Storage Class
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
-  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-  ##   GKE, AWS & OpenStack)
-  ##
-  # storageClass: "-"
-  subPath: ""
-  mountPath: "/var/lib/postgresql"
-  annotations: {}
-  accessModes:
-    - ReadWriteOnce
+accessNode:
+  #enable external access using LoadBalancer
+  service:
+    type: LoadBalancer
+  resources: {}
+  postgresql:
+    databases:
+      - postgres
+      - example
+    parameters:
+      enable_partitionwise_aggregate: on
+      jit: off
+      max_connections: 100
+      shared_buffers: 300MB
+      work_mem: 16MB
+      timescaledb.passfile: '../.pgpass'
+      log_connections: 'on'
+      log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
+      log_min_duration_statement: '1s'
+      log_statement: ddl
+      log_checkpoints: 'on'
+      log_lock_waits: 'on'
+      # These values are set as the default data volume size
+      # is small as well.
+      min_wal_size: 256MB
+      max_wal_size: 512MB
+      temp_file_limit: 1GB
 
-resources: {}
-  # If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  persistentVolume:
+    enabled: true
+    size: 5Gi
+    subPath: ""
+    mountPath: "/var/lib/postgresql"
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
 
-postgresql:
-  databases:
-    - postgres
-    - example
-  parameters:
-    max_connections: 100
-    max_prepared_transactions: 150
-    # This is rather small, but as this Helm Chart may be used to spin up
-    # 1 access node and 4 data nodes on a single minikube/microk8s this is set
-    # to a conservative value
-    shared_buffers: 300MB
-    work_mem: 16MB
-    timescaledb.passfile: '../.pgpass'
-    log_connections: 'on'
-    log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
-    log_min_duration_statement: '1s'
-    log_statement: ddl
-    log_checkpoints: 'on'
-    log_lock_waits: 'on'
-    # These values are set as the default data volume size
-    # is small as well.
-    min_wal_size: 256MB
-    max_wal_size: 512MB
-    temp_file_limit: 1GB
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
 
-# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-nodeSelector: {}
+dataNode:
+  replicas: 3
+  resources: {}
+    # If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  postgresql:
+    parameters:
+      max_prepared_transactions: 150
+      # This is rather small, but as this Helm Chart may be used to spin up
+      # 1 access node and 4 data nodes on a single minikube/microk8s this is set
+      # to a conservative value
+      shared_buffers: 300MB
+      work_mem: 16MB
+      timescaledb.passfile: '../.pgpass'
+      # These values are set as the default data volume size
+      # is small as well.
+      min_wal_size: 256MB
+      max_wal_size: 512MB
+      temp_file_limit: 1GB
 
-# https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-tolerations: []
+  persistentVolume:
+    enabled: true
+    size: 5Gi
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    # storageClass: "-"
+    subPath: ""
+    mountPath: "/var/lib/postgresql"
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
+
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 affinityTemplate: |
