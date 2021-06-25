@@ -64,7 +64,7 @@ accessNode:
 
   persistentVolume:
     enabled: true
-    size: 5G
+    size: 5Gi
     subPath: ""
     mountPath: "/var/lib/postgresql"
     annotations: {}
@@ -103,7 +103,7 @@ dataNode:
 
   persistentVolume:
     enabled: true
-    size: 5G
+    size: 5Gi
     ## database data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
