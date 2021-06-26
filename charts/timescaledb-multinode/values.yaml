@@ -71,9 +71,9 @@ accessNode:
     accessModes:
       - ReadWriteOnce
 
-    nodeSelector: {}
-    tolerations: []
-    affinity: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
 
 dataNode:
   replicas: 3
@@ -118,10 +118,9 @@ dataNode:
     accessModes:
       - ReadWriteOnce
 
-    nodeSelector: {}
-    tolerations: []
-    affinity: {}
-
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 affinityTemplate: |
