@@ -117,9 +117,9 @@ spec:
     {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName }}
     {{- end }}
-    {{- if .Values.affinity }}
+    {{- if .Values.dataNode.affinity }}
       affinity:
-{{ .Values.affinity | toYaml | indent 8 }}
+{{ .Values.dataNode.affinity | toYaml | indent 8 }}
     {{- else if .Values.affinityTemplate }}
       affinity:
 {{ tpl .Values.affinityTemplate . | indent 8 }}
