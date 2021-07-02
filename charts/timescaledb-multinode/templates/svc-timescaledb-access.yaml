@@ -15,6 +15,9 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "4000"
 spec:
   type: {{ .Values.accessNode.service.type }}
+  {{- if .Values.accessNode.service.headless }}
+  clusterIP: None
+  {{- end }}
   ports:
   - name: postgresql
     port: 5432
