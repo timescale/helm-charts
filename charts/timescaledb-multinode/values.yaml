@@ -38,7 +38,6 @@ accessNode:
   #enable external access using LoadBalancer
   service:
     type: LoadBalancer
-    headless: true
   resources: {}
   postgresql:
     databases:

@@ -38,6 +38,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 |       Parameter                              |           Description                       |                         Default                     |
 |----------------------------------------------|---------------------------------------------|-----------------------------------------------------|
 | `accessNode.service.type`                    | Setup external access using LoadBalancer or ClusterIP  | `LoadBalancer`                           |
+| `accessNode.service.clusterIP`               | Setup service to run in headless mode or with static IP| `nil`                           |
 | `accessNode.resources`                       | Any resources you wish to assign to the Access Node pod |`{}`                                                |
 | `accessNode.postgresql.databases`            | List of databases to automatically create a multinode setup for | `["postgres", "example"]`       |
 | `accessNode.postgresql.parameters`           | [PostgreSQL parameters](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-CONFIGURATION-FILE)) | Some required and preferred settings |
