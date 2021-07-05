@@ -131,6 +131,7 @@ access:
   service:
     type: ClusterIP
 ```
+Additionaly, when running the service as ClusterIP, you can specify a static IP addess or run service in headless mode by setting `accessNode.service.clusterIP` to `None`
 
 From inside a pod in the Kubernetes cluster, you need to use the
 internal DNS address, e.g.,
