@@ -105,7 +105,7 @@ spec:
           mountPath: "{{ .Values.dataNode.persistentVolume.mountPath }}"
           subPath: "{{ .Values.dataNode.persistentVolume.subPath }}"
         resources:
-{{ toYaml .Values.dataNode.postgresql.resources | indent 10 }}
+{{ toYaml .Values.dataNode.resources | indent 10 }}
     {{- with .Values.dataNode.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
