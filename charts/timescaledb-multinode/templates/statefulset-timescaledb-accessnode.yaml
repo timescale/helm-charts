@@ -110,7 +110,7 @@ spec:
           mountPath: "{{ .Values.accessNode.persistentVolume.mountPath }}"
           subPath: "{{ .Values.accessNode.persistentVolume.subPath }}"
         resources:
-{{ toYaml .Values.accessNode.postgresql.resources | indent 10 }}
+{{ toYaml .Values.accessNode.resources | indent 10 }}
     {{- with .Values.accessNode.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
