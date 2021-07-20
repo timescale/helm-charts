@@ -26,6 +26,9 @@ spec:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
         timescaleNodeType: access
+        {{ with .Values.accessNode.extraPodLabels -}}
+{{ toYaml . }}
+        {{- end }}
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
