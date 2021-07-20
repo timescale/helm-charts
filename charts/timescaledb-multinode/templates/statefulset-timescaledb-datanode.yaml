@@ -16,7 +16,7 @@ spec:
   podManagementPolicy: Parallel
   selector:
     matchLabels:
-      app: {{ template "timescaledb.fullname" . }}``
+      app: {{ template "timescaledb.fullname" . }}
       release: {{ .Release.Name }}
       timescaleNodeType: data
   template:
