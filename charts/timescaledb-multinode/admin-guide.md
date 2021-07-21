@@ -55,7 +55,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 ##### Data Nodes Parameters
 |       Parameter                            |           Description                       |                         Default                     |
 |--------------------------------------------|---------------------------------------------|-----------------------------------------------------|
-| `dataNode.replicas`                        | Number of Data Node replicas  | `3`                          |
+| `dataNode.instances`                        | Number of Data Node instances  | `3`                          |
 | `dataNode.resources`                       | Any resources you wish to assign to the Access Node pod | `{}`                                                |
 | `dataNode.postgresql.parameters`           | [PostgreSQL parameters](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-CONFIGURATION-FILE)) | Some required and preferred settings |
 | `dataNode.persistentVolume.accessModes`    | Persistent Volume access modes              | `[ReadWriteOnce]`                                   |

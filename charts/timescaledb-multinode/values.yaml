@@ -78,7 +78,7 @@ accessNode:
 
 dataNode:
   extraPodLabels: {}
-  replicas: 3
+  instances: 3
   resources: {}
     # If you do want to specify resources, uncomment the following
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.

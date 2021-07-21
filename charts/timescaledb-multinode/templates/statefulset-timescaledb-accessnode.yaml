@@ -12,7 +12,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   serviceName: {{ template "timescaledb.accessname" . }}
-  replicas: 1
+  instances: 1
   podManagementPolicy: Parallel
   selector:
     matchLabels:
