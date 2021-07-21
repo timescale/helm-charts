@@ -26,7 +26,7 @@ spec:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
         timescaleNodeType: access
-        {{ with .Values.accessNode.extraPodLabels -}}
+        {{- with .Values.accessNode.extraPodLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
