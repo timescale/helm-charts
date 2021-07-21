@@ -26,7 +26,7 @@ spec:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
         timescaleNodeType: data
-        {{ with .Values.dataNode.extraPodLabels -}}
+        {{- with .Values.dataNode.extraPodLabels }}
         {{ toYaml . }}
         {{- end }}
     spec:
