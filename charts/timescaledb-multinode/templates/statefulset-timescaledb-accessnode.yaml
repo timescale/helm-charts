@@ -26,6 +26,9 @@ spec:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
         timescaleNodeType: access
+        {{- with .Values.accessNode.extraPodLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
@@ -44,7 +47,7 @@ spec:
         env:
         - name: POSTGRESQL_CUSTOM_PARAMETERS
           value: |
-            {{- range $key, $value := .Values.postgresql.parameters }}
+            {{- range $key, $value := .Values.accessNode.postgresql.parameters }}
             {{ printf "%s = '%s'" $key ($value | toString) }}
             {{- end }}
         - name: POSTGRES_PASSWORD
@@ -81,8 +84,8 @@ spec:
             chmod 0600 "${PGDATA}/../.pgpass"
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.persistentVolume.subPath }}"
+          mountPath: "{{ .Values.accessNode.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.accessNode.persistentVolume.subPath }}"
       containers:
       - name: timescaledb
         securityContext:
@@ -107,39 +110,39 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.persistentVolume.subPath }}"
+          mountPath: "{{ .Values.accessNode.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.accessNode.persistentVolume.subPath }}"
         resources:
-{{ toYaml .Values.resources | indent 10 }}
-    {{- with .Values.nodeSelector }}
+{{ toYaml .Values.accessNode.resources | indent 10 }}
+    {{- with .Values.accessNode.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- with .Values.tolerations }}
+    {{- with .Values.accessNode.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
     {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName }}
     {{- end }}
-    {{- if .Values.affinity }}
+    {{- if .Values.accessNode.affinity }}
       affinity:
-{{ .Values.affinity | toYaml | indent 8 }}
+{{ .Values.accessNode.affinity | toYaml | indent 8 }}
     {{- else if .Values.affinityTemplate }}
       affinity:
 {{ tpl .Values.affinityTemplate . | indent 8 }}
     {{- end }}
-      {{- if not .Values.persistentVolume.enabled }}
+      {{- if not .Values.accessNode.persistentVolume.enabled }}
       - name: storage-volume
         emptyDir: {}
       {{- end }}
-  {{- if .Values.persistentVolume.enabled }}
+  {{- if .Values.accessNode.persistentVolume.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: storage-volume
         annotations:
-        {{- if .Values.persistentVolume.annotations }}
-{{ toYaml .Values.persistentVolume.annotations | indent 8 }}
+        {{- if .Values.accessNode.persistentVolume.annotations }}
+{{ toYaml .Values.accessNode.persistentVolume.annotations | indent 8 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
@@ -147,15 +150,15 @@ spec:
           heritage: {{ .Release.Service }}
       spec:
         accessModes:
-{{ toYaml .Values.persistentVolume.accessModes | indent 8 }}
+{{ toYaml .Values.accessNode.persistentVolume.accessModes | indent 8 }}
         resources:
           requests:
-            storage: "{{ .Values.persistentVolume.size }}"
-      {{- if .Values.persistentVolume.storageClass }}
-      {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+            storage: "{{ .Values.accessNode.persistentVolume.size }}"
+      {{- if .Values.accessNode.persistentVolume.storageClass }}
+      {{- if (eq "-" .Values.accessNode.persistentVolume.storageClass) }}
         storageClassName: ""
       {{- else }}
-        storageClassName: "{{ .Values.persistentVolume.storageClass }}"
+        storageClassName: "{{ .Values.accessNode.persistentVolume.storageClass }}"
       {{- end }}
       {{- end }}
   {{- end }}

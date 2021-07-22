@@ -24,6 +24,7 @@ To install the chart as a release and name it `my-release`:
 ```console
 helm upgrade --install my-release .
 ```
+Configurations can be defined seprately for each node type - access node and data node.
 
 You can override parameters using the `--set key=value[,key=value]` argument to `helm upgrade --install`,
 e.g., to install the chart with randomly generated passwords:
@@ -37,6 +38,21 @@ helm upgrade --install my-release . \
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 ```console
 helm upgrade --install my-release -f myvalues.yaml .
+```
+
+### Secret override
+
+Instead of setting secrets in values.yaml, they can be manually generated. The following example is for timescaledb-access node and timescaledb-data node.
+
+In values.yaml set:
+```console
+credentials:
+  fromValues: false
+```
+
+```console
+kubectl create secret generic `my-release`-access --from-literal=password-superuser='<manually_generated_timescaledb-access_password>'
+kubectl create secret generic `my-release`-data --from-literal=password-superuser='<manually_generated_client_timescaledb-data_password>'
 ```
 
 For details about what parameters you can set, have a look at the [Administrator Guide](admin-guide.md#configure)
@@ -108,6 +124,14 @@ our [TimescaleDB > Tutorial: Scaling out TimescaleDB](https://docs.timescale.com
 to create distributed hypertables and start using multinode TimescaleDB.
 
 ### Connecting from another pod
+If you are connecting from inside a pod in the Kubernetes cluster set service type to ClusterIP. Edit the following in values.yaml:
+
+```console
+access:
+  service:
+    type: ClusterIP
+```
+Additionaly, when running the service as ClusterIP, you can specify a static IP addess or run service in headless mode by setting `accessNode.service.clusterIP` to `None`
 
 From inside a pod in the Kubernetes cluster, you need to use the
 internal DNS address, e.g.,

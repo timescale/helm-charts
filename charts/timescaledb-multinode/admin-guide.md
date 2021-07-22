@@ -14,34 +14,59 @@ Please see the included NOTICE for copyright information and LICENSE for a copy 
 ## Configuration
 The following table lists the configurable parameters of the TimescaleDB Helm chart and their default values.
 
+##### Global Parameters
 |       Parameter                   |           Description                       |                         Default                     |
 |-----------------------------------|---------------------------------------------|-----------------------------------------------------|
 | `nameOverride`                    | Override the name of the chart              | `timescaledb`                                       |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
-| `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
 | `image.repository`                | The image to pull                           | `timescale/timescaledb-ha`                          |
 | `image.tag`                       | The version of the image to pull            | `pg12.5-ts2.0.0-p0`
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
+| `credentials.fromValues`          | Load credentials from values.yaml           | `true`                                              |
 | `credentials.accessNode.superuser`| Password of the superuser for the Access Node | `tea`                                             |
 | `credentials.dataNode.superuser`  | Password of the superuser for the Data Nodes  | `coffee`                                          |
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core) | `PGDATA` and some language settings |
-| `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
-| `nodeSelector`                    | Node label to use for scheduling            | `{}`                                                |
-| `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
+| `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
 | `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname  |
 | `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
-| `postgresql.databases`            | List of databases to automatically create a multinode setup for | `["postgres", "example"]`       |
-| `postgresql.parameters`           | [PostgreSQL parameters](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-CONFIGURATION-FILE)) | Some required and preferred settings |
-| `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
-| `persistentVolume.accessModes`    | Persistent Volume access modes              | `[ReadWriteOnce]`                                   |
-| `persistentVolume.annotations`    | Annotations for Persistent Volume Claim`    | `{}`                                                |
-| `persistentVolume.mountPath`      | Persistent Volume mount root path           | `/var/lib/postgresql`                               |
-| `persistentVolume.size`           | Persistent Volume size                      | `5Gi`                                               |
-| `persistentVolume.storageClass`   | Persistent Volume Storage Class             | `volume.alpha.kubernetes.io/storage-class: default` |
-| `persistentVolume.subPath`        | Subdirectory of Persistent Volume to mount  | `""`                                                |
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |
+
+
+##### Access Node Parameters
+|       Parameter                              |           Description                       |                         Default                     |
+|----------------------------------------------|---------------------------------------------|-----------------------------------------------------|
+| `accessNode.service.type`                    | Setup external access using LoadBalancer or ClusterIP  | `LoadBalancer`                           |
+| `accessNode.service.clusterIP`               | Setup service to run in headless mode or with static IP| `nil`                           |
+| `accessNode.resources`                       | Any resources you wish to assign to the Access Node pod |`{}`                                                |
+| `accessNode.postgresql.databases`            | List of databases to automatically create a multinode setup for | `["postgres", "example"]`       |
+| `accessNode.postgresql.parameters`           | [PostgreSQL parameters](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-CONFIGURATION-FILE)) | Some required and preferred settings |
+| `accessNode.persistentVolume.accessModes`    | Persistent Volume access modes              | `[ReadWriteOnce]`                                   |
+| `accessNode.persistentVolume.annotations`    | Annotations for Persistent Volume Claim`    | `{}`                                                |
+| `accessNode.persistentVolume.mountPath`      | Persistent Volume mount root path           | `/var/lib/postgresql`                               |
+| `accessNode.persistentVolume.size`           | Persistent Volume size                      | `5Gi`                                               |
+| `accessNode.persistentVolume.storageClass`   | Persistent Volume Storage Class             | `volume.alpha.kubernetes.io/storage-class: default` |
+| `accessNode.persistentVolume.subPath`        | Subdirectory of Persistent Volume to mount  | `""`                                                |
+| `accessNode.nodeSelector`                    | Access Node label to use for scheduling     | `{}`                                                |
+| `accessNode.tolerations`                     | List of node taints to tolerate by Access Node | `[]`                                             |
+| `accessNode.affinity`                        | Affinity settings | `{}`                                    |
+
+##### Data Nodes Parameters
+|       Parameter                            |           Description                       |                         Default                     |
+|--------------------------------------------|---------------------------------------------|-----------------------------------------------------|
+| `dataNode.instances`                        | Number of Data Node instances  | `3`                          |
+| `dataNode.resources`                       | Any resources you wish to assign to the Access Node pod | `{}`                                                |
+| `dataNode.postgresql.parameters`           | [PostgreSQL parameters](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-CONFIGURATION-FILE)) | Some required and preferred settings |
+| `dataNode.persistentVolume.accessModes`    | Persistent Volume access modes              | `[ReadWriteOnce]`                                   |
+| `dataNode.persistentVolume.annotations`    | Annotations for Persistent Volume Claim`    | `{}`                                                |
+| `dataNode.persistentVolume.mountPath`      | Persistent Volume mount root path           | `/var/lib/postgresql`                               |
+| `dataNode.persistentVolume.size`           | Persistent Volume size                      | `5Gi`                                               |
+| `dataNode.persistentVolume.storageClass`   | Persistent Volume Storage Class             | `volume.alpha.kubernetes.io/storage-class: default` |
+| `dataNode.persistentVolume.subPath`        | Subdirectory of Persistent Volume to mount  | `""`                                                |
+| `dataNode.nodeSelector`                    | Access Node label to use for scheduling     | `{}`                                                |
+| `dataNode.tolerations`                     | List of node taints to tolerate by Access Node | `[]`                                             |
+| `dataNode.affinity`                        | Affinity settings | `{}`                                    |
 
 ### Examples
 - Override value using commandline parameters

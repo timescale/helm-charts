@@ -12,7 +12,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   serviceName: {{ template "timescaledb.dataname" . }}
-  replicas: {{ .Values.dataNodes }}
+  replicas: {{ .Values.dataNode.instances }}
   podManagementPolicy: Parallel
   selector:
     matchLabels:
@@ -26,6 +26,9 @@ spec:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
         timescaleNodeType: data
+        {{- with .Values.dataNode.extraPodLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
@@ -44,7 +47,7 @@ spec:
         env:
         - name: POSTGRESQL_CUSTOM_PARAMETERS
           value: |
-            {{- range $key, $value := .Values.postgresql.parameters }}
+            {{- range $key, $value := .Values.dataNode.postgresql.parameters }}
             {{ printf "%s = '%s'" $key ($value | toString) }}
             {{- end }}
         - name: POSTGRES_PASSWORD
@@ -76,8 +79,8 @@ spec:
             echo "DROP EXTENSION timescaledb" | /docker-entrypoint.sh postgres --single -D "${PGDATA}" template1
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.persistentVolume.subPath }}"
+          mountPath: "{{ .Values.dataNode.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.dataNode.persistentVolume.subPath }}"
       containers:
       - name: timescaledb
         securityContext:
@@ -102,39 +105,39 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - name: storage-volume
-          mountPath: "{{ .Values.persistentVolume.mountPath }}"
-          subPath: "{{ .Values.persistentVolume.subPath }}"
+          mountPath: "{{ .Values.dataNode.persistentVolume.mountPath }}"
+          subPath: "{{ .Values.dataNode.persistentVolume.subPath }}"
         resources:
-{{ toYaml .Values.resources | indent 10 }}
-    {{- with .Values.nodeSelector }}
+{{ toYaml .Values.dataNode.resources | indent 10 }}
+    {{- with .Values.dataNode.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- with .Values.tolerations }}
+    {{- with .Values.dataNode.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
     {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName }}
     {{- end }}
-    {{- if .Values.affinity }}
+    {{- if .Values.dataNode.affinity }}
       affinity:
-{{ .Values.affinity | toYaml | indent 8 }}
+{{ .Values.dataNode.affinity | toYaml | indent 8 }}
     {{- else if .Values.affinityTemplate }}
       affinity:
 {{ tpl .Values.affinityTemplate . | indent 8 }}
     {{- end }}
-      {{- if not .Values.persistentVolume.enabled }}
+      {{- if not .Values.dataNode.persistentVolume.enabled }}
       - name: storage-volume
         emptyDir: {}
       {{- end }}
-  {{- if .Values.persistentVolume.enabled }}
+  {{- if .Values.dataNode.persistentVolume.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: storage-volume
         annotations:
-        {{- if .Values.persistentVolume.annotations }}
-{{ toYaml .Values.persistentVolume.annotations | indent 8 }}
+        {{- if .Values.dataNode.persistentVolume.annotations }}
+{{ toYaml .Values.dataNode.persistentVolume.annotations | indent 8 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
@@ -142,15 +145,15 @@ spec:
           heritage: {{ .Release.Service }}
       spec:
         accessModes:
-{{ toYaml .Values.persistentVolume.accessModes | indent 8 }}
+{{ toYaml .Values.dataNode.persistentVolume.accessModes | indent 8 }}
         resources:
           requests:
-            storage: "{{ .Values.persistentVolume.size }}"
-      {{- if .Values.persistentVolume.storageClass }}
-      {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+            storage: "{{ .Values.dataNode.persistentVolume.size }}"
+      {{- if .Values.dataNode.persistentVolume.storageClass }}
+      {{- if (eq "-" .Values.dataNode.persistentVolume.storageClass) }}
         storageClassName: ""
       {{- else }}
-        storageClassName: "{{ .Values.persistentVolume.storageClass }}"
+        storageClassName: "{{ .Values.dataNode.persistentVolume.storageClass }}"
       {{- end }}
       {{- end }}
   {{- end }}
