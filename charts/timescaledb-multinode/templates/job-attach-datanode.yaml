@@ -71,7 +71,7 @@ https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-INTERPOLATION
               name: {{ template "timescaledb.accessname" $ }}
               key: password-superuser
       restartPolicy: OnFailure
-  backoffLimit: 2
+  backoffLimit: 20
 ...
 {{ end }}
 {{ end }}
