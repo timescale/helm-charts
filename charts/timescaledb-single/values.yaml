@@ -16,6 +16,11 @@ clusterName:
 # However, in pg_upgrade scenarios, you may need to specify an explicit version
 version:
 
+curlimage:
+  repository: curlimages/curl
+  tag: "7.78.0"
+  pullPolicy: Always
+
 image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha

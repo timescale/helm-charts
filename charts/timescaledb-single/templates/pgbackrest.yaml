@@ -56,7 +56,8 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: {{ template "timescaledb.fullname" $ }}-{{ .type }}
-              image: curlimages/curl
+              image: "{{ .Values.curlimage.repository }}:{{ .Values.curlimage.tag }}"
+              imagePullPolicy: {{ .Values.curlimage.pullPolicy }}
               command: ["/usr/bin/curl"]
               args:
               - --connect-timeout
