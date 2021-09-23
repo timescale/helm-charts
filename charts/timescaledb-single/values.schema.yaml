@@ -137,6 +137,11 @@ properties:
       periodSeconds:
         type: integer
         minimum: 1
+  service:
+    primary:
+      "$ref": "#/definitions/service"
+    replica:
+      "$ref": "#/definitions/service"
   loadBalancer:
     "$ref": "#/definitions/loadBalancer"
   replicaLoadBalancer:
@@ -164,7 +169,7 @@ properties:
             "$ref": "#/definitions/percent"
           readWriteFreeMB:
             type: integer
-            minimum: 0        
+            minimum: 0
   sharedMemory:
     type: object
     additionalProperties: false
@@ -538,6 +543,42 @@ definitions:
     type: integer
     mimimum: 0
     maximum: 100
+  service:
+    type: object
+    additionalProperties: false
+    properties:
+      type:
+        type: string
+        enum:
+        - ClusterIP
+        - LoadBalancer
+        - NodePort
+      port:
+        type: integer
+        minimum: 1000
+        maximum: 65535
+      nodePort:
+        type: integer
+        minimum: 1000
+        maximum: 65535
+      labels:
+        type:
+        - object
+        - "null"
+        additionalProperties:
+          type: string
+      annotations:
+        type:
+        - object
+        - "null"
+        additionalProperties:
+          type: string
+      spec:
+        type:
+        - object
+        - "null"
+        additionalProperties:
+          type: string
   loadBalancer:
     type: object
     additionalProperties: false
