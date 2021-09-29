@@ -12,13 +12,21 @@ metadata:
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
     role: master
+{{- if .Values.service.primary.labels }}
+{{ .Values.service.primary.labels | toYaml | indent 4 }}
+{{- end }}
+{{- if and .Values.loadBalancer.enabled .Values.loadBalancer.annotations }}
   annotations:
 {{ .Values.loadBalancer.annotations | toYaml | indent 4 }}
+{{- else if .Values.service.primary.annotations }}
+  annotations:
+{{ .Values.service.primary.annotations | toYaml | indent 4 }}
+{{- end }}
 spec:
 {{- if .Values.loadBalancer.enabled }}
   type: LoadBalancer
 {{- else }}
-  type: ClusterIP
+  type: {{ .Values.service.primary.type }}
 {{- end }}
   ports:
 {{- if .Values.pgBouncer.enabled }}
@@ -29,9 +37,19 @@ spec:
 {{- end }}
   - name: postgresql
     # This always defaults to 5432, even if `!loadBalancer.enabled`.
-    port: {{ .Values.loadBalancer.port }}
+    port: {{ if .Values.loadBalancer.enabled }}
+      {{- .Values.loadBalancer.port }}
+    {{- else }}
+      {{- .Values.service.primary.port }}
+    {{- end }}
     targetPort: postgresql
     protocol: TCP
-{{- if .Values.loadBalancer.spec }}
+    {{- if and (and (not .Values.loadBalancer.enabled) (eq .Values.service.primary.type "NodePort")) .Values.service.primary.nodePort }}
+    # Enabled if `!.Values.loadBalancer.enabled` and `.Values.service.primary.type == "NodePort"` and `.Values.service.primary.nodePort != nil`
+    nodePort: {{ .Values.service.primary.nodePort }}
+    {{- end }}
+{{- if and .Values.loadBalancer.enabled .Values.loadBalancer.spec }}
 {{ .Values.loadBalancer.spec | toYaml | indent 2 }}
+{{- else if .Values.service.primary.spec }}
+{{ .Values.service.primary.spec | toYaml | indent 2 }}
 {{- end }}
