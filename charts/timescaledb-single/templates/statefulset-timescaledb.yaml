@@ -531,7 +531,7 @@ spec:
         name: storage-volume
         annotations:
         {{- if .Values.persistentVolumes.data.annotations }}
-{{ toYaml .Values.persistentVolumes.data.annotations | indent 8 }}
+{{ toYaml .Values.persistentVolumes.data.annotations | indent 10 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
