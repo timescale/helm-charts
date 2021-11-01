@@ -1,6 +1,7 @@
 name: "Test Helm Charts"
 on:
 - push
+- pull_request
 
 jobs:
   lint:
