@@ -18,6 +18,23 @@ After you have followed the upgrade guide you should be able to upgrade your dep
 helm upgrade --install my-release ./charts/timescaledb-single -f values/my-release.yaml
 ```
 
+# Upgrading from 0.9 to 0.10
+The `loadBalancer` & `replicaLoadBalancer` values have been deprecated and will be removed in future releases. These configuration values have been replaced with a more comprehensive configuration pattern for generating Kubernetes Services. The new configuration options are nested under the `service` key, and have two top-level fields: `primary` and `replica`, corresponding to the Kubernetes Service for the primary and replicas respectively.
+
+In order to generate configuration equivalent to the deprecated `loadBalancer` config using the new `service` config, use the following snippet:
+
+```yaml
+loadBalancer:
+  # If this field remains enabled, then the new `service` config will be ignored.
+  enabled: false
+service:
+  primary:
+    type: LoadBalancer
+    annotations:
+      # This is added by default using the old config, but not the new config.
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "4000"
+```
+
 # Upgrading from 0.8 to 0.9
 The default Docker Image now points to PostgreSQL 13 instead of PostgreSQL 13,
 the default image however does contain the PostgreSQL 12 binaries as well.
