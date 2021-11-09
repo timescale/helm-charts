@@ -81,7 +81,7 @@ We have a Helm Repository that you can use, instead of cloning this Git repo.
 
 First add the repository with:
 ```console
-helm repo add timescale 'https://charts.timescale.com'
+helm repo add timescale 'https://raw.githubusercontent.com/timescale/timescaledb-kubernetes/master/charts/repo/'
 ```
 > **NOTICE**: Before installing the chart, you need to make sure that the required Kubernetes Secrets are created. 
 You can do this with our helper script. Look at the [Administrator Guide](admin-guide.md#creating-the-secrets) for more details.
