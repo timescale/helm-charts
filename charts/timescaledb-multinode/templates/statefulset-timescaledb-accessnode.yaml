@@ -81,7 +81,8 @@ spec:
             chmod 0600 "${PGDATA}/../.pgpass"
             {{- if .Values.internalIpRange }}
             echo "Adding {{ .Values.internalIpRange }} in pg_hba.conf"
-            echo "host    all             all             {{ .Values.internalIpRange }}              trust" >> ${PGDATA}/pg_hba.conf
+            grep -qxF "host all all {{ .Values.internalIpRange }} trust" "pg_hba.conf" \
+                || echo "host all all {{ .Values.internalIpRange }} trust" >> pg_hba.conf
             {{- end }}
         volumeMounts:
         - name: storage-volume
