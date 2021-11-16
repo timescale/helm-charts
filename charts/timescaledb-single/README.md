@@ -98,7 +98,7 @@ chart itself.
 
   ```console
   cd ./timescaledb-single
-  bash ./generate_kustomization.sh my_release
+  bash ./generate_kustomization.sh my-release
   ```
 
   The script will generate configuration for
