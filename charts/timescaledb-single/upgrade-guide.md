@@ -4,6 +4,8 @@ Before you upgrade your deployment, you should ensure you have
 followed the version specific upgrade guides.
 
 ##### Upgrade guides
+- [0.10 to 0.11](#upgrading-from-010x-to-011x)
+- [0.9 to 0.10](#upgrading-from-09x-to-010x)
 - [0.8 to 0.9](#upgrading-from-08x-to-09x)
 - [0.7 to 0.8](#upgrading-from-07x-to-08x)
 - [0.6 to 0.7](#upgrading-from-06x-to-07x)
@@ -16,6 +18,28 @@ After you have followed the upgrade guide you should be able to upgrade your dep
 > happens, so downtime is minimal, but there is some disruption.
 ```sh
 helm upgrade --install my-release ./charts/timescaledb-single -f values/my-release.yaml
+```
+
+# Upgrading from 0.10 to 0.11
+
+Handndling secrets was changed to remove kustomize wrapper. `unsafe_credentials` was removed and helm now generates secrets on first run unless they are provided in `secrets` map. To upgrade from previous chart version it is necessary to move secrets from objects in kubernetes cluster into helm chart values.
+
+To make migration simpler, chart still offers a way to reference external secrets with new fields in `secrets` map. In order to preserve previous secrets change the following section in `values.yaml`:
+
+```yaml
+secretNames:
+  credentials: <name-of-secret-with-credentials>
+  certificate: <name-of-secret-with-certificate>
+  pgbackrest: <name-of-secret-with-pgbackrest-config>
+```
+
+to new structure:
+
+```yaml
+secrets:
+  credentialsSecretName: <name-of-secret-with-credentials>
+  certificateSecretName: <name-of-secret-with-certificate>
+  pgbackrestSecretName: <name-of-secret-with-pgbackrest-config>
 ```
 
 # Upgrading from 0.9 to 0.10
