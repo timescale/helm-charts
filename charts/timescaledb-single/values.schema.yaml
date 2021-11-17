@@ -33,14 +33,16 @@ required:
 - replicaCount
 - replicaLoadBalancer
 - resources
-- secretNames
+- secrets
 - serviceAccount
+- serviceMonitor
 - sharedMemory
 - timescaledbTune
 - tolerations
-- unsafe
 additionalProperties: false
 properties:
+  serviceMonitor:
+    type: object
   podManagementPolicy:
     type:
     - string
@@ -445,8 +447,6 @@ properties:
         type:
         - string
         - "null"
-  unsafe:
-    type: boolean
   env:
     type:
     - array
@@ -483,25 +483,28 @@ properties:
         type:
         - array
         - "null"
-  secretNames:
+  secrets:
     type: object
     additionalProperties: false
     properties:
+      credentialsSecretName:
+        type: string
       credentials:
         type:
-        - string
+        - object
         - "null"
-        minLength: 1
+      certificateSecretName:
+        type: string
       certificate:
         type:
-        - string
+        - object
         - "null"
-        minLength: 1
+      pgbackrestSecretName:
+        type: string
       pgbackrest:
         type:
-        - string
+        - object
         - "null"
-        minLength: 1
   image:
     type: object
     additionalProperties: false
