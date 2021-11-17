@@ -103,13 +103,13 @@ ${HOME}/.pgbackrest_environment
 {{- end -}}
 
 {{- define "secrets_credentials" -}}
-{{ .Values.secretNames.credentials | default (printf "%s-credentials" (include "clusterName" .)) }}
+{{ printf "%s-credentials" (include "clusterName" .) }}
 {{- end -}}
 
 {{- define "secrets_certificate" -}}
-{{ .Values.secretNames.certificate | default (printf "%s-certificate" (include "clusterName" .)) }}
+{{ printf "%s-certificate" (include "clusterName" .) }}
 {{- end -}}
 
 {{- define "secrets_pgbackrest" -}}
-{{ .Values.secretNames.pgbackrest | default (printf "%s-pgbackrest" (include "clusterName" .)) }}
+{{ printf "%s-pgbackrest" (include "clusterName" .) }}
 {{- end -}}
