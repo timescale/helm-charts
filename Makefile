@@ -70,7 +70,6 @@ clean-ci:
 .PHONY: shellcheck shellcheck-single
 shellcheck: shellcheck-single
 shellcheck-single:
-	shellcheck charts/timescaledb-single/generate_kustomization.sh
 	@for vfile in $(SINGLE_VALUES_FILES); do \
 		helm template $(SINGLE_CHART_DIR) -s templates/configmap-scripts.yaml -f $$vfile > $(CI_SINGLE_DIR)/temp.yaml || exit 1 ; \
 		cat $(CI_SINGLE_DIR)/temp.yaml | python3 ./yaml2json.py > $(CI_SINGLE_DIR)/temp.json || exit 1; \
