@@ -46,7 +46,7 @@ secrets:
     tls.crt: ""
     tls.key: ""
 
-  # Selector used to provision your own Secret containing pgbackrest configuration details.
+  # Selector used to provision your own Secret containing certificate details.
   # This is mutually exclusive with `certificate` option and takes precedence over it.
   # WARNING: Use this option with caution
   certificateSecretName: ""
