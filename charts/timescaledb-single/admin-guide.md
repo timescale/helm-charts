@@ -84,35 +84,41 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `replicaLoadBalancer.spec`    | Deprecated(0.10.0): Extra configuration for replica service spec | `nil`   |
 | `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
-| `secretNames.certificate`         | Existing `type:kubernetes.io/tls` secret containing a tls.key and tls.crt | `RELEASE-certificate` |
-| `secretNames.credentials`         | Existing secret that contains env vars that influence Patroni (e.g. PATRONI_SUPERUSER_PASSWORD) | `RELEASE-credentials` |
-| `secretNames.pgbackrest`          | Existing secret that contains env vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET) | `RELEASE-pgbackgrest` |
+| `secrets.credentials`             | A map of environment variables that influence Patroni, for example PATRONI_SUPERUSER_PASSWORD or PATRONI_REPLICATION_PASSWORD | Randomly generated |
+| `secrets.credentialsSecretName`   | Existing secret that contains env vars that influence Patroni (e.g. PATRONI_SUPERUSER_PASSWORD). This setting takes precedence over everything set in `secrets.credentials` | `""` |
+| `secrets.certificate`             | This map should contain tls key (`tls.key`) and certifiacte (`tls.crt`) | Randomly generated |
+| `secrets.certificateSecretName`   | Existing `type:kubernetes.io/tls` secret containing a `tls.key` and `tls.crt`. This setting takes precedence over anything set in `secrets.certificate` | `""` |
+| `secrets.pgbackrest`              | This map should contain environment variables that influence pgBackRest. | Randomly generated |
+| `secrets.pgbackrestSecretName`    | Existing secret that contains env vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET). This setting takes precedence over everything set in `secrets.pgbackrest` | `""` |
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |
+| `serviceMonitor.enabled`          | Enable deployment of ServiceMonitor used with prometheus-operator. | `false` |
+| `serviceMonitor.portName`         | Name of the port (not number!) on which prometheus metrics are exposed. | `metrics` |
+| `serviceMonitor.path`             | Path on which prometheus metrics are exposed. | `/metrics` |
+| `serviceMonitor.interval`         | Prometheus scrape interval. Lower values increase resolution, higher values reduce prometheus memory consumption. Do not set over 2m. | `10s` |
+| `serviceMonitor.scrapeTimeout`    | Prometheus scrape timeout. Value cannot be lower than scrape interval. | `nil` |
+| `serviceMonitor.namespace`        | Setting this will cause deploying ServiceMonitor in a different namespace than TimescaleDB. | `nil` |
+| `serviceMonitor.labels`           | Additional labels that can be set on ServiceMonitor object. | `nil` |
+| `serviceMonitor.metricRelabelings` | Additional prometheus metric relabelings. | `nil` |
+| `serviceMonitor.targetLabels`     | List of additional kubernetes labels that need to be transferred from Service object into metrics. | `nil` |
 | `sharedMemory.useMount`           | Mount `/dev/shm` as a Memory disk           | `false`                                             |
 | `timescaledbTune.enabled`         | If true, runs `timescaledb-tune` before starting PostgreSQL | `true`                              |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
-| `unsafe`                          | If true, will generate random a random certificate and random credentials, removing the need for the pre-installation steps with secrets | `false`. This should only be `true` for throw-away (evaluation) deployments |
 | `version`                         | The major PostgreSQL version to use         | empty, defaults to the Docker image default         |
 
-### Creating the Secrets
+### Handling Secrets
 
-The chart expects that the Secret objects referenced in `secretNames.credentials`, `secretNames.certificate` and  `secretNames.pgbackrest` are already created when deploying. The values in these secrets will be used as ENV variables to securely configure the deployment.
+The chart allows to specify secrets like database credentials, certificates, and pgbackrest configuration as values in `values.yaml`. Those need to be set up before first run of `helm install` or they will be randomly generated.
 
-We've included a helper script `generate_kustomization.sh` to help generate a [kustomization](https://kustomize.io) for a single deployment. The script generates configuration for:
-* strong random passwords for the database
-* a self-signed SSL certificate (for demo and dev purposes)
-* backup (if enabled)
+> **NOTICE** Rotation of those secrets is not possible with `helm update`. This is done to ensure `helm update` won't break an already running database.
 
-The script is interactive and (if you wish to enable backups) will ask you to enter your values
-for the pgBackRest S3 config (like bucket, region, endpoint, key and secret).
-It will also ask if you want the script to install the secrets directly.
+### Alternative way of handling Secrets
 
-```sh
-charts/timescaledb-single/generate_kustomization.sh <release name>
-```
+> **NOTICE** This method is here to ensure backwards compatibility. It is recommended to use method mentioned earlier (specifying credentials directly in `values.yaml`).
 
-The script can install the secrets immediately, it creates the following secrets:
+
+Alternativelly the chart allows referencing existing Secret objects via `secret.credentialsSecretName`, `secret.certificateSecretName` and  `secret.pgbackrestSecretName`. If set, those options take precedence over specifying
+secrets directly in `values.yaml`. The values in these secrets will be used as ENV variables to securely configure the deployment.
 
 #### Credentials
 
@@ -128,8 +134,7 @@ This Secret should contain the ENV vars that will influence Patroni. It should a
 
 This Secret should be of `type: kubernetes.io/tls` with two items: `tls.crt` and `tls.key`. The certificate is used for the database connections.
 
-> **NOTICE**: The `generate_kustomization.sh` script generates self-signed certificates that should
-only be used for development and demo purposes.
+> **NOTICE**: By default helm chart generates self-signed certificates that should only be used for development and demo purposes.
 The certificate should be replaced by a signed certificate, signed by a Certificate Authority (CA) that you trust.
 
 #### pgBackRest
