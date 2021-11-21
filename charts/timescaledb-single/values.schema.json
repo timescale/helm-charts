@@ -32,6 +32,57 @@
       "mimimum": 0,
       "type": "integer"
     },
+    "service": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "nodePort": {
+          "maximum": 65535,
+          "minimum": 1000,
+          "type": "integer"
+        },
+        "port": {
+          "maximum": 65535,
+          "minimum": 1000,
+          "type": "integer"
+        },
+        "spec": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "type": {
+          "enum": [
+            "ClusterIP",
+            "LoadBalancer",
+            "NodePort"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "volume": {
       "additionalProperties": false,
       "properties": {
@@ -696,6 +747,14 @@
         }
       },
       "type": "object"
+    },
+    "service": {
+      "primary": {
+        "$ref": "#/definitions/service"
+      },
+      "replica": {
+        "$ref": "#/definitions/service"
+      }
     },
     "serviceAccount": {
       "additionalProperties": false,

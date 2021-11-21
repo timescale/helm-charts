@@ -19,8 +19,8 @@ version:
 image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
-  repository: timescaledev/timescaledb-ha
-  tag: pg12-ts2.0-latest
+  repository: timescale/timescaledb-ha
+  tag: pg13.4-ts2.4.2-p0
   pullPolicy: Always
 
 # These secrets should exist before the Helm is used to deploy this TimescaleDB.
@@ -254,6 +254,47 @@ postInit:
       name: custom-secret-scripts
       optional: true
 
+# Values for defining the primary & replica Kubernetes Services.
+service:
+  primary:
+    # One of (ClusterIP | LoadBalancer | NodePort). Headless services are not supported.
+    type: ClusterIP
+    # The port used by the service.
+    port: 5432
+    # Optional NodePort, only used for type `NodePort`.
+    nodePort: null
+    # Additional labels to be added to the Service.
+    labels: {}
+    # Additional annotations to be added to the Service.
+    annotations: {}
+    # Define extra fields to be interpolated into the Service spec.
+    #
+    # This allows for adding support for new features and functionality which may not yet
+    # be directly supported in this chart.
+    spec: {}
+    # loadBalancerSourceRanges:
+    # - "0.0.0.0/0"
+
+  replica:
+    # One of (ClusterIP | LoadBalancer | NodePort). Headless services are not supported.
+    type: ClusterIP
+    # The port used by the service.
+    port: 5432
+    # Optional NodePort, only used for type `NodePort`.
+    nodePort: null
+    # Additional labels to be added to the Service.
+    labels: {}
+    # Additional annotations to be added to the Service.
+    annotations: {}
+    # Define extra fields to be interpolated into the Service spec.
+    #
+    # This allows for adding support for new features and functionality which may not yet
+    # be directly supported in this chart.
+    spec: {}
+    # loadBalancerSourceRanges:
+    # - "0.0.0.0/0"
+
+# DEPRECATED(0.10.0): use the `service.primary` values instead.
 loadBalancer:
   # If not enabled, we still expose the primary using a so called Headless Service
   # https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
@@ -481,6 +522,22 @@ prometheus:
   volumeMounts:
   # - name: exporter-config
   #   mountPath: /var/exporter
+
+serviceMonitor:
+  # Specifies whether ServiceMonitor for Prometheus operator should be created
+  enabled: false
+  portName: metrics
+  path: /metrics
+  interval: 10s
+  # scrapeTimeout: 30s
+  # Specifies namespace, where ServiceMonitor should be installed
+  # namespace: monitoring
+  # labels:
+  #   release: prometheus
+  # honorLabels: true
+  # metricRelabelings: []
+  # targetLabels:
+  #   - foo
 
 # For new deployments, we would advise Parallel here, however as that change breaks previous
 # deployments, it is set to OrderedReady here

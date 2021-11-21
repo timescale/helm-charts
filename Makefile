@@ -7,8 +7,8 @@ SINGLE_VALUES_FILES := $(SINGLE_CHART_DIR)/values.yaml $(wildcard $(SINGLE_CHART
 DEPLOYMENTS := $(SINGLE_VALUES_FILES)
 K8S_NAMESPACE ?= citest
 
-export PULL_TIMEOUT ?= 600s
-export DEPLOYMENT_TIMEOUT ?= 180s
+export PULL_TIMEOUT ?= 3000s
+export DEPLOYMENT_TIMEOUT ?= 600s
 
 .PHONY: publish
 publish: publish-multinode publish-single
