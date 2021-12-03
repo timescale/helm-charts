@@ -22,9 +22,25 @@ helm upgrade --install my-release ./charts/timescaledb-single -f values/my-relea
 
 # Upgrading from 0.10 to 0.11
 
-Handndling secrets was changed to remove kustomize wrapper. `unsafe_credentials` was removed and helm now generates secrets on first run unless they are provided in `secrets` map. To upgrade from previous chart version it is necessary to move secrets from objects in kubernetes cluster into helm chart values.
+## Major PostgreSQL version bump
+The default Docker Image now points to PostgreSQL 14 instead of PostgreSQL 13,
+the default image however does contain the PostgreSQL 13 binaries as well.
 
-To make migration simpler, chart still offers a way to reference external secrets with new fields in `secrets` map. In order to preserve previous secrets change the following section in `values.yaml`:
+If you want to run PostgreSQL 14 on the 0.11 Helm Charts you should set version to 13 in
+your `values.yaml`:
+
+```yaml
+version: 13
+```
+
+Doing a [`pg_upgrade`](https://www.postgresql.org/docs/14/pgupgrade.html) is (for now) out of scope
+for these Helm Charts.
+
+## Deprecation of `kustomize`
+
+Handling secrets was changed to remove kustomize wrapper. `unsafe_credentials` was removed and helm now generates secrets on first run unless they are provided in `secrets` map. To upgrade from previous chart version it is necessary to move secrets from objects in kubernetes cluster into helm chart values.
+
+To make migration simpler, the chart still offers a way to reference external secrets with new fields in `secrets` map. In order to preserve previous secrets change the following section in `values.yaml`:
 
 ```yaml
 secretNames:
