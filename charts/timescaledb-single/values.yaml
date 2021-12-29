@@ -23,22 +23,46 @@ image:
   tag: pg13.4-ts2.4.2-p0
   pullPolicy: Always
 
-# These secrets should exist before the Helm is used to deploy this TimescaleDB.
-# You can use generate_kustomization.sh to help in creating these secrets, or have
-# a look at kustomize/example to see how you could install them.
-secretNames:
-  # This secret should contain environment variables that influence Patroni,
+# By default those secrets are randomly generated.
+# To prevent misconfiguration, modifications from helm upgrade won't be applied to those secrets.
+# As a result changing secrets cannot be done via helm and need manual intervention.
+secrets:
+  # This map should contain environment variables that influence Patroni,
   # for example PATRONI_SUPERUSER_PASSWORD or PATRONI_REPLICATION_PASSWORD
   # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#postgresql
-  credentials:  # defaults to RELEASE-credentials
+  credentials:
+    PATRONI_SUPERUSER_PASSWORD: ""
+    PATRONI_REPLICATION_PASSWORD: ""
+    PATRONI_admin_PASSWORD: ""
 
-  # This secret should be a Secret of type kubernetes.io/tls, containing
-  # both a tls.key and a tls.crt
-  certificate:  # defaults to RELEASE-certificate
+  # Selector used to provision your own Secret containing patroni configuration details
+  # This is mutually exclusive with `credentials` option and takes precedence over it.
+  # WARNING: Use this option with caution  
+  credentialsSecretName: ""
 
-  # This secret should contain environment variables that influence pgBackRest,
-  # for example, PGBACKREST_REPO1_S3_KEY or PGBACKREST_REPO1_S3_KEY_SECRET
-  pgbackrest:  # defaults to RELEASE-pgbackrest
+  # This map should contain tls key and certifiacte. When empty,
+  # helm will generate self-signed certificate.
+  certificate:
+    tls.crt: ""
+    tls.key: ""
+
+  # Selector used to provision your own Secret containing certificate details.
+  # This is mutually exclusive with `certificate` option and takes precedence over it.
+  # WARNING: Use this option with caution
+  certificateSecretName: ""
+
+  # This secret should contain environment variables that influence pgBackRest.
+  pgbackrest:
+    PGBACKREST_REPO1_S3_REGION: ""
+    PGBACKREST_REPO1_S3_KEY: ""
+    PGBACKREST_REPO1_S3_KEY_SECRET: ""
+    PGBACKREST_REPO1_S3_BUCKET: ""
+    PGBACKREST_REPO1_S3_ENDPOINT: "s3.amazonaws.com"
+  
+  # Selector used to provision your own Secret containing pgbackrest configuration details
+  # This is mutually exclusive with `pgbackrest` option and takes precedence over it.
+  # WARNING: Use this option with caution
+  pgbackrestSecretName: ""
 
 backup:
   enabled: false
@@ -523,6 +547,22 @@ prometheus:
   # - name: exporter-config
   #   mountPath: /var/exporter
 
+serviceMonitor:
+  # Specifies whether ServiceMonitor for Prometheus operator should be created
+  enabled: false
+  portName: metrics
+  path: /metrics
+  interval: 10s
+  # scrapeTimeout: 30s
+  # Specifies namespace, where ServiceMonitor should be installed
+  # namespace: monitoring
+  # labels:
+  #   release: prometheus
+  # honorLabels: true
+  # metricRelabelings: []
+  # targetLabels:
+  #   - foo
+
 # For new deployments, we would advise Parallel here, however as that change breaks previous
 # deployments, it is set to OrderedReady here
 podManagementPolicy: OrderedReady
@@ -571,11 +611,6 @@ serviceAccount:
   # The name of the ServiceAccount to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
-
-# Setting unsafe to true will generate some random credentials. This is meant
-# for development or first evaluation of the Helm Charts. It should *not* be
-# used for anything beyong the evaluation phase.
-unsafe: false
 
 debug:
   # This setting is mainly for during development, debugging or troubleshooting.

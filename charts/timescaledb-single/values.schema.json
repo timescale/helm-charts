@@ -721,29 +721,35 @@
     "schedulerName": {
       "type": "string"
     },
-    "secretNames": {
+    "secrets": {
       "additionalProperties": false,
       "properties": {
         "certificate": {
-          "minLength": 1,
           "type": [
-            "string",
+            "object",
             "null"
           ]
+        },
+        "certificateSecretName": {
+          "type": "string"
         },
         "credentials": {
-          "minLength": 1,
           "type": [
-            "string",
+            "object",
             "null"
           ]
         },
+        "credentialsSecretName": {
+          "type": "string"
+        },
         "pgbackrest": {
-          "minLength": 1,
           "type": [
-            "string",
+            "object",
             "null"
           ]
+        },
+        "pgbackrestSecretName": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -769,6 +775,9 @@
           ]
         }
       },
+      "type": "object"
+    },
+    "serviceMonitor": {
       "type": "object"
     },
     "sharedMemory": {
@@ -807,9 +816,6 @@
     "tolerations": {
       "type": "array"
     },
-    "unsafe": {
-      "type": "boolean"
-    },
     "version": {
       "maximum": 14,
       "minimum": 11,
@@ -843,12 +849,12 @@
     "replicaCount",
     "replicaLoadBalancer",
     "resources",
-    "secretNames",
+    "secrets",
     "serviceAccount",
+    "serviceMonitor",
     "sharedMemory",
     "timescaledbTune",
-    "tolerations",
-    "unsafe"
+    "tolerations"
   ],
   "schema": "http://json-schema.org/draft-07/schema#"
 }

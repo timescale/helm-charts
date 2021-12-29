@@ -42,19 +42,13 @@ When configured for Backups to S3:
 
 ## Installing
 
-To install the chart with the release name `my-release`, first you need
-to create a set of Kubernetes Secret objects that will contain:
+To install the chart with the release name `my-release`, first  in `values.yaml` you need to set credentials mentioned in list
+below. If you decide not to set those credentials, they will be randomly generated. Those credentials can be setup via helm only
+during helm first run and they won't be rotated with subsequent helm update commands to prevent breaking the database.
 
 * The credentials for the superuser, admin and stand-by users
 * TLS Certificates
 * pgbackrest config (optional)
-
-This repo has a simple script that uses [Kustomize](https://kustomize.io/)
-to help you with this 
-(See the [Administration Guide](admin-guide.md#creating-the-secrets) for more details): 
-```console
-./generate_kustomization.sh my-release
-```
 
 Then you can install the chart with:
 ```console
@@ -83,38 +77,14 @@ First add the repository with:
 ```console
 helm repo add timescale 'https://charts.timescale.com'
 ```
-> **NOTICE**: Before installing the chart, you need to make sure that the required Kubernetes Secrets are created. 
-You can do this with our helper script. Look at the [Administrator Guide](admin-guide.md#creating-the-secrets) for more details.
+> **NOTICE**: Helm chart installation will randomly generate secrets which cannot be rotated with subsequent helm upgrades.
+If you want to use predefined credentials, please set them in `secrets` section of `values.yaml` before running `helm install`.
 
-The fastest way is to use the helper script packed with the 
-chart itself.
-* First pull the chart and unpack it:
+Next proceed to install the chart:
 
-  ```console
-  helm pull timescale/timescaledb-single --untar
-  ```
-
-* Then run the `generate_kustomization.sh` script:
-
-  ```console
-  cd ./timescaledb-single
-  bash ./generate_kustomization.sh my_release
-  ```
-
-  The script will generate configuration for
-  * strong random passwords for the database
-  * a self-signed SSL certificate (for demo and dev purposes)
-  * backup (if enabled)
-
-  It will prompt if you want it install the secrets directly, 
-  or print out how to do it after (p)reviewing the generated
-  files.
-
-* And install the chart:
-
-  ```console
-  helm install my-release .
-  ```
+```console
+helm install my-release .
+```
 
 To keep the repo up to date with new versions you can do:
 ```console
