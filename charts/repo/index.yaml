@@ -67,9 +67,9 @@ entries:
     version: 0.3.0
   timescaledb-single:
   - apiVersion: v1
-    created: "2021-12-03T13:57:44.135752723+01:00"
+    created: "2021-09-29T10:57:30.12348-05:00"
     description: TimescaleDB HA Deployment.
-    digest: 858f3eba4d7fae12dba440cb5d244ddf3435ec1bdd3cda59a6d7946c67e63ad5
+    digest: 43583cf0bbce0986328f51633d3a53ec0e5927b288f386f52082e5cdab1e5092
     home: https://github.com/timescale/timescaledb-kubernetes
     maintainers:
     - email: support@timescale.com
