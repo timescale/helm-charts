@@ -54,8 +54,8 @@ secrets:
   # This secret should contain environment variables that influence pgBackRest.
   pgbackrest:
     PGBACKREST_REPO1_S3_REGION: ""
-    PGBACKREST_REPO1_S3_KEY: ""
-    PGBACKREST_REPO1_S3_KEY_SECRET: ""
+    # PGBACKREST_REPO1_S3_KEY: ""
+    # PGBACKREST_REPO1_S3_KEY_SECRET: ""
     PGBACKREST_REPO1_S3_BUCKET: ""
     PGBACKREST_REPO1_S3_ENDPOINT: "s3.amazonaws.com"
   
