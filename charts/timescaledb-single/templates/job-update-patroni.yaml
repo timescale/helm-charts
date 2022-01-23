@@ -37,6 +37,10 @@ spec:
         heritage: {{ .Release.Service }}
     spec:
       restartPolicy: OnFailure
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       containers:
       - name: {{ template "timescaledb.fullname" . }}-patch-patroni-config
         image: curlimages/curl
