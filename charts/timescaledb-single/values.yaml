@@ -14,14 +14,14 @@ clusterName:
 
 # The major PostgreSQL version to use, defaults to the default version of the Docker image
 # However, in pg_upgrade scenarios, you may need to specify an explicit version
-version:
+version: 14
 
 image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescale/timescaledb-ha
-  tag: pg13.4-ts2.4.2-p0
-  pullPolicy: Always
+  tag: pg14.1-ts2.5.1-oss-p2
+  pullPolicy: IfNotPresent
 
 # By default those secrets are randomly generated.
 # To prevent misconfiguration, modifications from helm upgrade won't be applied to those secrets.
@@ -53,11 +53,6 @@ secrets:
 
   # This secret should contain environment variables that influence pgBackRest.
   pgbackrest:
-    PGBACKREST_REPO1_S3_REGION: ""
-    PGBACKREST_REPO1_S3_KEY: ""
-    PGBACKREST_REPO1_S3_KEY_SECRET: ""
-    PGBACKREST_REPO1_S3_BUCKET: ""
-    PGBACKREST_REPO1_S3_ENDPOINT: "s3.amazonaws.com"
   
   # Selector used to provision your own Secret containing pgbackrest configuration details
   # This is mutually exclusive with `pgbackrest` option and takes precedence over it.
@@ -65,7 +60,7 @@ secrets:
   pgbackrestSecretName: ""
 
 backup:
-  enabled: false
+  enabled: true
   pgBackRest:
     # https://pgbackrest.org/configuration.html
     # Although not impossible, care should be taken not to include secrets
@@ -73,12 +68,6 @@ backup:
     compress-type: lz4
     process-max: 4
     start-fast: "y"
-    repo1-retention-diff: 2
-    repo1-retention-full: 2
-    repo1-type: s3
-    repo1-cipher-type: "none"
-    repo1-s3-region: us-east-2
-    repo1-s3-endpoint: s3.amazonaws.com
 
   # Overriding the archive-push/archive-get sections is most useful in
   # very high througput situations. Look at values/high_throuhgput_example.yaml for more details
@@ -104,13 +93,14 @@ backup:
   # Although not impossible, care should be taken not to include secrets
   # in these parameters. Use Kubernetes Secrets to specify S3 Keys, Secrets etc.
   env:
-  # - name: PGBACKREST_REPO1_S3_BUCKET
-  #   value: my_example_s3_bucket_for_backups
-  # - name: PGBACKREST_REPO1_S3_KEY_SECRET
-  #   valueFrom:
-  #     secretKeyRef:
-  #       name: pgbackrest-dev-secrets
-  #       key: repo1-s3-key-secret
+    - name: PGBACKREST_REPO1_RETENTION_DIFF
+      value: "2"
+    - name: PGBACKREST_REPO1_RETENTION_FULL_TYPE
+      value: time
+    - name: PGBACKREST_REPO1_RETENTION_FULL
+      value: "30"
+    # - name: PGBACKREST_REPO1_PATH
+    #   value: /backup/db/backrest # default is `/var/lib/pgbackrest`
 
 # When creating a *new* deployment, the default is to initialize (using initdb) the database.
 # If however, you want to initialize the database using an existing backup, you can do so by
@@ -322,7 +312,7 @@ service:
 loadBalancer:
   # If not enabled, we still expose the primary using a so called Headless Service
   # https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
-  enabled: true
+  enabled: false
   port: 5432
   # Read more about the AWS annotations here:
   # https://kubernetes.io/docs/concepts/cluster-administration/cloud-providers/#aws
@@ -368,7 +358,7 @@ persistentVolumes:
   # https://www.postgresql.org/docs/current/creating-cluster.html#CREATING-CLUSTER-MOUNT-POINTS
   data:
     enabled: true
-    size: 2Gi
+    size: 10Gi
     ## database data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -376,7 +366,7 @@ persistentVolumes:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    # storageClass: "-"
+    storageClassName: managed-nfs-storage
     subPath: ""
     mountPath: "/var/lib/postgresql"
     annotations: {}
@@ -388,7 +378,7 @@ persistentVolumes:
     enabled: true
     size: 1Gi
     subPath: ""
-    storageClass:
+    storageClassName: managed-nfs-storage
     # When changing this mountPath ensure you also change the following key to reflect this:
     # patroni.postgresql.basebackup.[].waldir
     mountPath: "/var/lib/postgresql/wal"
@@ -399,10 +389,21 @@ persistentVolumes:
   # tablespaces:
     # example1:
     #   size: 5Gi
-    #   storageClass: gp2
+    #   storageClassName: managed-nfs-storage
     # example2:
     #   size: 5Gi
-    #   storageClass: gp2
+    #   storageClassName: managed-nfs-storage
+  backup:
+    enabled: true
+    size: 10Gi
+    subPath: ""
+    storageClassName: managed-nfs-storage
+    # this is the default repo path 
+    # https://pgbackrest.org/configuration.html#section-repository/option-repo-path
+    mountPath: "/var/lib/pgbackrest"
+    annotations: {}
+    accessModes:
+      - ReadWriteMany
 
 # EXPERIMENTAL, please do *not* enable on production environments
 # if enabled, fullWalPrevention will switch the default transaction mode from read write
@@ -418,15 +419,15 @@ fullWalPrevention:
     readWriteFreePercent: 8
     readWriteFreeMB: 128
 
-resources: {}
+resources:
   # If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 2Gi
 
 sharedMemory:
   # By default Kubernetes only provides 64MB to /dev/shm
@@ -465,7 +466,7 @@ timescaledbTune:
 # enabling pgBouncer will run an extra container in every Pod, serving a pgBouncer
 # pass-through instance
 pgBouncer:
-  enabled: false
+  enabled: true
   port: 6432
   config:
   # DANGER: The below settings are considered to be safe to set, and we recommend

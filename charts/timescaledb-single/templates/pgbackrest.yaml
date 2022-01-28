@@ -24,7 +24,7 @@ spec:
 ...
 {{- range .Values.backup.jobs }}
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ template "timescaledb.fullname" $ }}-{{ .name }}

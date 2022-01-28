@@ -117,6 +117,8 @@ properties:
         type: object
         additionalProperties:
           "$ref": "#/definitions/volume"
+      backup:
+        "$ref": "#/definitions/volume"
   readinessProbe:
     type: object
     additionalProperties: false
@@ -612,7 +614,7 @@ definitions:
         type:
         - string
         - "null"
-      storageClass:
+      storageClassName:
         type:
         - string
         - "null"

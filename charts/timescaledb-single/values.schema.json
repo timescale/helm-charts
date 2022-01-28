@@ -107,7 +107,7 @@
         "size": {
           "type": "string"
         },
-        "storageClass": {
+        "storageClassName": {
           "type": [
             "string",
             "null"
@@ -542,6 +542,9 @@
           "type": "object"
         },
         "wal": {
+          "$ref": "#/definitions/volume"
+        },
+        "backup": {
           "$ref": "#/definitions/volume"
         }
       },

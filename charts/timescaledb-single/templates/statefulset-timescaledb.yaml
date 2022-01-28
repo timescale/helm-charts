@@ -195,79 +195,79 @@ spec:
 
             exec patroni /etc/timescaledb/patroni.yaml
         env:
-        # We use mixed case environment variables for Patroni User management,
-        # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.
-        # Where possible, we want to have lowercase usernames in PostgreSQL as more complex postgres usernames
-        # requiring quoting to be done in certain contexts, which many tools do not do correctly, or even at all.
-        # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#bootstrap-configuration
-        - name: PATRONI_admin_OPTIONS
-          value: createrole,createdb
-        - name: PATRONI_REPLICATION_USERNAME
-          value: standby
-        # To specify the PostgreSQL and Rest API connect addresses we need
-        # the PATRONI_KUBERNETES_POD_IP to be available as a bash variable, so we can compose an
-        # IP:PORT address later on
-        - name: PATRONI_KUBERNETES_POD_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
-        - name: PATRONI_POSTGRESQL_CONNECT_ADDRESS
-          value: "$(PATRONI_KUBERNETES_POD_IP):5432"
-        - name: PATRONI_RESTAPI_CONNECT_ADDRESS
-          value: "$(PATRONI_KUBERNETES_POD_IP):8008"
-        - name: PATRONI_KUBERNETES_PORTS
-          {{- if .Values.pgBouncer.enabled }}
-          value: '[{"name": "postgresql", "port": 5432}, {"name": "pgbouncer", "port": 6432}]'
-          {{- else }}
-          value: '[{"name": "postgresql", "port": 5432}]'
+          # We use mixed case environment variables for Patroni User management,
+          # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.
+          # Where possible, we want to have lowercase usernames in PostgreSQL as more complex postgres usernames
+          # requiring quoting to be done in certain contexts, which many tools do not do correctly, or even at all.
+          # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#bootstrap-configuration
+          - name: PATRONI_admin_OPTIONS
+            value: createrole,createdb
+          - name: PATRONI_REPLICATION_USERNAME
+            value: standby
+          # To specify the PostgreSQL and Rest API connect addresses we need
+          # the PATRONI_KUBERNETES_POD_IP to be available as a bash variable, so we can compose an
+          # IP:PORT address later on
+          - name: PATRONI_KUBERNETES_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: PATRONI_POSTGRESQL_CONNECT_ADDRESS
+            value: "$(PATRONI_KUBERNETES_POD_IP):5432"
+          - name: PATRONI_RESTAPI_CONNECT_ADDRESS
+            value: "$(PATRONI_KUBERNETES_POD_IP):8008"
+          - name: PATRONI_KUBERNETES_PORTS
+            {{- if .Values.pgBouncer.enabled }}
+            value: '[{"name": "postgresql", "port": 5432}, {"name": "pgbouncer", "port": 6432}]'
+            {{- else }}
+            value: '[{"name": "postgresql", "port": 5432}]'
+            {{- end }}
+          - name: PATRONI_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: PATRONI_POSTGRESQL_DATA_DIR
+            value: {{ include "data_directory" . | quote }}
+          - name: PATRONI_KUBERNETES_NAMESPACE
+            value: {{ $.Release.Namespace }}
+          - name: PATRONI_KUBERNETES_LABELS
+            value: {{ printf "{app: %s, cluster-name: %s, release: %s}" (include "timescaledb.fullname" .) (include "clusterName" .) .Release.Name  | quote }}
+          - name: PATRONI_SCOPE
+            value: {{ template "clusterName" . }}
+          - name: PGBACKREST_CONFIG
+            value: /etc/pgbackrest/pgbackrest.conf
+          # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly,
+          # but for interactive sessions, callbacks and PostgreSQL tools they should be correct.
+          - name: PGDATA
+            value: "$(PATRONI_POSTGRESQL_DATA_DIR)"
+          - name: PGHOST
+            value: "{{ template "socket_directory" . }}"
+          - name: BOOTSTRAP_FROM_BACKUP
+            value: {{ .Values.bootstrapFromBackup.enabled | int | quote }}
+          {{- if .Values.env }}{{ .Values.env | default list | toYaml | nindent 10 }}{{- end }}
+            # pgBackRest is also called using the archive_command if the backup is enabled.
+            # this script will also need access to the environment variables specified for
+            # the backup. This can be removed once we do not directly invoke pgBackRest
+            # from inside the TimescaleDB container anymore
+          {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 10 }}{{- end }}
+          {{- if .Values.version }}
+          - name: PATH
+            value: /usr/lib/postgresql/{{ .Values.version }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
           {{- end }}
-        - name: PATRONI_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: PATRONI_POSTGRESQL_DATA_DIR
-          value: {{ include "data_directory" . | quote }}
-        - name: PATRONI_KUBERNETES_NAMESPACE
-          value: {{ $.Release.Namespace }}
-        - name: PATRONI_KUBERNETES_LABELS
-          value: {{ printf "{app: %s, cluster-name: %s, release: %s}" (include "timescaledb.fullname" .) (include "clusterName" .) .Release.Name  | quote }}
-        - name: PATRONI_SCOPE
-          value: {{ template "clusterName" . }}
-        - name: PGBACKREST_CONFIG
-          value: /etc/pgbackrest/pgbackrest.conf
-        # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly,
-        # but for interactive sessions, callbacks and PostgreSQL tools they should be correct.
-        - name: PGDATA
-          value: "$(PATRONI_POSTGRESQL_DATA_DIR)"
-        - name: PGHOST
-          value: "{{ template "socket_directory" . }}"
-        - name: BOOTSTRAP_FROM_BACKUP
-          value: {{ .Values.bootstrapFromBackup.enabled | int | quote }}
-        {{- if .Values.env }}{{ .Values.env | default list | toYaml | nindent 8 }}{{- end }}
-          # pgBackRest is also called using the archive_command if the backup is enabled.
-          # this script will also need access to the environment variables specified for
-          # the backup. This can be removed once we do not directly invoke pgBackRest
-          # from inside the TimescaleDB container anymore
-        {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 8 }}{{- end }}
-        {{- if .Values.version }}
-        - name: PATH
-          value: /usr/lib/postgresql/{{ .Values.version }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-        {{- end }}
         envFrom:
-        - secretRef:
-            name: {{ template "secrets_credentials" . }}
-            optional: false
-        - secretRef:
-            name: {{ template "secrets_pgbackrest" . }}
-            optional: true
-        {{- if or .Values.envFrom .Values.backup.envFrom -}}
-        {{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 -}}
-        {{- end }}
+          - secretRef:
+              name: {{ template "secrets_credentials" . }}
+              optional: false
+          - secretRef:
+              name: {{ template "secrets_pgbackrest" . }}
+              optional: true
+          {{- if or .Values.envFrom .Values.backup.envFrom -}}
+          {{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 10 -}}
+          {{- end }}
         ports:
-        - containerPort: 8008
-          name: patroni
-        - containerPort: 5432
-          name: postgresql
+          - containerPort: 8008
+            name: patroni
+          - containerPort: 5432
+            name: postgresql
         {{- if .Values.readinessProbe.enabled }}
         readinessProbe:
           exec:
@@ -289,6 +289,12 @@ spec:
         - name: wal-volume
           mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
+        {{- end }}
+        {{- if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
+        - name: backup-volume
+          mountPath: {{ (include "pgbackrest_repo1_path" $) }}
+          # mountPath: {{ .Values.persistentVolumes.backup.mountPath | quote }}
+          subPath: {{ .Values.persistentVolumes.backup.subPath | quote }}
         {{- end }}
         {{- if .Values.sharedMemory.useMount }}
         - name: shared-memory
@@ -382,27 +388,33 @@ spec:
         - containerPort: 8081
           name: pgbackrest
         volumeMounts:
-        - name: socket-directory
-          mountPath: {{ template "socket_directory" . }}
-          readOnly: true
-        - name: storage-volume
-          mountPath: {{ .Values.persistentVolumes.data.mountPath | quote }}
-          subPath: {{ .Values.persistentVolumes.data.subPath | quote }}
-        {{- if .Values.persistentVolumes.wal.enabled }}
-        - name: wal-volume
-          mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
-          subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
-        {{- end }}
+          - name: socket-directory
+            mountPath: {{ template "socket_directory" . }}
+            readOnly: true
+          - name: storage-volume
+            mountPath: {{ .Values.persistentVolumes.data.mountPath | quote }}
+            subPath: {{ .Values.persistentVolumes.data.subPath | quote }}
+          {{- if .Values.persistentVolumes.wal.enabled }}
+          - name: wal-volume
+            mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
+            subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
+          {{- end }}
+          {{- if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
+          - name: backup-volume
+            mountPath: {{ (include "pgbackrest_repo1_path" $) }}
+            # mountPath: {{ .Values.persistentVolumes.backup.mountPath | quote }}
+            subPath: {{ .Values.persistentVolumes.backup.subPath | quote }}
+          {{- end }}
 {{- range $tablespaceName := ( .Values.persistentVolumes.tablespaces | default dict | keys ) }}
-        - name: {{ $tablespaceName }}
-          mountPath: {{ printf "%s/%s" (include "tablespaces_dir" $) $tablespaceName }}
+          - name: {{ $tablespaceName }}
+            mountPath: {{ printf "%s/%s" (include "tablespaces_dir" $) $tablespaceName }}
 {{- end }}
-        - mountPath: /etc/pgbackrest
-          name: pgbackrest
-          readOnly: true
-        - mountPath: {{ template "scripts_dir" . }}
-          name: timescaledb-scripts
-          readOnly: true
+          - name: pgbackrest
+            mountPath: /etc/pgbackrest
+            readOnly: true
+          - name: timescaledb-scripts
+            mountPath: {{ template "scripts_dir" . }}
+            readOnly: true
         env:
           - name: PGHOST
             value: {{ template "socket_directory" . }}
@@ -412,15 +424,15 @@ spec:
             value: /etc/pgbackrest/pgbackrest.conf
           {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 10 }}{{- end }}
         envFrom:
-        - secretRef:
-            name: {{ template "secrets_credentials" . }}
-            optional: false
-        - secretRef:
-            name: {{ template "secrets_pgbackrest" . }}
-            optional: false
-        {{- if or .Values.envFrom .Values.backup.envFrom -}}
-        {{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 -}}
-        {{- end }}
+          - secretRef:
+              name: {{ template "secrets_credentials" . }}
+              optional: false
+          - secretRef:
+              name: {{ template "secrets_pgbackrest" . }}
+              optional: false
+          {{- if or .Values.envFrom .Values.backup.envFrom -}}
+          {{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 10 -}}
+          {{- end }}
 {{ end }}
 
 {{- if .Values.prometheus.enabled }}
@@ -510,6 +522,11 @@ spec:
           name: {{ template "timescaledb.fullname" . }}-pgbackrest
           defaultMode: 416 # 0640 permissions
           optional: true
+      {{- if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
+      - name: backup-volume
+        persistentVolumeClaim:
+          claimName: backup-volume
+      {{- end }}
       - name: certificate
         secret:
           secretName:  {{ template "secrets_certificate" . }}
@@ -545,11 +562,11 @@ spec:
         resources:
           requests:
             storage: "{{ .Values.persistentVolumes.data.size }}"
-      {{- if .Values.persistentVolumes.data.storageClass }}
-      {{- if (eq "-" .Values.persistentVolumes.data.storageClass) }}
+      {{- if .Values.persistentVolumes.data.storageClassName }}
+      {{- if (eq "-" .Values.persistentVolumes.data.storageClassName) }}
         storageClassName: ""
       {{- else }}
-        storageClassName: "{{ .Values.persistentVolumes.data.storageClass }}"
+        storageClassName: "{{ .Values.persistentVolumes.data.storageClassName }}"
       {{- end }}
       {{- end }}
   {{- end }}
@@ -572,11 +589,11 @@ spec:
         resources:
           requests:
             storage: "{{ .Values.persistentVolumes.wal.size }}"
-      {{- if .Values.persistentVolumes.wal.storageClass }}
-      {{- if (eq "-" .Values.persistentVolumes.wal.storageClass) }}
+      {{- if .Values.persistentVolumes.wal.storageClassName }}
+      {{- if (eq "-" .Values.persistentVolumes.wal.storageClassName) }}
         storageClassName: ""
       {{- else }}
-        storageClassName: "{{ .Values.persistentVolumes.wal.storageClass }}"
+        storageClassName: "{{ .Values.persistentVolumes.wal.storageClassName }}"
       {{- end }}
       {{- end }}
   {{- end }}
@@ -598,5 +615,5 @@ spec:
         resources:
           requests:
             storage: "{{ $volume.size }}"
-        storageClassName: {{ $volume.storageClass | default "" }}
+        storageClassName: {{ $volume.storageClassName | default "" }}
 {{- end }}

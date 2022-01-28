@@ -66,6 +66,10 @@ ${HOME}/.pgbackrest_environment
 /etc/pgbackrest/bootstrap
 {{- end -}}
 
+{{- define "pgbackrest_repo1_path" -}}
+{{ printf "/%s/%s/" .Release.Namespace (include "clusterName" .) }}
+{{- end -}}
+
 {{- define "postgres.uid" -}}
 {{- default .Values.uid "1000" -}}
 {{- end -}}

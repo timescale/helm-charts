@@ -1,0 +1,31 @@
+# This PersistentVolumeClaim is only created if enabled.
+{{ if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backup-volume
+  annotations:
+  {{- if .Values.persistentVolumes.backup.annotations }}
+{{ toYaml .Values.persistentVolumes.backup.annotations | indent 4 }}
+  {{- end }}
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    cluster-name: {{ template "clusterName" . }}
+    purpose: backup-directory
+spec:
+  accessModes:
+{{ toYaml .Values.persistentVolumes.backup.accessModes | indent 4 }}
+  resources:
+    requests:
+      storage: "{{ .Values.persistentVolumes.backup.size }}"
+{{- if .Values.persistentVolumes.backup.storageClassName }}
+{{- if (eq "-" .Values.persistentVolumes.backup.storageClassName) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.persistentVolumes.backup.storageClassName }}"
+{{- end }}
+{{- end }}
+{{ end }}
