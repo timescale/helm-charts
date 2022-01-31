@@ -28,7 +28,7 @@ spec:
       - port: 8081
         protocol: TCP
     {{ if .Values.prometheus.enabled }}
-    # Prom server for scraping exporter
+    # Prometheus server for scraping exporter
     - from:
       - podSelector:
           matchLabels:
