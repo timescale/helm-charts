@@ -50,6 +50,8 @@ spec:
         env:
         - name: TSTUNE_FILE
           value: {{ template "tstune_config" . }}
+        - name: POSTGRES_MAJOR_VERSION
+          value: {{ .Values.version | quote }}
         - name: RESOURCES_WAL_VOLUME
           value: {{ if .Values.persistentVolumes.wal.enabled }}{{ .Values.persistentVolumes.wal.size }}{{ else }}"0"{{ end }}
         - name: RESOURCES_DATA_VOLUME
@@ -93,7 +95,7 @@ spec:
               fi
 
               touch "${TSTUNE_FILE}"
-              timescaledb-tune -quiet -pg-version 11 -conf-path "${TSTUNE_FILE}" -cpus "${CPUS}" -memory "${MEMORY}MB" \
+              timescaledb-tune -quiet -pg-version ${POSTGRES_MAJOR_VERSION} -conf-path "${TSTUNE_FILE}" -cpus "${CPUS}" -memory "${MEMORY}MB" \
                 {{ range $key, $value := .Values.timescaledbTune.args | default dict }}{{ printf "--%s %s " $key (quote $value)}}{{ end }} -yes
 
               # If there is a dedicated WAL Volume, we want to set max_wal_size to 60% of that volume
