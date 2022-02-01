@@ -208,6 +208,7 @@ data:
         # we want to override the environment with the environment
         # shellcheck disable=SC2046
         export $(env -i envdir {{ template "pgbackrest_bootstrap_environment_dir" . | quote }} env) > /dev/null
+        # export PGBACKREST_REPO1_PATH={{ index .Values.bootstrapFromBackup "repo1-path" | default ( include "pgbackrest_repo1_path" .) | quote }}
         export PGBACKREST_REPO1_PATH={{ index .Values.bootstrapFromBackup "repo1-path" | quote }}
 
         if [ -z "${PGBACKREST_REPO1_PATH}" ]; then

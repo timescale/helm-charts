@@ -237,6 +237,10 @@ spec:
             value: {{ template "clusterName" . }}
           - name: PGBACKREST_CONFIG
             value: /etc/pgbackrest/pgbackrest.conf
+          {{- if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
+          - name: PGBACKREST_REPO1_PATH
+            value: {{ template "pgbackrest_repo1_path" }}
+          {{- end }}
           # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly,
           # but for interactive sessions, callbacks and PostgreSQL tools they should be correct.
           - name: PGDATA
@@ -295,7 +299,6 @@ spec:
         {{- if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
         - name: backup-volume
           mountPath: {{ (include "pgbackrest_repo1_path" $) }}
-          # mountPath: {{ .Values.persistentVolumes.backup.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.backup.subPath | quote }}
         {{- end }}
         {{- if .Values.sharedMemory.useMount }}
@@ -423,6 +426,10 @@ spec:
             value: poddb
           - name: PGBACKREST_CONFIG
             value: /etc/pgbackrest/pgbackrest.conf
+          {{- if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
+          - name: PGBACKREST_REPO1_PATH
+            value: {{ template "pgbackrest_repo1_path" }}
+          {{- end }}
           {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 10 }}{{- end }}
         envFrom:
           - secretRef:

@@ -403,14 +403,16 @@ persistentVolumes:
     # example2:
     #   size: 5Gi
     #   storageClass: gp2
+  # If you want to use [repo-type](https://pgbackrest.org/configuration.html#section-repository/option-repo-type) `posix` with pgbackrest
+  # enable this persistentVolume and apply a storageClass that supports `ReadWriteMany` (e.g. NFS see https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes)
+  # Also you need to adjust `Values.backup.pgbackrest` to your needs (i.e. at least set the repo-type).
+  # It is recommended to remove all S3 related environment variables, values from config maps and secrets.
+  # `mountPath` and `subPath` are not used for this volume. The value for `mountPath` is generated and provided as template (`pgbackrest_repo1_path`)
+  # used for volume mounts and the `PGBACKREST_REPO1_PATH` environment variable (except when bootstraping from backup)
   backup:
     enabled: false
     size: 10Gi
-    subPath: ""
     # storageClass: "-"
-    # this is the default repo path 
-    # https://pgbackrest.org/configuration.html#section-repository/option-repo-path
-    mountPath: "/var/lib/pgbackrest"
     annotations: {}
     accessModes:
       - ReadWriteMany
