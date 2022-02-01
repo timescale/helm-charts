@@ -564,11 +564,11 @@ spec:
         resources:
           requests:
             storage: "{{ .Values.persistentVolumes.data.size }}"
-      {{- if .Values.persistentVolumes.data.storageClassName }}
-      {{- if (eq "-" .Values.persistentVolumes.data.storageClassName) }}
+      {{- if .Values.persistentVolumes.data.storageClass }}
+      {{- if (eq "-" .Values.persistentVolumes.data.storageClass) }}
         storageClassName: ""
       {{- else }}
-        storageClassName: "{{ .Values.persistentVolumes.data.storageClassName }}"
+        storageClassName: "{{ .Values.persistentVolumes.data.storageClass }}"
       {{- end }}
       {{- end }}
   {{- end }}
@@ -591,11 +591,11 @@ spec:
         resources:
           requests:
             storage: "{{ .Values.persistentVolumes.wal.size }}"
-      {{- if .Values.persistentVolumes.wal.storageClassName }}
-      {{- if (eq "-" .Values.persistentVolumes.wal.storageClassName) }}
+      {{- if .Values.persistentVolumes.wal.storageClass }}
+      {{- if (eq "-" .Values.persistentVolumes.wal.storageClass) }}
         storageClassName: ""
       {{- else }}
-        storageClassName: "{{ .Values.persistentVolumes.wal.storageClassName }}"
+        storageClassName: "{{ .Values.persistentVolumes.wal.storageClass }}"
       {{- end }}
       {{- end }}
   {{- end }}
@@ -617,5 +617,5 @@ spec:
         resources:
           requests:
             storage: "{{ $volume.size }}"
-        storageClassName: {{ $volume.storageClassName | default "" }}
+        storageClassName: {{ $volume.storageClass | default "" }}
 {{- end }}

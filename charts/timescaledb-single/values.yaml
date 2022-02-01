@@ -360,13 +360,13 @@ persistentVolumes:
     enabled: true
     size: 10Gi
     ## database data Persistent Volume Storage Class
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
+    ## If defined, storageClass: <storageClass>
+    ## If set to "-", storageClass: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClass spec is
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClassName: managed-nfs-storage
+    storageClass: managed-nfs-storage
     subPath: ""
     mountPath: "/var/lib/postgresql"
     annotations: {}
@@ -378,7 +378,7 @@ persistentVolumes:
     enabled: true
     size: 1Gi
     subPath: ""
-    storageClassName: managed-nfs-storage
+    storageClass: managed-nfs-storage
     # When changing this mountPath ensure you also change the following key to reflect this:
     # patroni.postgresql.basebackup.[].waldir
     mountPath: "/var/lib/postgresql/wal"
@@ -389,15 +389,15 @@ persistentVolumes:
   # tablespaces:
     # example1:
     #   size: 5Gi
-    #   storageClassName: managed-nfs-storage
+    #   storageClass: managed-nfs-storage
     # example2:
     #   size: 5Gi
-    #   storageClassName: managed-nfs-storage
+    #   storageClass: managed-nfs-storage
   backup:
     enabled: true
     size: 10Gi
     subPath: ""
-    storageClassName: managed-nfs-storage
+    storageClass: managed-nfs-storage
     # this is the default repo path 
     # https://pgbackrest.org/configuration.html#section-repository/option-repo-path
     mountPath: "/var/lib/pgbackrest"

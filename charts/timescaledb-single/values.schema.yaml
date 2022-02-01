@@ -614,7 +614,7 @@ definitions:
         type:
         - string
         - "null"
-      storageClassName:
+      storageClass:
         type:
         - string
         - "null"

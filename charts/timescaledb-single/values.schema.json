@@ -107,7 +107,7 @@
         "size": {
           "type": "string"
         },
-        "storageClassName": {
+        "storageClass": {
           "type": [
             "string",
             "null"

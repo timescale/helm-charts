@@ -21,11 +21,11 @@ spec:
   resources:
     requests:
       storage: "{{ .Values.persistentVolumes.backup.size }}"
-{{- if .Values.persistentVolumes.backup.storageClassName }}
-{{- if (eq "-" .Values.persistentVolumes.backup.storageClassName) }}
+{{- if .Values.persistentVolumes.backup.storageClass }}
+{{- if (eq "-" .Values.persistentVolumes.backup.storageClass) }}
   storageClassName: ""
 {{- else }}
-  storageClassName: "{{ .Values.persistentVolumes.backup.storageClassName }}"
+  storageClassName: "{{ .Values.persistentVolumes.backup.storageClass }}"
 {{- end }}
 {{- end }}
 {{ end }}
