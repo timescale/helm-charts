@@ -4,7 +4,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: backup-volume
+  name: {{ template "pgbackrest_backup_pvc" . }}
   {{- if .Values.persistentVolumes.backup.annotations }}
   annotations:
 {{ toYaml .Values.persistentVolumes.backup.annotations | indent 4 }}
@@ -14,7 +14,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     cluster-name: {{ template "clusterName" . }}
-    purpose: backup-directory
+    purpose: backup-storage
 spec:
   accessModes:
 {{ toYaml .Values.persistentVolumes.backup.accessModes | indent 4 }}

@@ -66,6 +66,10 @@ ${HOME}/.pgbackrest_environment
 /etc/pgbackrest/bootstrap
 {{- end -}}
 
+{{- define "pgbackrest_backup_pvc" -}}
+{{ printf "%s-backup-volume" (include "clusterName" .) }}
+{{- end -}}
+
 {{- define "pgbackrest_repo1_path" -}}
 {{ printf "/%s/%s/" .Release.Namespace (include "clusterName" .) }}
 {{- end -}}

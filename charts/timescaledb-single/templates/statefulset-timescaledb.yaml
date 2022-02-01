@@ -533,7 +533,7 @@ spec:
       {{- if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
       - name: backup-volume
         persistentVolumeClaim:
-          claimName: backup-volume
+          claimName: {{ template "pgbackrest_backup_pvc" . }}
       {{- end }}
       - name: certificate
         secret:
