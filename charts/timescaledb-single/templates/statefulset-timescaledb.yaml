@@ -430,7 +430,7 @@ spec:
               optional: false
           - secretRef:
               name: {{ template "secrets_pgbackrest" . }}
-              optional: false
+              optional: true
           {{- if or .Values.envFrom .Values.backup.envFrom -}}
           {{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 10 -}}
           {{- end }}

@@ -115,5 +115,5 @@ ${HOME}/.pgbackrest_environment
 {{- end -}}
 
 {{- define "secrets_pgbackrest" -}}
-{{ printf "%s-pgbackrest" (include "clusterName" .) }}
+{{ .Values.secrets.pgbackrestSecretName | default (printf "%s-pgbackrest" (include "clusterName" .)) }}
 {{- end -}}
