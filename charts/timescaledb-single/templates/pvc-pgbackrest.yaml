@@ -1,12 +1,12 @@
-# This PersistentVolumeClaim is only created if enabled.
 {{ if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
 ---
+# This PersistentVolumeClaim is only created if enabled.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: backup-volume
-  annotations:
   {{- if .Values.persistentVolumes.backup.annotations }}
+  annotations:
 {{ toYaml .Values.persistentVolumes.backup.annotations | indent 4 }}
   {{- end }}
   labels:
