@@ -239,7 +239,7 @@ spec:
             value: /etc/pgbackrest/pgbackrest.conf
           {{- if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
           - name: PGBACKREST_REPO1_PATH
-            value: {{ template "pgbackrest_repo1_path" }}
+            value: {{ template "pgbackrest_repo1_path" . }}
           {{- end }}
           # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly,
           # but for interactive sessions, callbacks and PostgreSQL tools they should be correct.
@@ -428,7 +428,7 @@ spec:
             value: /etc/pgbackrest/pgbackrest.conf
           {{- if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
           - name: PGBACKREST_REPO1_PATH
-            value: {{ template "pgbackrest_repo1_path" }}
+            value: {{ template "pgbackrest_repo1_path" . }}
           {{- end }}
           {{- if .Values.backup.env }}{{ .Values.backup.env | default list | toYaml | nindent 10 }}{{- end }}
         envFrom:
