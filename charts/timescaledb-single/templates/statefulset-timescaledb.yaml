@@ -51,7 +51,7 @@ spec:
         - name: TSTUNE_FILE
           value: {{ template "tstune_config" . }}
         - name: POSTGRES_MAJOR_VERSION
-          value: {{ .Values.version | quote }}
+          value: {{ .Values.version | default 11 | quote }}
         - name: RESOURCES_WAL_VOLUME
           value: {{ if .Values.persistentVolumes.wal.enabled }}{{ .Values.persistentVolumes.wal.size }}{{ else }}"0"{{ end }}
         - name: RESOURCES_DATA_VOLUME
