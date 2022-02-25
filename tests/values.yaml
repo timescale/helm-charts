@@ -1,8 +1,8 @@
 replicaCount: 2
-secretNames:
-  credentials: example-credentials
-  certificate: example-certificate
-  pgbackrest: example-pgbackrest
+secrets:
+  credentialsSecretName: example-credentials
+  certificateSecretName: example-certificate
+  pgbackrestSecretName: example-pgbackrest
 
 patroni:
   postgresql:
