@@ -130,6 +130,7 @@ spec:
 {{ tpl .Values.affinityTemplate . | indent 8 }}
     {{- end }}
       {{- if not .Values.persistentVolume.enabled }}
+      volumes:
       - name: storage-volume
         emptyDir: {}
       {{- end }}
