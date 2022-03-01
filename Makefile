@@ -1,5 +1,3 @@
-ROGUE_KUSTOMIZE_FILES := $(shell find charts/timescaledb-single/kustomize/ -mindepth 2 -type f ! -path '*kustomize/example*')
-ROGUE_KUSTOMIZE_DIRS := $(shell find charts/timescaledb-single/kustomize/  -mindepth 1 -type d ! -path '*kustomize/example*')
 SINGLE_CHART_DIR := charts/timescaledb-single
 MULTI_CHART_DIR := charts/timescaledb-multinode
 CI_SINGLE_DIR := $(SINGLE_CHART_DIR)/ci/
@@ -20,22 +18,11 @@ publish-multinode:
 
 .PHONY: publish-single
 publish-single:
-	@if [ "$(ROGUE_KUSTOMIZE_FILES)" != "" ]; then \
-		echo "Found non-example files in the timescaledb-single/kustomize directory"; \
-		echo "Please remove these files using 'make clean' or manually"; \
-		echo ""; \
-		echo "Unfortunately we cannot exclude these files in .helmignore due to"; \
-		echo "        https://github.com/helm/helm/issues/3622"; \
-		echo ""; \
-		exit 1; \
-	fi
 	helm package charts/timescaledb-single --destination charts/repo
 	helm repo index charts/repo
 
 .PHONY: clean
 clean: clean-ci
-	@if [ "$(ROGUE_KUSTOMIZE_FILES)" != "" ]; then rm -v $(ROGUE_KUSTOMIZE_FILES); fi
-	@if [ "$(ROGUE_KUSTOMIZE_DIRS)" != "" ]; then rmdir -v $(ROGUE_KUSTOMIZE_DIRS); fi
 
 .PHONY: assert-schema-equals
 assert-schema-equals:
@@ -102,7 +89,6 @@ prepare-ci:
 	@kubectl config set-context --current --namespace $(K8S_NAMESPACE)
 	@kubectl apply -f tests/custom_pgbouncer_user_list.yaml
 	@kubectl apply -f tests/custom-init-scripts.yaml
-	@kubectl kustomize "$(SINGLE_CHART_DIR)/kustomize/example" | kubectl apply --namespace $(K8S_NAMESPACE) -f -
 	@for storageclass in gp2 slow; do \
 		kubectl get storageclass/$${storageclass} > /dev/null 2> /dev/null || \
 		kubectl get storageclass -o json \

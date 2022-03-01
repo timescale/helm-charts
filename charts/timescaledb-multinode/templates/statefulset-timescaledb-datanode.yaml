@@ -42,6 +42,8 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+        - name: PG_HBA_TAIL
+          value: host all all all md5
         - name: POSTGRESQL_CUSTOM_PARAMETERS
           value: |
             {{- range $key, $value := .Values.postgresql.parameters }}
@@ -74,6 +76,7 @@ spec:
             # The TimescaleDB extension should not be available by default, as this interferes with the bootstrapping
             # done by the access nodes. Therefore we drop the extensions from template1
             echo "DROP EXTENSION timescaledb" | /docker-entrypoint.sh postgres --single -D "${PGDATA}" template1
+            grep "${PG_HBA_TAIL}" "${PGDATA}/pg_hba.conf" || echo "${PG_HBA_TAIL}" >> "${PGDATA}/pg_hba.conf"
         volumeMounts:
         - name: storage-volume
           mountPath: "{{ .Values.persistentVolume.mountPath }}"

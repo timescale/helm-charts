@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.11.0 - 2021-12-03]
+### Changed
+ * The `loadBalancer` & `replicaLoadBalancer` config parameters have been deprecated. Their defaults have been preserved for this release, so `loadBalancer.enabled` still defaults to `true`. It is now recommended that `loadBalancer.enabled` & `replicaLoadBalancer.enabled` be set to false, and instead the new `service.primary` & `service.replica` config values should be used.
+
 ## [v0.10.0 - 2021-09-28]
 This changeset introduces the ability to control the generated Kubernetes Services for the primary and replicas. It is now possible to declare the exact type of Service being generated, with support for NodePort services.
 
