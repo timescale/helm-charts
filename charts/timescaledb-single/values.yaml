@@ -23,6 +23,11 @@ image:
   tag: pg13.4-ts2.4.2-p0
   pullPolicy: Always
 
+# If you pull the image from a private repository you need to create an image pull secret
+# https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+# imagePullSecrets:
+# - name: registry-credentials
+
 # By default those secrets are randomly generated.
 # To prevent misconfiguration, modifications from helm upgrade won't be applied to those secrets.
 # As a result changing secrets cannot be done via helm and need manual intervention.
