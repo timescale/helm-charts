@@ -89,6 +89,7 @@ prepare-ci:
 	@kubectl config set-context --current --namespace $(K8S_NAMESPACE)
 	@kubectl apply -f tests/custom_pgbouncer_user_list.yaml
 	@kubectl apply -f tests/custom-init-scripts.yaml
+	@kubectl apply -f tests/custom_secrets.yaml
 	@for storageclass in gp2 slow; do \
 		kubectl get storageclass/$${storageclass} > /dev/null 2> /dev/null || \
 		kubectl get storageclass -o json \
