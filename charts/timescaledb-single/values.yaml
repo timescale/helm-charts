@@ -370,9 +370,9 @@ persistentVolumes:
     enabled: true
     size: 2Gi
     ## database data Persistent Volume Storage Class
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
+    ## If defined, storageClass: <storageClass>
+    ## If set to "-", storageClass: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClass spec is
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
@@ -403,6 +403,19 @@ persistentVolumes:
     # example2:
     #   size: 5Gi
     #   storageClass: gp2
+  # If you want to use [repo-type](https://pgbackrest.org/configuration.html#section-repository/option-repo-type) `posix` with pgbackrest
+  # enable this persistentVolume and apply a storageClass that supports `ReadWriteMany` (e.g. NFS see https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes)
+  # Also you need to adjust `Values.backup.pgbackrest` to your needs (i.e. at least set the repo-type).
+  # It is recommended to remove all S3 related environment variables, values from config maps and secrets.
+  # `mountPath` and `subPath` are not used for this volume. The value for `mountPath` is generated and provided as template (`pgbackrest_repo1_path`)
+  # used for volume mounts and the `PGBACKREST_REPO1_PATH` environment variable (except when bootstraping from backup)
+  backup:
+    enabled: false
+    size: 10Gi
+    # storageClass: "-"
+    annotations: {}
+    accessModes:
+      - ReadWriteMany
 
 # EXPERIMENTAL, please do *not* enable on production environments
 # if enabled, fullWalPrevention will switch the default transaction mode from read write

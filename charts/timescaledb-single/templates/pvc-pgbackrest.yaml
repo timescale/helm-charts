@@ -1,0 +1,31 @@
+{{ if and .Values.backup.enabled .Values.persistentVolumes.backup.enabled }}
+---
+# This PersistentVolumeClaim is only created if enabled.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "pgbackrest_backup_pvc" . }}
+  {{- if .Values.persistentVolumes.backup.annotations }}
+  annotations:
+{{ toYaml .Values.persistentVolumes.backup.annotations | indent 4 }}
+  {{- end }}
+  labels:
+    app: {{ template "timescaledb.fullname" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    cluster-name: {{ template "clusterName" . }}
+    purpose: backup-storage
+spec:
+  accessModes:
+{{ toYaml .Values.persistentVolumes.backup.accessModes | indent 4 }}
+  resources:
+    requests:
+      storage: "{{ .Values.persistentVolumes.backup.size }}"
+{{- if .Values.persistentVolumes.backup.storageClass }}
+{{- if (eq "-" .Values.persistentVolumes.backup.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.persistentVolumes.backup.storageClass }}"
+{{- end }}
+{{- end }}
+{{ end }}

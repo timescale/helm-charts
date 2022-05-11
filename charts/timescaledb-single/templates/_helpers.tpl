@@ -66,6 +66,14 @@ ${HOME}/.pgbackrest_environment
 /etc/pgbackrest/bootstrap
 {{- end -}}
 
+{{- define "pgbackrest_backup_pvc" -}}
+{{ printf "%s-backup-volume" (include "clusterName" .) }}
+{{- end -}}
+
+{{- define "pgbackrest_repo1_path" -}}
+{{ printf "/%s/%s/" .Release.Namespace (include "clusterName" .) }}
+{{- end -}}
+
 {{- define "postgres.uid" -}}
 {{- default .Values.uid "1000" -}}
 {{- end -}}
@@ -111,5 +119,5 @@ ${HOME}/.pgbackrest_environment
 {{- end -}}
 
 {{- define "secrets_pgbackrest" -}}
-{{ printf "%s-pgbackrest" (include "clusterName" .) }}
+{{ .Values.secrets.pgbackrestSecretName | default (printf "%s-pgbackrest" (include "clusterName" .)) }}
 {{- end -}}

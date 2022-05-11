@@ -543,6 +543,9 @@
         },
         "wal": {
           "$ref": "#/definitions/volume"
+        },
+        "backup": {
+          "$ref": "#/definitions/volume"
         }
       },
       "type": "object"

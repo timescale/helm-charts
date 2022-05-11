@@ -1,0 +1,35 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+version: 14
+
+image:
+  tag: pg14.1-ts2.5.1-oss-p2
+  pullPolicy: IfNotPresent
+
+secrets:
+  pgbackrest:
+    # deleting s3 props from default values (see https://helm.sh/docs/chart_template_guide/values_files/#deleting-a-default-key)
+    PGBACKREST_REPO1_S3_REGION: null
+    PGBACKREST_REPO1_S3_KEY: null
+    PGBACKREST_REPO1_S3_KEY_SECRET: null
+    PGBACKREST_REPO1_S3_BUCKET: null
+    PGBACKREST_REPO1_S3_ENDPOINT: null
+
+backup:
+  enabled: true
+  pgBackRest:
+    # https://pgbackrest.org/configuration.html
+    # Although not impossible, care should be taken not to include secrets
+    # in these parameters. Use Kubernetes Secrets to specify S3 Keys, Secrets etc.
+    # deleting s3 props from default values (see https://helm.sh/docs/chart_template_guide/values_files/#deleting-a-default-key)
+    repo1-s3-region: null
+    repo1-s3-endpoint: null
+    # since the default repo-type is `posix` we could also delete this key - but being explicit about this also has advantages
+    repo1-type: posix
+
+persistentVolumes:
+  backup:
+    enabled: true
+    # creating that storageClass is not scope of this chart
+    storageClass: nfs
