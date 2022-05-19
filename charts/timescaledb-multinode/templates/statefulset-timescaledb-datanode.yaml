@@ -71,6 +71,11 @@ spec:
             echo "Writing custom PostgreSQL Parameters to ${PGDATA}/postgresql_helm_customizations.conf"
             echo "cluster_name = '$(hostname)'" > "${PGDATA}/postgresql_helm_customizations.conf"
             echo "${POSTGRESQL_CUSTOM_PARAMETERS}" | sort >> "${PGDATA}/postgresql_helm_customizations.conf"
+            {{- if .Values.internalIpRange }}
+            echo "Adding {{ .Values.internalIpRange }} in pg_hba.conf"
+            grep -qxF "host all all {{ .Values.internalIpRange }} trust" "pg_hba.conf" \
+                || echo "host all all {{ .Values.internalIpRange }} trust" >> pg_hba.conf
+            {{- end }}
             # The TimescaleDB extension should not be available by default, as this interferes with the bootstrapping
             # done by the access nodes. Therefore we drop the extensions from template1
             echo "DROP EXTENSION timescaledb" | /docker-entrypoint.sh postgres --single -D "${PGDATA}" template1
