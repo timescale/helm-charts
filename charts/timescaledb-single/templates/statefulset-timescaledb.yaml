@@ -255,10 +255,10 @@ spec:
         {{- end }}
         envFrom:
         - secretRef:
-            name: {{ template "secrets_credentials" . }}
+            name: {{- if .Values.secrets.credentialsSecretName }} "{{ .Values.secrets.credentialsSecretName }}" {{- else }} {{ template "secrets_credentials" . }} {{- end}}
             optional: false
         - secretRef:
-            name: {{ template "secrets_pgbackrest" . }}
+            name: {{- if .Values.secrets.pgbackrestSecretName }} "{{ .Values.secrets.pgbackrestSecretName }}" {{- else }} {{ template "secrets_pgbackrest" . }} {{- end}}
             optional: true
         {{- if or .Values.envFrom .Values.backup.envFrom -}}
         {{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 -}}
@@ -512,7 +512,7 @@ spec:
           optional: true
       - name: certificate
         secret:
-          secretName:  {{ template "secrets_certificate" . }}
+          secretName:  {{- if .Values.secrets.certificateSecretName }} "{{.Values.secrets.certificateSecretName}}" {{- else}} {{ template "secrets_certificate" . }} {{- end }}
           defaultMode: 416 # 0640 permissions
       - name: pgbackrest-bootstrap
         secret:
