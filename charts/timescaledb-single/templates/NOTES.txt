@@ -8,10 +8,10 @@ TimescaleDB can be accessed via port 5432 on the following DNS name from within 
 To get your password for superuser run:
 
     # superuser password
-    PGPASSWORD_POSTGRES=$(kubectl get secret --namespace {{ .Release.Namespace }} {{- if .Values.secrets.credentialsSecretName }} {{.Values.secrets.credentialsSecretName }} {{- else}} {{ template "secrets_credentials" . }} {{- end }} -o jsonpath="{.data.PATRONI_SUPERUSER_PASSWORD}" | base64 --decode)
+    PGPASSWORD_POSTGRES=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "secrets_credentials" . }} -o jsonpath="{.data.PATRONI_SUPERUSER_PASSWORD}" | base64 --decode)
 
     # admin password
-    PGPASSWORD_ADMIN=$(kubectl get secret --namespace {{ .Release.Namespace }} {{- if .Values.secrets.credentialsSecretName }} {{.Values.secrets.credentialsSecretName }} {{- else}} {{ template "secrets_credentials" . }} {{- end }} -o jsonpath="{.data.PATRONI_admin_PASSWORD}" | base64 --decode)
+    PGPASSWORD_ADMIN=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "secrets_credentials" . }} -o jsonpath="{.data.PATRONI_admin_PASSWORD}" | base64 --decode)
 
 To connect to your database, choose one of these options:
 
