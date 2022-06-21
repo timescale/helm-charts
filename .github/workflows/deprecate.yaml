@@ -10,6 +10,6 @@ on:
 jobs:
   do-not-commit:
     runs-on: ubuntu-latest
-    name: Repo shouldn't be modified
+    name: chart/repo directory shouldn't be modified
     steps:
     - run: exit 1
