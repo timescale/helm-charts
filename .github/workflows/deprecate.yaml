@@ -1,0 +1,15 @@
+name: Deprecate repo
+on:
+  push:
+    paths:
+    - 'charts/repo/**'
+  pull_request:
+    paths:
+    - 'charts/repo/**'
+
+jobs:
+  do-not-commit:
+    runs-on: ubuntu-latest
+    name: Repo shouldn't be modified
+    steps:
+    - run: exit 1
