@@ -1,0 +1,25 @@
+{
+    "timezone": "Etc/UTC",
+    "extends": [
+      "config:base",
+      "schedule:daily"
+    ],
+    "dependencyDashboardLabels": ["dependencies"],
+    "dependencyDashboardAutoclose": "true",
+    "labels": ["dependencies"],
+    "regexManagers": [
+      {
+        "fileMatch": ["^\\.github\\/workflows\\/[^/]+\\.ya?ml$"],
+        "matchStrings": ["helm-version:\\s(?<currentValue>.*?)\\n"],
+        "datasourceTemplate": "github-tags",
+        "depNameTemplate": "helm/helm"
+      }
+    ],
+    "packageRules": [
+      {
+        "addLabels": ["github_actions"],
+        "groupName": "github actions",
+        "matchPaths": [".github/**"]
+      }
+    ]
+  }
