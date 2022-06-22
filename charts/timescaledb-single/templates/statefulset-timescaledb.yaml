@@ -354,7 +354,7 @@ spec:
             name: pgbouncer
             readOnly: true
 {{- if .Values.pgBouncer.userListSecretName }}
-          - mountPath: /etc/pgbouncer/userlist/userlist.txt
+          - mountPath: /etc/pgbouncer/userlist/
             name: pgbouncer-userlist
             readOnly: true
 {{- end }}
