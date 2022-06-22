@@ -823,6 +823,13 @@
         "integer",
         "null"
       ]
+    },
+    "priorityClassName": {
+      "minimum": 1,
+      "type": [
+        "integer",
+        "null"
+      ]
     }
   },
   "required": [

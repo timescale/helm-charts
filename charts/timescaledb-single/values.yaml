@@ -23,6 +23,11 @@ image:
   tag: pg14.3-ts2.7.0-p0
   pullPolicy: Always
 
+## @param priorityClassName Name of the existing priority class to be used by kafka pods
+## Ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: "timescaledb"
+
 # By default those secrets are randomly generated.
 # To prevent misconfiguration, modifications from helm upgrade won't be applied to those secrets.
 # As a result changing secrets cannot be done via helm and need manual intervention.
