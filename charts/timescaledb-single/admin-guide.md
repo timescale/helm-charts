@@ -254,6 +254,11 @@ Alternatively, you can use the [AWS Management Console](https://s3.console.aws.a
 
 ## Backups
 
+### A Warning Regarding WAL Volume Usage
+If backups are not enabled via `pgbackrest`, the WAL data for the instance will not be maintained. This will result in WAL data filling the volume to capacity, regardless of where that data is stored.
+
+If you intend to use this Helm chart in any operational capacity, configuring and enabling backups is *NOT* optional!
+
 ### Create backups to S3
  the following items are required for you to enable creating backups to S3:
 
