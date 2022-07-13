@@ -512,7 +512,7 @@ spec:
           optional: true
       - name: certificate
         secret:
-          secretName:  {{ template "secrets_certificate" . }}
+          secretName: {{ template "secrets_certificate" . }}
           defaultMode: 416 # 0640 permissions
       - name: pgbackrest-bootstrap
         secret:

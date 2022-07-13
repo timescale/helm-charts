@@ -13,7 +13,7 @@ To get your password for superuser run:
     # admin password
     PGPASSWORD_ADMIN=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "secrets_credentials" . }} -o jsonpath="{.data.PATRONI_admin_PASSWORD}" | base64 --decode)
 
-To connect to your database, chose one of these options:
+To connect to your database, choose one of these options:
 
 1. Run a postgres pod and connect using the psql cli:
     # login as superuser

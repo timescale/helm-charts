@@ -3,22 +3,24 @@ on:
 - push
 - pull_request
 
+env:
+  helm-version: v3.8.1
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Fetch history
-        run: git fetch --prune --unshallow
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Copy example values files to the expected Helm Linter locations
         run: make refresh-ci-values
 
       - name: Run linter on Helm Charts
         id: lint
-        uses: helm/chart-testing-action@v2.1.0
+        uses: helm/chart-testing-action@v2.2.1
         with:
           command: lint
 
@@ -27,14 +29,14 @@ jobs:
 
       - name: Run shellcheck on all scripts
         run: make shellcheck
+
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Fetch history
-        run: git fetch --prune --unshallow
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Test if Chart.yaml has been touched
         id: single_chart_changed
@@ -48,9 +50,11 @@ jobs:
         id: install-kubectl
         if: steps.single_chart_changed.outputs.changes != ''
 
-      - uses: azure/setup-helm@v1
+      - uses: azure/setup-helm@v2.1
         id: install-helm
         if: steps.single_chart_changed.outputs.changes != ''
+        with:
+          version: ${{ env.helm-version }}
 
       - name: Test all available values files clusters
         run: make test
