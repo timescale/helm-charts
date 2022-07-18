@@ -5,3 +5,4 @@
 **/credentials.conf
 **/ci
 charts/repo/
+dist/
