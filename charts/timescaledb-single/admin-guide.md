@@ -279,6 +279,29 @@ backup:
 helm upgrade --install example -f myvalues.yaml charts/timescaledb-single
 ```
 
+### Create backups to GCS
+ the following items are required for you to enable creating backups to GCS:
+
+- a GCS bucket available for your backups
+- a [Service Account](https://cloud.google.com/storage/docs/projects#service-accounts)
+- [IAM Permissions for Cloud Storage](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/add-bucket-policy.html) that allows the service account read and write access to (parts of) the bucket
+- [Service Account Key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) for authentication
+
+The service account key json file should be configured through the `RELEASE-pgbackrest-secrets` secret. Once you create this secret
+with the service account key, you can enable backups by setting `backup.enabled` to `true` and configuring `pgabackrest` to use GCS for backups. For example, if `RELEASE-pgbackrest-secrets` was configured with the service account key as `your-service-key.json`:
+
+```yaml
+# Filename: myvalues.yaml
+backup:
+  enabled: true
+  repo1-type: gcs
+  repo1-gcs-bucket: your-bucket
+  repo1-gcs-key: /etc/pgbackrest_secrets/your-service-key.json
+```
+```
+helm upgrade --install example -f myvalues.yaml charts/timescaledb-single
+```
+
 ### Control the backup schedule
 If you want to alter the backup jobs, or their schedule, you can override the `backup.jobs` in your configuration, for example:
 

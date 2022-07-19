@@ -6,14 +6,16 @@ Please see the included NOTICE for copyright information and LICENSE for a copy 
 # TimescaleDB Single
 
 ##### Table of Contents
-- [Introduction](#introduction)
-- [Installing](#installing)
-  - [Installing from the Timescale Helm Repo](#installing-from-the-timescale-helm-repo)
-- [Connecting to TimescaleDBs](#connecting-to-timescaledbs)
-  - [Connecting from inside the Cluster](#connecting-from-inside-the-cluster)
-- [Create backups to S3](#create-backups-to-s3)
-- [Cleanup](#cleanup)
-- [Further reading](#further-reading)
+- [TimescaleDB Single](#timescaledb-single)
+        - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Installing](#installing)
+    - [Installing from the Timescale Helm Repo](#installing-from-the-timescale-helm-repo)
+  - [Connecting to TimescaleDBs](#connecting-to-timescaledbs)
+    - [Connecting from inside the Cluster](#connecting-from-inside-the-cluster)
+  - [Create backups to S3 or GCS](#create-backups-to-s3-or-gcs)
+  - [Cleanup](#cleanup)
+  - [Further reading](#further-reading)
 
 ## Introduction
 This directory contains a Helm chart to deploy a three
@@ -139,7 +141,7 @@ RELEASE=my-release
 kubectl exec -ti $(kubectl get pod -o name -l role=master,release=$RELEASE) psql
 ```
 
-## Create backups to S3
+## Create backups to S3 or GCS
 The backup is disabled by default, look at the
 [Administrator Guide](admin-guide.md#backups) on how to configure backup location, credentials, schedules, etc.
 
