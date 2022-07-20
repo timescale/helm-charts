@@ -34,10 +34,13 @@ jobs:
           done
 
       - name: Publish releases
+        working-directory: dist
         env:
           AWS_REGION: 'us-east-1'
           AWS_ACCESS_KEY_ID: ${{ secrets.ORG_AWS_HELM_CHART_BUCKET_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ORG_AWS_HELM_CHART_BUCKET_SECRET_ACCESS_KEY }}
         run: |
             helm repo add tscharts s3://charts.timescale.com
-            helm s3 push dist/* tscharts --acl public-read --relative --ignore-if-exists
+            for repo in *.tgz; do
+              helm s3 push $repo tscharts --acl public-read --relative --ignore-if-exists
+            done
