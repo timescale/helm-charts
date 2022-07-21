@@ -6,16 +6,14 @@ Please see the included NOTICE for copyright information and LICENSE for a copy 
 # TimescaleDB Single
 
 ##### Table of Contents
-- [TimescaleDB Single](#timescaledb-single)
-        - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Installing](#installing)
-    - [Installing from the Timescale Helm Repo](#installing-from-the-timescale-helm-repo)
-  - [Connecting to TimescaleDBs](#connecting-to-timescaledbs)
-    - [Connecting from inside the Cluster](#connecting-from-inside-the-cluster)
-  - [Create backups to S3 or GCS](#create-backups-to-s3-or-gcs)
-  - [Cleanup](#cleanup)
-  - [Further reading](#further-reading)
+- [Introduction](#introduction)
+- [Installing](#installing)
+  - [Installing from the Timescale Helm Repo](#installing-from-the-timescale-helm-repo)
+- [Connecting to TimescaleDBs](#connecting-to-timescaledbs)
+  - [Connecting from inside the Cluster](#connecting-from-inside-the-cluster)
+- [Create backups to S3 or GCS](#create-backups-to-s3-or-gcs)
+- [Cleanup](#cleanup)
+- [Further reading](#further-reading)
 
 ## Introduction
 This directory contains a Helm chart to deploy a three
