@@ -52,12 +52,19 @@ secrets:
   certificateSecretName: ""
 
   # This secret should contain environment variables that influence pgBackRest.
-  pgbackrest:
-    PGBACKREST_REPO1_S3_REGION: ""
-    PGBACKREST_REPO1_S3_KEY: ""
-    PGBACKREST_REPO1_S3_KEY_SECRET: ""
-    PGBACKREST_REPO1_S3_BUCKET: ""
-    PGBACKREST_REPO1_S3_ENDPOINT: "s3.amazonaws.com"
+  pgbackrest: {}
+    # Example S3 configuration
+    # PGBACKREST_REPO1_S3_REGION: ""
+    # PGBACKREST_REPO1_S3_KEY: ""
+    # PGBACKREST_REPO1_S3_KEY_SECRET: ""
+    # PGBACKREST_REPO1_S3_BUCKET: ""
+    # PGBACKREST_REPO1_S3_ENDPOINT: "s3.amazonaws.com"
+
+    # Example Azure configuration
+    # PGBACKREST_REPO1_AZURE_ACCOUNT: ""
+    # PGBACKREST_REPO1_AZURE_CONTAINER: ""
+    # PGBACKREST_REPO1_AZURE_KEY: ""
+    # PGBACKREST_REPO1_AZURE_KEY_TYPE: ""
   
   # Selector used to provision your own Secret containing pgbackrest configuration details
   # This is mutually exclusive with `pgbackrest` option and takes precedence over it.
@@ -75,10 +82,22 @@ backup:
     start-fast: "y"
     repo1-retention-diff: 2
     repo1-retention-full: 2
-    repo1-type: s3
     repo1-cipher-type: "none"
-    repo1-s3-region: us-east-2
-    repo1-s3-endpoint: s3.amazonaws.com
+
+    # Example S3 configuration
+    # repo1-type: s3
+    # repo1-s3-region: us-east-2
+    # repo1-s3-endpoint: s3.amazonaws.com
+
+    # Example GCS configuration
+    # repo1-type: gcs
+    # repo1-path: /repo
+    # repo1-gcs-bucket: your-bucket
+    # repo1-gcs-key: /etc/pgbackrest_secrets/your-service-key.json
+
+    # Example Azure configuration
+    # repo1-type: azure
+    # repo1-path: /repo
 
   # Overriding the archive-push/archive-get sections is most useful in
   # very high througput situations. Look at values/high_throuhgput_example.yaml for more details
