@@ -268,12 +268,53 @@ If you intend to use this Helm chart in any operational capacity, configuring an
 - access key that allows you to login as the IAM user
 
 These configuration items should be part of the `RELEASE-pgbackrest` secret. Once you recreate this secret
-with the correct configurations, you can enable the backup by setting `backup.enabled` to `true`, for example:
+with the correct configurations, you can enable the backup in your `values.yaml`, for example:
 
 ```yaml
 # Filename: myvalues.yaml
+secrets:
+  pgbackrest:
+    PGBACKREST_REPO1_S3_REGION: ""
+    PGBACKREST_REPO1_S3_KEY: ""
+    PGBACKREST_REPO1_S3_KEY_SECRET: ""
+    PGBACKREST_REPO1_S3_BUCKET: ""
+    PGBACKREST_REPO1_S3_ENDPOINT: "s3.amazonaws.com"
+
 backup:
   enabled: true
+  pgBackRest:
+    repo1-type: s3
+    repo1-s3-region: us-east-2
+    repo1-s3-endpoint: s3.amazonaws.com
+```
+```
+helm upgrade --install example -f myvalues.yaml charts/timescaledb-single
+```
+
+### Create backups to Azure
+ the following items are required for you to enable creating backups to Azure:
+
+- an Azure Storage [account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create?toc=%2Fazure%2Fstorage%2Fblobs%2Ftoc.json&tabs=azure-portal)
+- a container in the storage account
+- [Storage account access key](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage?toc=%2Fazure%2Fstorage%2Fblobs%2Ftoc.json&tabs=azure-portal) for authentication (either shared or sas)
+
+Similarly to S3, the access key configuration items should be part of the `RELEASE-pgbackrest` secret. Once you recreate this secret
+with the correct configurations, you can enable the backup in your `values.yaml`, for example:
+
+```yaml
+# Filename: myvalues.yaml
+secrets:
+  pgbackrest:
+    PGBACKREST_REPO1_AZURE_ACCOUNT: ""
+    PGBACKREST_REPO1_AZURE_CONTAINER: ""
+    PGBACKREST_REPO1_AZURE_KEY: ""
+    PGBACKREST_REPO1_AZURE_KEY_TYPE: ""
+
+backup:
+  enabled: true
+  pgBackRest:
+    repo1-type: azure
+    repo1-path: /repo
 ```
 ```
 helm upgrade --install example -f myvalues.yaml charts/timescaledb-single
