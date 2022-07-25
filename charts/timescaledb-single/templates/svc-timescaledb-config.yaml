@@ -20,12 +20,9 @@ kind: Service
 metadata:
   name: {{ template "clusterName" . }}-config
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    cluster-name: {{ template "clusterName" . }}
     component: patroni
+{{ include "timescaledb-helm.labels" . | indent 4 }}
+    app.kubernetes.io/component: patroni
 spec:
   selector:
     app: {{ template "timescaledb.fullname" . }}

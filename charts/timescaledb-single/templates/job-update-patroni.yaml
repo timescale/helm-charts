@@ -18,11 +18,8 @@ kind: Job
 metadata:
   name: "{{ .Release.Name }}-patroni-{{ randAlphaNum 2 | lower }}"
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 4}}
+    app.kubernetes.io/component: patroni
   annotations:
     "helm.sh/hook": post-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded
