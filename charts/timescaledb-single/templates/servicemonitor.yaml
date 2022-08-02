@@ -8,11 +8,7 @@ metadata:
   namespace: {{ .Values.serviceMonitor.namespace }}
   {{- end }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 4}}
     {{- if .Values.serviceMonitor.labels -}}
     {{ toYaml .Values.serviceMonitor.labels | nindent 4 }}
     {{- end }}

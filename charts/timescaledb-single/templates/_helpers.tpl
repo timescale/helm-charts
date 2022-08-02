@@ -113,3 +113,20 @@ ${HOME}/.pgbackrest_environment
 {{- define "secrets_pgbackrest" -}}
 {{ .Values.secrets.pgbackrestSecretName | default (printf "%s-pgbackrest" (include "clusterName" .)) | quote }}
 {{- end -}}
+
+{{/*
+Generate common labels to be used
+*/}}
+{{- define "timescaledb.labels" -}}
+app: {{ include "timescaledb.fullname" . }}
+chart: {{ template "timescaledb.chart" . }}
+release: {{ .Release.Name }}
+heritage: {{ .Release.Service }}
+cluster-name: {{ template "clusterName" . }}
+{{- end }}
+
+{{- define "timescaledb-helm.labels" -}}
+{{ include "timescaledb.labels" . }}
+app.kubernetes.io/name: {{ include "timescaledb.fullname" . | quote }}
+app.kubernetes.io/version: {{ .Chart.Version }}
+{{- end }}

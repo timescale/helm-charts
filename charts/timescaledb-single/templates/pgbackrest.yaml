@@ -8,11 +8,8 @@ kind: Service
 metadata:
   name: {{ template "timescaledb.fullname" . }}-backup
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 4}}
+    app.kubernetes.io/component: backup
 spec:
   ports:
   - port: 8081
@@ -29,12 +26,9 @@ kind: CronJob
 metadata:
   name: {{ template "timescaledb.fullname" $ }}-{{ .name }}
   labels:
-    app: {{ template "timescaledb.fullname" $ }}
-    chart: {{ template "timescaledb.chart" $ }}
-    release: {{ $.Release.Name }}
-    heritage: {{ $.Release.Service }}
     backup-type: {{ .type }}
-    cluster-name: {{ template "clusterName" $ }}
+{{ include "timescaledb-helm.labels" $ | indent 4}}
+    app.kubernetes.io/component: backup
 spec:
   schedule: {{ quote .schedule }}
   concurrencyPolicy: Forbid
