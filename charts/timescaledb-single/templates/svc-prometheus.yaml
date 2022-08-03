@@ -9,11 +9,9 @@ metadata:
   name: {{ template "clusterName" . }}-prometheus
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
     component: postgres-exporter
+{{ include "timescaledb-helm.labels" . | indent 4 }}
+    app.kubernetes.io/component: postgres-exporter
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9187"

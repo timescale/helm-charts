@@ -6,11 +6,8 @@ kind: StatefulSet
 metadata:
   name: {{ template "timescaledb.fullname" . }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 4 }}
+    app.kubernetes.io/component: timescaledb
 spec:
   serviceName: {{ template "timescaledb.fullname" . }}
   replicas: {{ .Values.replicaCount }}
@@ -25,9 +22,8 @@ spec:
     metadata:
       name: {{ template "timescaledb.fullname" . }}
       labels:
-        app: {{ template "timescaledb.fullname" . }}
-        release: {{ .Release.Name }}
-        cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 8 }}
+        app.kubernetes.io/component: timescaledb
 {{- if .Values.podAnnotations }}
       annotations:
 {{ toYaml .Values.podAnnotations | indent 8 }}
@@ -181,7 +177,7 @@ spec:
             export -p > "{{ template "pod_environment_file" }}"
             export -p | grep PGBACKREST > "{{ template "pgbackrest_environment_file" }}"
 
-            for UNKNOWNVAR in $(env | awk -F '=' '!/^(PATRONI_.*|HOME|PGDATA|PGHOST|LC_.*|LANG|PATH|KUBERNETES_SERVICE_.*)=/ {print $1}')
+            for UNKNOWNVAR in $(env | awk -F '=' '!/^(PATRONI_.*|HOME|PGDATA|PGHOST|LC_.*|LANG|PATH|KUBERNETES_SERVICE_.*|AWS_ROLE_ARN|AWS_WEB_IDENTITY_TOKEN_FILE)=/ {print $1}')
             do
                 unset "${UNKNOWNVAR}"
             done
@@ -355,7 +351,7 @@ spec:
             name: pgbouncer
             readOnly: true
 {{- if .Values.pgBouncer.userListSecretName }}
-          - mountPath: /etc/pgbouncer/userlist/userlist.txt
+          - mountPath: /etc/pgbouncer/userlist/
             name: pgbouncer-userlist
             readOnly: true
 {{- end }}

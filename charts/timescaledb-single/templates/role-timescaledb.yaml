@@ -7,10 +7,8 @@ kind: Role
 metadata:
   name: {{ template "timescaledb.fullname" . }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+{{ include "timescaledb-helm.labels" . | indent 4}}
+    app.kubernetes.io/component: rbac
 rules:
 - apiGroups: [""]
   resources: ["configmaps"]
@@ -23,10 +21,6 @@ rules:
   - watch
   # delete is required only for 'patronictl remove'
   - delete
-- apiGroups: [""]
-  resources: ["services"]
-  verbs:
-  - create
 - apiGroups: [""]
   resources:
   - endpoints
