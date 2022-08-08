@@ -18,3 +18,7 @@ sources:
 maintainers:
 - name: TimescaleDB
   email: support@timescale.com
+
+# The chart is deprecated. We are looking for maintainers to remove this field.
+# More in https://github.com/timescale/helm-charts/blob/master/charts/timescaledb-multinode/README.md#call-for-maintainers
+deprecated: true
