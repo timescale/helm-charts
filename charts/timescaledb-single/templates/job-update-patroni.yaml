@@ -17,6 +17,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: "{{ .Release.Name }}-patroni-{{ randAlphaNum 2 | lower }}"
+  namespace: {{ .Release.Namespace }}
   labels:
 {{ include "timescaledb-helm.labels" . | indent 4}}
     app.kubernetes.io/component: patroni

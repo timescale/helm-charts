@@ -5,6 +5,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "timescaledb.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
 {{ include "timescaledb-helm.labels" . | indent 4 }}
     app.kubernetes.io/component: timescaledb
