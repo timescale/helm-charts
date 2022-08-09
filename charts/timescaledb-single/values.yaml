@@ -23,6 +23,11 @@ image:
   tag: pg14.3-ts2.7.0-p0
   pullPolicy: Always
 
+## @param priorityClassName Name of the existing priority class to be used by kafka pods
+## Ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName:
+
 # By default those secrets are randomly generated.
 # To prevent misconfiguration, modifications from helm upgrade won't be applied to those secrets.
 # As a result changing secrets cannot be done via helm and need manual intervention.
@@ -52,12 +57,13 @@ secrets:
   certificateSecretName: ""
 
   # This secret should contain environment variables that influence pgBackRest.
-  pgbackrest:
-    PGBACKREST_REPO1_S3_REGION: ""
-    PGBACKREST_REPO1_S3_KEY: ""
-    PGBACKREST_REPO1_S3_KEY_SECRET: ""
-    PGBACKREST_REPO1_S3_BUCKET: ""
-    PGBACKREST_REPO1_S3_ENDPOINT: "s3.amazonaws.com"
+  pgbackrest: {}
+    # Example configuration
+    # PGBACKREST_REPO1_S3_REGION: ""
+    # PGBACKREST_REPO1_S3_KEY: ""
+    # PGBACKREST_REPO1_S3_KEY_SECRET: ""
+    # PGBACKREST_REPO1_S3_BUCKET: ""
+    # PGBACKREST_REPO1_S3_ENDPOINT: "s3.amazonaws.com"
   
   # Selector used to provision your own Secret containing pgbackrest configuration details
   # This is mutually exclusive with `pgbackrest` option and takes precedence over it.
@@ -75,10 +81,18 @@ backup:
     start-fast: "y"
     repo1-retention-diff: 2
     repo1-retention-full: 2
-    repo1-type: s3
     repo1-cipher-type: "none"
-    repo1-s3-region: us-east-2
-    repo1-s3-endpoint: s3.amazonaws.com
+
+    # Example for s3
+    # repo1-type: s3
+    # repo1-s3-region: us-east-2
+    # repo1-s3-endpoint: s3.amazonaws.com
+
+    # Example for azure
+    # repo1-type: azure
+    # repo1-azure-account: azurestorageaccount
+    # repo1-azure-container: timescaledbcontainer
+    # repo1-azure-key: Ozz7nHipXVvL4M8rqvjlR1gBs/jShsWtaERPnOy3Ja6MRcIK8211Hkvg3N8by3uPBcxkT4K6nrGY+0Hjq58jMz==
 
   # Overriding the archive-push/archive-get sections is most useful in
   # very high througput situations. Look at values/high_throuhgput_example.yaml for more details

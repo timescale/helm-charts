@@ -536,6 +536,11 @@ properties:
     - "null"
     minimum: 11
     maximum: 14
+  priorityClassName:
+    type:
+    - string
+    - "null"
+    minLength: 1
   nameOverride:
     type:
     - string

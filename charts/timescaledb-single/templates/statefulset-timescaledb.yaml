@@ -30,6 +30,9 @@ spec:
 {{- end }}
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
       securityContext:
         # The postgres user inside the TimescaleDB image has uid=1000.
         # This configuration ensures the permissions of the mounts are suitable
