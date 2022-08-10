@@ -1,0 +1,29 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "avalanche.fullname" . }}
+  labels:
+{{ include "avalanche-helm.labels" . | indent 4 }}
+    app.kubernetes.io/component: avalanche
+{{- if .Values.service.labels }}
+{{ .Values.service.labels | toYaml | indent 4 }}
+{{- end }}
+{{- if .Values.service.annotations }}
+  annotations:
+{{ .Values.service.annotations | toYaml | indent 4 }}
+{{- end }}
+spec:
+  selector:
+{{ include "avalanche.labels" . | indent 4}}
+  type: {{ .Values.service.type }}
+  ports:
+  - name: metrics
+    port: {{ .Values.service.port }}
+    targetPort: metrics
+    protocol: TCP
+{{- if .Values.service.spec }}
+{{ .Values.service.spec | toYaml | indent 2 }}
+{{- end }}
