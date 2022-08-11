@@ -75,8 +75,8 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `podManagementPolicy`             | Either [`OrderedReady` or `Parallel`](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies) | `OrderedReady` |
 | `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/prometheus-community/postgres_exporter) sidecar | `false` |
 | `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
-| `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |
-| `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.7.0`                                            |
+| `prometheus.image.repository`     | The postgres\_exporter docker repo          | `quay.io/prometheuscommunity/postgres_exporter`     |
+| `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.11.0`                                           |
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
 | `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
 | `replicaLoadBalancer.annotations` | Deprecated(0.10.0): Pass on annotations to the Load Balancer | An AWS ELB annotation to increase the idle timeout |
