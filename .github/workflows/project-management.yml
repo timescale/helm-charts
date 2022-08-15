@@ -1,0 +1,36 @@
+name: Project Management
+
+on:
+  issues:
+    types: [opened, reopened]
+  release:
+    types: [published]
+  schedule:
+    - cron: '13 2 * * MON' # Run every Monday at 2:13 UTC
+
+jobs:
+  assign_issue:
+    runs-on: ubuntu-latest
+    name: Assign Issue to a Project
+    if: github.event_name == 'issues'
+    steps:
+    - name: Assign NEW issues to project O11y Applications
+      uses: actions/add-to-project@main
+      with:
+        project-url: 'https://github.com/orgs/timescale/projects/54'
+        # PAT token is managed by @paulfantom
+        github-token: ${{ secrets.ORG_PROJECT_PAT }}
+
+  stale-issues-handler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v5
+        with:
+          any-of-labels: 'needs-more-info,question'
+          stale-pr-label: 'stale'
+          exempt-all-milestones: true
+          days-before-stale: 30
+          days-before-close: 30
+          stale-issue-message: |
+            This issue went stale because it was not updated in a month. Please consider updating it to improve the quality of the project.
+          close-issue-message: 'This issue was closed because it has been stalled for 30 days with no activity.'
