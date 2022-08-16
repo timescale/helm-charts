@@ -64,7 +64,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `persistentVolumes.<name>.subPath`| Subdirectory of Persistent Volume to mount  | `""`                                                |
 | `persistentVolumes.data.enabled`  | If enabled, use a Persistent Data Volume    | `true`                                              |
 | `persistentVolumes.data.mountPath`| Persistent Data Volume mount root path      | `/var/lib/postgresql/`                              |
-| `persistentVolumes.tablespaces`   | A mapping of tablespaces and Volumes        | `nil`, see [multiple-tablespaces.yaml](values/multiple-tablespaces.yaml) for a full example |
+| `persistentVolumes.tablespaces`   | A mapping of tablespaces and Volumes        | `nil`, see [multiple-tablespaces.yaml](ci/multiple-tablespaces.yaml) for a full example |
 | `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume. If disabled, WAL will be on the Data Volume | `true`     |
 | `persistentVolumes.wal.mountPath` | Persistent Wal Volume mount root path       | `/var/lib/postgresql/wal/`                          |
 | `pgBouncer.config`                | Additional pgBouncer [configuration](https://www.pgbouncer.org/config.html) items | A reasonable set of defaults |
@@ -186,9 +186,9 @@ at: https://pgbackrest.org/command.html#introduction
     ```console
     helm upgrade --install my-release charts/timescaledb-single -f myvalues.yaml
     ```
-- Use an example values file to match an AWS EC2 Instance type, for example, using `charts/timescaledb-single/values/m5.large.example.yaml`:
+- Use an example values file to match an AWS EC2 Instance type, for example, using `charts/timescaledb-single/ci/m5.large.example.yaml`:
     ```console
-    helm upgrade --install my-release charts/timescaledb-single -f charts/timescaledb-single/values/m5.large.example.yaml
+    helm upgrade --install my-release charts/timescaledb-single -f charts/timescaledb-single/ci/m5.large.example.yaml
     ```
 
 ## Connecting
