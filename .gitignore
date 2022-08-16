@@ -3,6 +3,8 @@
 **/*.key
 **/pgbackrest.conf
 **/credentials.conf
-**/ci
 charts/repo/
+charts/*/charts
 dist/
+requirements.lock
+tmp/

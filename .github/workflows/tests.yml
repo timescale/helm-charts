@@ -1,0 +1,91 @@
+name: "Test Helm Charts"
+on:
+  - push
+  - pull_request
+
+env:
+  go-version: 1.19.0
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.go-version }}
+
+      - name: Install gojsontoyaml
+        run: go install github.com/brancz/gojsontoyaml@latest
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.2.1
+
+      - name: Run chart-testing (lint)
+        run: make lint
+
+      - name: Run shellcheck
+        run: make shellcheck
+
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.go-version }}
+
+      - name: Install gojsontoyaml
+        run: go install github.com/brancz/gojsontoyaml@latest
+
+      - name: Generate JSON Schema
+        run: make json-schema && git diff --exit-code
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kube:
+          - "1.23"
+          - "1.24"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.2.1
+
+      - name: Start kuberenetes cluster
+        env:
+          KUBE_VERSION: ${{ matrix.kube }}
+        run: |
+          make start-kind
+      - name: Wait for cluster to finish bootstraping
+        run: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=300s
+
+      - name: Run e2e chart-testing
+        run: make e2e
+
+  test-result:
+    name: End-to-End Test Results
+    if: always()
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark the job as a success
+        if: needs.test.result == 'success'
+        run: exit 0
+      - name: Mark the job as a failure
+        if: needs.test.result != 'success'
+        run: exit 1

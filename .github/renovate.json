@@ -13,6 +13,12 @@
         "matchStrings": ["helm-version:\\s(?<currentValue>.*?)\\n"],
         "datasourceTemplate": "github-tags",
         "depNameTemplate": "helm/helm"
+      },
+      {
+        "fileMatch": ["^\\.github\\/workflows\\/[^/]+\\.ya?ml$"],
+        "matchStrings": ["go-version:\\s(?<currentValue>.*?)\\n"],
+        "datasourceTemplate": "golang-version",
+        "depNameTemplate": "golang"
       }
     ],
     "packageRules": [
@@ -20,6 +26,10 @@
         "addLabels": ["github_actions"],
         "groupName": "github actions",
         "matchPaths": [".github/**"]
+      },
+      {
+        "groupName": "helm charts",
+        "matchManagers": ["helmv3","helm-values"]
       }
     ]
   }

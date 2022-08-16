@@ -1,18 +1,14 @@
-# TimescaleDB Kubernetes
+[![Security Audit](https://github.com/timescale/helm-charts/actions/workflows/sec-audit.yml/badge.svg)](https://github.com/timescale/helm-charts/actions/workflows/sec-audit.yml)
+[![Test Helm Charts](https://github.com/timescale/helm-charts/actions/workflows/tests.yml/badge.svg)](https://github.com/timescale/helm-charts/actions/workflows/tests.yml)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/timescale/helm-charts)](https://github.com/timescale/helm-charts/pulse/monthly)
+[![License](https://img.shields.io/github/license/timescale/helm-charts)](https://github.com/timescale/helm-charts/blob/main/LICENSE)
+[![Slack](https://img.shields.io/badge/chat-join%20slack-brightgreen.svg)](https://timescaledb.slack.com/)
+
+# Timescale Helm Charts
 
 This repository contains Helm charts to help with the deployment of
-[TimescaleDB](https://github.com/timescale/timescaledb/) on Kubernetes. This
+[TimescaleDB](https://github.com/timescale/timescaledb/) and [Promscale](https://github.com/timescale/promscale) on Kubernetes. This
 project is currently in active development.
-
-Supported Versions:
-- Kubernetes: [AWS EKS](https://aws.amazon.com/eks/), [MicroK8s](https://microk8s.io/), and [minikube](https://github.com/kubernetes/minikube/releases)
-
-# Recipes
-
-| Recipe| TimescaleDB | Description |
-|---|---|---|
-| [TimescaleDB Single](charts/timescaledb-single) | Based on 1.x | TimescaleDB Single allows you to deploy a highly-available TimescaleDB database configuration. |
-| [TimescaleDB Multinode](charts/timescaledb-multinode) | In Development | TimescaleDB Multinode allows you to deploy a multi-node, distributed version of TimescaleDB. |
 
 # Repository
 
@@ -30,13 +26,9 @@ For more information, have a look at the [Using Helm](https://helm.sh/docs/intro
 - [Migrating data to TimescaleDB](https://docs.timescale.com/getting-started/migrating-data)
 - [Tutorials and sample data](https://docs.timescale.com/tutorials)
 
-## Get Help
-- [Slack Channel](https://slack.timescale.com/)
-- [GitHub Issues](https://github.com/timescale/timescaledb-kubernetes/issues)
-
 ## License
 
-TimescaleDB Kubernetes resources in this repository are released under the [Apache 2.0 license](LICENSE).
+Resources in this repository are released under the [Apache 2.0 license](LICENSE).
 
 ## Contributing
 
