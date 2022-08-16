@@ -1,4 +1,4 @@
-name: "Test Helm Charts"
+name: "Test [old]"
 on:
 - push
 - pull_request
@@ -7,29 +7,6 @@ env:
   helm-version: v3.8.1
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Copy example values files to the expected Helm Linter locations
-        run: make refresh-ci-values
-
-      - name: Run linter on Helm Charts
-        id: lint
-        uses: helm/chart-testing-action@v2.2.1
-        with:
-          command: lint
-
-      - name: Install shellcheck
-        run: sudo apt-get install shellcheck
-
-      - name: Run shellcheck on all scripts
-        run: make shellcheck
-
   test:
     runs-on: ubuntu-latest
     steps:
