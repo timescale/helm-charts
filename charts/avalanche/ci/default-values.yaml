@@ -1,0 +1,10 @@
+# Arguments that will be passed onto deployment pods
+# The list of available cli flags can be found by
+# running avalanche --help
+extraArgs:
+  - --metric-count=1
+  - --series-count=1000
+  - --remote-url=http://test-promscale.tobs-test.svc:9201/write
+  - --remote-write-interval=30s
+
+readinessProbe: null
