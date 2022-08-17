@@ -49,6 +49,9 @@ jobs:
       - name: Generate JSON Schema
         run: make json-schema && git diff --exit-code
 
+      - name: Generate promscale alerts
+        run: make promscale-mixin && git diff --exit-code
+
   test:
     runs-on: ubuntu-latest
     strategy:

@@ -1,4 +1,4 @@
-{{- /* This file is generated using a script located at scripts/generate-helm-alerts.sh */}}
+{{- /* This file is generated using a script located at scripts/generate-promscale-alerts.sh */}}
 {{ if .Values.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule

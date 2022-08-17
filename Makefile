@@ -30,6 +30,10 @@ shellcheck: extract-scripts
 		shellcheck $$f --exclude=SC1090,SC1091,SC2148 ;\
 	done
 
+.PHONY: promscale-mixin
+promscale-mixin:
+	./scripts/generate-promscale-alerts.sh
+
 .PHONY: delete-kind
 delete-kind:  ## This is a phony target that is used to delete the local kubernetes kind cluster.
 	kind delete cluster && sleep 10
