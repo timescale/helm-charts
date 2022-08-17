@@ -21,6 +21,10 @@
 #
 # 1: https://kubernetes.io/docs/concepts/storage/storage-classes/#aws-ebs
 # 2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+loadBalancer:
+  enabled: false
+
+
 persistentVolumes:
   data:
     size: 500Gi
