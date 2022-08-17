@@ -47,6 +47,20 @@ start-kind: delete-kind  ## This is a phony target that is used to create a loca
 load-images:  ## Load images into the local kubernetes kind cluster.
 	./scripts/load-images.sh
 
+.PHONY: install-db
+install-db:  ## Install the testing database into the local kubernetes kind cluster.
+	helm install \
+		--namespace ext-db \
+		--create-namespace db \
+		--wait \
+		--timeout 15m \
+		--debug \
+		charts/timescaledb-single \
+		--set replicaCount=1 \
+		--set secrets.credentials.PATRONI_SUPERUSER_PASSWORD="temporarypassword" \
+		--set loadBalancer.enabled=false \
+		--set image.tag=pg14.4-ts2.7.2-p0
+
 .PHONY: e2e
 e2e: load-images  ## Run e2e installation tests using ct (chart-testing).
 	# TODO(paulfantom): re-enable when it is possible to use `ct` to test the chart

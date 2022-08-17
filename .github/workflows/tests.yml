@@ -23,7 +23,7 @@ jobs:
         run: go install github.com/brancz/gojsontoyaml@latest
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.2.1
+        uses: helm/chart-testing-action@v2.3.0
 
       - name: Run chart-testing (lint)
         run: make lint
@@ -75,6 +75,14 @@ jobs:
           make start-kind
       - name: Wait for cluster to finish bootstraping
         run: kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=300s
+
+      - name: Check changed charts
+        id: changed-charts
+        run: echo "::set-output name=charts::$(ct list-changed | grep promscale)"
+
+      - name: Pre-install DB
+        if: steps.changed-charts.outputs.charts != ''
+        run: make install-db
 
       - name: Run e2e chart-testing
         run: make e2e
