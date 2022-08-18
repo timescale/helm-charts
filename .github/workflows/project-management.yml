@@ -5,6 +5,7 @@ on:
     types: [opened, reopened]
   release:
     types: [published]
+  pull_request_target:
   schedule:
     - cron: '13 2 * * MON' # Run every Monday at 2:13 UTC
 
@@ -34,3 +35,15 @@ jobs:
           stale-issue-message: |
             This issue went stale because it was not updated in a month. Please consider updating it to improve the quality of the project.
           close-issue-message: 'This issue was closed because it has been stalled for 30 days with no activity.'
+
+  labeler:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    name: Label PRs based on files changed
+    if: github.event_name == 'pull_request_target'
+    steps:
+      - uses: actions/labeler@v4
+        env:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
