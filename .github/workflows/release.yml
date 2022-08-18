@@ -68,5 +68,5 @@ jobs:
         with:
           tag: ${{ steps.chart.outputs.chart }}-${{ steps.chartversion.outputs.version }}
           allowUpdates: true
-          generateReleaseNotes: false
-          artifacts: "chart_release/*.tgz"
+          generateReleaseNotes: true
+          artifacts: "dist/*.tgz"
