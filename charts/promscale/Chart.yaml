@@ -2,12 +2,13 @@ apiVersion: v2
 name: promscale
 description: Promscale Connector deployment
 
-version: 0.13.0
+version: 13.0.0
 appVersion: 0.13.0
 
 home: https://github.com/timescale/promscale
 sources:
 - https://github.com/timescale/promscale
+- https://github.com/timescale/helm-charts
 
 maintainers:
 - name: TimescaleDB

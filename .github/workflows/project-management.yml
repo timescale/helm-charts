@@ -45,5 +45,5 @@ jobs:
     if: github.event_name == 'pull_request_target'
     steps:
       - uses: actions/labeler@v4
-        env:
+        with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
