@@ -1,0 +1,28 @@
+invalid:
+- charts/repo/*
+
+area/timescaledb-single:
+- charts/timescaledb-single/*
+
+area/timescaledb-multinode:
+- charts/timescaledb-multinode/*
+
+area/promscale:
+- charts/promscale/*
+
+area/avalanche:
+- charts/avalanche/*
+
+area/tooling:
+- .github/*
+- scripts/*
+- testdata/*
+- Makefile
+- ct.yaml
+- .gitignore
+
+area/docs:
+- CONTRIBUTING.md
+- LICENSE
+- NOTICE
+- README.md
