@@ -110,6 +110,10 @@ while installing the chart. For example:
 helm install --name my-release -f myvalues.yaml .
 ```
 
+## Upgrading
+
+See [UPGRADING.md](UPGRADING.md).
+
 ## Configuration
 
 | Parameter                       | Description                                                                                                                                                             | Default                            |
@@ -143,3 +147,5 @@ helm install --name my-release -f myvalues.yaml .
 | `service.openTelemetry.port`    | Port the connector Service will accept otlp connections on                                                                                            | `9202`                             |
 | `service.openTelemetry.enabled` | Expose OpenTelemetry port in the Service object to allow sending OTel data to promscale.                                                              | `true`                             |
 | `serviceMonitor.enabled`        | Enable creation of serviceMonitor object used by prometheus-operator. Setting this to false enables prometheus annotation-based scraping.             | `false`                            |
+
+##
