@@ -8,6 +8,10 @@
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-io-characteristics.html
 # https://cloud.google.com/compute/docs/disks/performance
 #
+
+loadBalancer:
+  enabled: false
+
 persistentVolumes:
   data:
     size: 2Ti

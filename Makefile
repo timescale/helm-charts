@@ -63,10 +63,7 @@ install-db:  ## Install the testing database into the local kubernetes kind clus
 
 .PHONY: e2e
 e2e: load-images  ## Run e2e installation tests using ct (chart-testing).
-	# TODO(paulfantom): re-enable when it is possible to use `ct` to test the chart
-	# Chart is still tested using older method via a shell script
-	ct install --config ct.yaml --exclude-deprecated --excluded-charts=timescaledb-single
-
+	ct install --config ct.yaml --exclude-deprecated
 
 ### TODO(paulfantom): remove this section once timescaledb-single is using `ct` and `helm test` for testing.
 

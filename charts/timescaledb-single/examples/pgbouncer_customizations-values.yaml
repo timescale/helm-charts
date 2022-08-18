@@ -1,3 +1,6 @@
+loadBalancer:
+  enabled: false
+
 pgBouncer:
   enabled: true
   port: 6432
