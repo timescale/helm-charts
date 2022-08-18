@@ -1,4 +1,3 @@
-[![Security Audit](https://github.com/timescale/helm-charts/actions/workflows/sec-audit.yml/badge.svg)](https://github.com/timescale/helm-charts/actions/workflows/sec-audit.yml)
 [![Test Helm Charts](https://github.com/timescale/helm-charts/actions/workflows/tests.yml/badge.svg)](https://github.com/timescale/helm-charts/actions/workflows/tests.yml)
 [![Commit activity](https://img.shields.io/github/commit-activity/m/timescale/helm-charts)](https://github.com/timescale/helm-charts/pulse/monthly)
 [![License](https://img.shields.io/github/license/timescale/helm-charts)](https://github.com/timescale/helm-charts/blob/main/LICENSE)
@@ -10,26 +9,27 @@ This repository contains Helm charts to help with the deployment of
 [TimescaleDB](https://github.com/timescale/timescaledb/) and [Promscale](https://github.com/timescale/promscale) on Kubernetes. This
 project is currently in active development.
 
-# Repository
+## Repository
 
-The Charts are available in a Helm Chart Repository, which is part of this project.
+The Charts are available in a Helm Chart Repository hosted in Amazon S3 bucket.
 The following command will make this repository ready for use:
 ```
-helm repo add timescaledb 'https://raw.githubusercontent.com/timescale/timescaledb-kubernetes/master/charts/repo/'
+helm repo add timescale 'https://charts.timescale.com/'
 ```
 For more information, have a look at the [Using Helm](https://helm.sh/docs/intro/using_helm/#helm-repo-working-with-repositories) documentation.
 
-# Additional documentation
+## Additional documentation
 
 - [Why use TimescaleDB?](https://docs.timescale.com/introduction)
 - [Installing TimescaleDB](https://docs.timescale.com/getting-started/installation)
 - [Migrating data to TimescaleDB](https://docs.timescale.com/getting-started/migrating-data)
 - [Tutorials and sample data](https://docs.timescale.com/tutorials)
+- [Installing Promscale](https://docs.timescale.com/promscale/latest/installation/kubernetes/)
 
-## License
+# License
 
 Resources in this repository are released under the [Apache 2.0 license](LICENSE).
 
-## Contributing
+# Contributing
 
 If you wish to make contributions to this project, please refer to [Contributor Instructions](CONTRIBUTING.md) for more information.
