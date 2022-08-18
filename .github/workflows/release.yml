@@ -55,7 +55,6 @@ jobs:
           helm package charts/${{ steps.chart.outputs.chart }} -d dist/
 
       - name: Publish ${{ steps.chart.outputs.chart }}-${{ steps.chartversion.outputs.version }}
-        working-directory: dist
         env:
           AWS_REGION: 'us-east-1'
           AWS_ACCESS_KEY_ID: ${{ secrets.ORG_AWS_HELM_CHART_BUCKET_ACCESS_KEY_ID }}
