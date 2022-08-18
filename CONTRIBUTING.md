@@ -11,7 +11,7 @@ We'd love your help!
 _NOTE_: In order to make testing and merging of PRs easier, please submit changes to multiple charts in separate PRs.
 
 Remember to always work in a branch of your local copy, as you might otherwise
-have to contend with conflicts in master.
+have to contend with conflicts in the main branch.
 
 Please also see [GitHub
 flow](https://docs.github.com/en/get-started/quickstart/github-flow).

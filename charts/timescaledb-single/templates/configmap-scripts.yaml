@@ -227,7 +227,7 @@ data:
     ```
 
     For more information, consult the admin guide:
-    https://github.com/timescale/timescaledb-kubernetes/blob/master/charts/timescaledb-single/admin-guide.md#bootstrap-from-backup
+    https://github.com/timescale/helm-charts/blob/main/charts/timescaledb-single/admin-guide.md#bootstrap-from-backup
 
 
     __EOT__
