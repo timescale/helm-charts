@@ -62,7 +62,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ORG_AWS_HELM_CHART_BUCKET_SECRET_ACCESS_KEY }}
         run: |
             helm repo add tscharts s3://charts.timescale.com
-            helm s3 push ${{ steps.chart.outputs.chart }} tscharts --acl public-read --relative --ignore-if-exists
+            helm s3 push dist/* tscharts --acl public-read --relative --ignore-if-exists
 
       - name: Create release
         uses: ncipollo/release-action@v1.10.0

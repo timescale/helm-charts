@@ -3,7 +3,7 @@
 ---
 # See https://github.com/helm/chart-testing#configuration
 remote: origin
-target-branch: master
+target-branch: main
 chart-dirs:
 - charts
 chart-repos: []
