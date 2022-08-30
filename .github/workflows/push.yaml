@@ -23,11 +23,11 @@ jobs:
         uses: helm/kind-action@v1.3.0
         if: steps.single_chart_changed.outputs.changes != ''
 
-      - uses: azure/setup-kubectl@v1
+      - uses: azure/setup-kubectl@v3
         id: install-kubectl
         if: steps.single_chart_changed.outputs.changes != ''
 
-      - uses: azure/setup-helm@v2.2
+      - uses: azure/setup-helm@v3.3
         id: install-helm
         if: steps.single_chart_changed.outputs.changes != ''
         with:
