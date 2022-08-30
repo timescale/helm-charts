@@ -611,6 +611,8 @@ serviceAccount:
   # The name of the ServiceAccount to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+  # A map of annotations to be set on the ServiceAccount
+  annotations: {}
 
 debug:
   # This setting is mainly for during development, debugging or troubleshooting.
