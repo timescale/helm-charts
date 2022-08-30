@@ -541,6 +541,8 @@ properties:
     - string
     - "null"
     minLength: 1
+  global:
+    additionalProperties: true
 definitions:
   percent:
     type: integer

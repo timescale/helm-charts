@@ -277,6 +277,9 @@
       },
       "type": "object"
     },
+    "global": {
+      "additionalProperties": true
+    },
     "image": {
       "additionalProperties": false,
       "properties": {
