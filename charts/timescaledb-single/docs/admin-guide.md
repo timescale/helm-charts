@@ -92,6 +92,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `secrets.pgbackrestSecretName`    | Existing secret that contains env vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET). This setting takes precedence over everything set in `secrets.pgbackrest` | `""` |
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |
+| `serviceAccount.annotations`      | A map of annotations to be set on the service account       | `{}`                                              |
 | `serviceMonitor.enabled`          | Enable deployment of ServiceMonitor used with prometheus-operator. | `false` |
 | `serviceMonitor.portName`         | Name of the port (not number!) on which prometheus metrics are exposed. | `metrics` |
 | `serviceMonitor.path`             | Path on which prometheus metrics are exposed. | `/metrics` |
