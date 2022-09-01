@@ -10,42 +10,42 @@
 # and its json counterpart
 schema: http://json-schema.org/draft-07/schema#
 required:
-- affinity
-- affinityTemplate
-- backup
-- bootstrapFromBackup
-- callbacks
-- debug
-- fullWalPrevention
-- image
-- loadBalancer
-- nameOverride
-- networkPolicy
-- nodeSelector
-- patroni
-- persistentVolumes
-- pgBouncer
-- podAnnotations
-- podManagementPolicy
-- prometheus
-- rbac
-- readinessProbe
-- replicaCount
-- replicaLoadBalancer
-- resources
-- secrets
-- serviceAccount
-- serviceMonitor
-- sharedMemory
-- timescaledbTune
-- tolerations
+  - affinity
+  - affinityTemplate
+  - backup
+  - bootstrapFromBackup
+  - callbacks
+  - debug
+  - fullWalPrevention
+  - image
+  - loadBalancer
+  - nameOverride
+  - networkPolicy
+  - nodeSelector
+  - patroni
+  - persistentVolumes
+  - pgBouncer
+  - podAnnotations
+  - podManagementPolicy
+  - prometheus
+  - rbac
+  - readinessProbe
+  - replicaCount
+  - replicaLoadBalancer
+  - resources
+  - secrets
+  - serviceAccount
+  - serviceMonitor
+  - sharedMemory
+  - timescaledbTune
+  - tolerations
 additionalProperties: false
 properties:
   serviceMonitor:
     type: object
   podManagementPolicy:
     type:
-    - string
+      - string
   postInit:
     description: |
       postInit allows you to configure additional scripts that will be run once
@@ -53,8 +53,8 @@ properties:
       every .sh, .sql, and .sql.gz script will be executed in sorted order and they should
       return exitcode 0 on success.
     type:
-    - array
-    - "null"
+      - array
+      - "null"
     items:
       type: object
       additionalProperties: false
@@ -86,9 +86,9 @@ properties:
         type: object
         default: {}
         examples:
-        - max_conns: "120"
-          cpus: "5"
-          memory: "4GB"
+          - max_conns: "120"
+            cpus: "5"
+            memory: "4GB"
   schedulerName:
     type: string
   bootstrapFromBackup:
@@ -99,12 +99,12 @@ properties:
         type: boolean
       repo1-path:
         type:
-        - string
-        - "null"
+          - string
+          - "null"
       secretName:
         type:
-        - string
-        - "null"
+          - string
+          - "null"
   persistentVolumes:
     type: object
     additionalProperties: false
@@ -185,12 +185,12 @@ properties:
     properties:
       configMap:
         type:
-        - string
-        - "null"
+          - string
+          - "null"
   envFrom:
     type:
-    - array
-    - "null"
+      - array
+      - "null"
   resources:
     type: object
     additionalProperties: false
@@ -216,8 +216,8 @@ properties:
         type: boolean
       name:
         type:
-        - string
-        - "null"
+          - string
+          - "null"
   rbac:
     type: object
     additionalProperties: false
@@ -233,7 +233,7 @@ properties:
           listen:
             type: string
             enum:
-            - 0.0.0.0:8008
+              - 0.0.0.0:8008
       bootstrap:
         type: object
         properties:
@@ -279,12 +279,12 @@ properties:
                     type: object
           method:
             type:
-            - string
-            - "null"
+              - string
+              - "null"
           post_init:
             type:
-            - string
-            - "null"
+              - string
+              - "null"
           restore_or_initdb:
             type: object
             additionalProperties: false
@@ -300,8 +300,8 @@ properties:
             type: boolean
         additionalProperties:
           type:
-          - string
-          - boolean
+            - string
+            - boolean
       log:
         type: object
       postgresql:
@@ -314,7 +314,7 @@ properties:
           listen:
             type: string
             enum:
-            - "0.0.0.0:5432"
+              - "0.0.0.0:5432"
           pgbackrest:
             type: object
             properties:
@@ -334,8 +334,8 @@ properties:
                 type: string
           basebackup:
             type:
-            - array
-            - "null"
+              - array
+              - "null"
             items:
               type: object
               additionalProperties:
@@ -355,8 +355,8 @@ properties:
               type: string
           use_unix_socket:
             type:
-            - boolean
-            - "null"
+              - boolean
+              - "null"
   prometheus:
     type: object
     additionalProperties: false
@@ -365,22 +365,22 @@ properties:
         type: boolean
       env:
         type:
-        - array
-        - "null"
+          - array
+          - "null"
         items:
           type: object
       image:
         type: object
       volumes:
         type:
-        - array
-        - "null"
+          - array
+          - "null"
         items:
           type: object
       volumeMounts:
         type:
-        - array
-        - "null"
+          - array
+          - "null"
         items:
           type: object
   networkPolicy:
@@ -393,8 +393,8 @@ properties:
         type: string
       ingress:
         type:
-        - array
-        - "null"
+          - array
+          - "null"
         items:
           type: object
   pgBouncer:
@@ -417,8 +417,8 @@ properties:
           A pointer to a SecretName containing user/password pairs in the format expected by pgbouncer
           https://www.pgbouncer.org/config.html#authentication-file-format
         type:
-        - string
-        - "null"
+          - string
+          - "null"
       enabled:
         type: boolean
         default: false
@@ -426,11 +426,11 @@ properties:
         type: integer
         default: 6432
         enum:
-        - 6432
+          - 6432
       config:
         type:
-        - object
-        - "null"
+          - object
+          - "null"
   nodeSelector:
     type: object
   podAnnotations:
@@ -445,44 +445,44 @@ properties:
     properties:
       execStartPre:
         type:
-        - string
-        - "null"
+          - string
+          - "null"
   env:
     type:
-    - array
-    - "null"
+      - array
+      - "null"
   backup:
     type: object
     additionalProperties: false
     required:
-    - enabled
-    - pgBackRest
-    - jobs
+      - enabled
+      - pgBackRest
+      - jobs
     properties:
       enabled:
         type: boolean
       pgBackRest:
         type:
-        - object
-        - "null"
+          - object
+          - "null"
       "pgBackRest:archive-get":
         type:
-        - object
-        - "null"
+          - object
+          - "null"
       "pgBackRest:archive-push":
         type:
-        - object
-        - "null"
+          - object
+          - "null"
       jobs:
         type: array
       env:
         type:
-        - array
-        - "null"
+          - array
+          - "null"
       envFrom:
         type:
-        - array
-        - "null"
+          - array
+          - "null"
   secrets:
     type: object
     additionalProperties: false
@@ -491,20 +491,20 @@ properties:
         type: string
       credentials:
         type:
-        - object
-        - "null"
+          - object
+          - "null"
       certificateSecretName:
         type: string
       certificate:
         type:
-        - object
-        - "null"
+          - object
+          - "null"
       pgbackrestSecretName:
         type: string
       pgbackrest:
         type:
-        - object
-        - "null"
+          - object
+          - "null"
   image:
     type: object
     additionalProperties: false
@@ -518,30 +518,32 @@ properties:
       pullPolicy:
         type: string
         enum:
-        - Always
-        - Never
-        - IfNotPresent
+          - Always
+          - Never
+          - IfNotPresent
   replicaCount:
     type: integer
     minimum: 0
   clusterName:
     type:
-    - string
-    - "null"
+      - string
+      - "null"
     minLength: 1
     maxLength: 30
   version:
     type:
-    - integer
-    - "null"
+      - integer
+      - "null"
     minimum: 11
     maximum: 14
   nameOverride:
     type:
-    - string
-    - "null"
+      - string
+      - "null"
     minLength: 1
   global:
+    additionalProperties: true
+  enabled:
     additionalProperties: true
 definitions:
   percent:
@@ -555,9 +557,9 @@ definitions:
       type:
         type: string
         enum:
-        - ClusterIP
-        - LoadBalancer
-        - NodePort
+          - ClusterIP
+          - LoadBalancer
+          - NodePort
       port:
         type: integer
         minimum: 1000
@@ -568,20 +570,20 @@ definitions:
         maximum: 65535
       labels:
         type:
-        - object
-        - "null"
+          - object
+          - "null"
         additionalProperties:
           type: string
       annotations:
         type:
-        - object
-        - "null"
+          - object
+          - "null"
         additionalProperties:
           type: string
       spec:
         type:
-        - object
-        - "null"
+          - object
+          - "null"
         additionalProperties:
           type: string
   loadBalancer:
@@ -590,8 +592,8 @@ definitions:
     properties:
       spec:
         type:
-        - object
-        - "null"
+          - object
+          - "null"
       enabled:
         type: boolean
       port:
@@ -612,12 +614,12 @@ definitions:
         type: string
       subPath:
         type:
-        - string
-        - "null"
+          - string
+          - "null"
       storageClass:
         type:
-        - string
-        - "null"
+          - string
+          - "null"
       mountPath:
         type: string
       annotations:
