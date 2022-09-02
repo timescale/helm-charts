@@ -231,6 +231,9 @@
       },
       "type": "object"
     },
+    "enabled": {
+      "additionalProperties": true
+    },
     "env": {
       "type": [
         "array",
