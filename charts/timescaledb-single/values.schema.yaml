@@ -218,6 +218,8 @@ properties:
         type:
           - string
           - "null"
+      annotations:
+        type: object
   rbac:
     type: object
     additionalProperties: false

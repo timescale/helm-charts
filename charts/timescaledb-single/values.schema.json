@@ -771,6 +771,9 @@
     "serviceAccount": {
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "type": "object"
+        },
         "create": {
           "type": "boolean"
         },
