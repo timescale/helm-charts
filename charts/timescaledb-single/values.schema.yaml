@@ -35,13 +35,13 @@ required:
   - resources
   - secrets
   - serviceAccount
-  - serviceMonitor
+  - podMonitor
   - sharedMemory
   - timescaledbTune
   - tolerations
 additionalProperties: false
 properties:
-  serviceMonitor:
+  podMonitor:
     type: object
   podManagementPolicy:
     type:

@@ -547,14 +547,14 @@ prometheus:
   # - name: exporter-config
   #   mountPath: /var/exporter
 
-serviceMonitor:
-  # Specifies whether ServiceMonitor for Prometheus operator should be created
+podMonitor:
+  # Specifies whether PodMonitor for Prometheus operator should be created
   enabled: false
   portName: metrics
   path: /metrics
   interval: 10s
   # scrapeTimeout: 30s
-  # Specifies namespace, where ServiceMonitor should be installed
+  # Specifies namespace, where PodMonitor should be installed
   # namespace: monitoring
   # labels:
   #   release: prometheus
