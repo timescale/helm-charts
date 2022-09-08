@@ -25,6 +25,9 @@ spec:
       labels:
 {{ include "timescaledb-helm.labels" . | indent 8 }}
         app.kubernetes.io/component: timescaledb
+      {{- if .Values.podLabels }}
+{{ toYaml .Values.podLabels | indent 8 }}
+      {{- end }}
 {{- if .Values.podAnnotations }}
       annotations:
 {{ toYaml .Values.podAnnotations | indent 8 }}

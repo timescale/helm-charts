@@ -26,6 +26,7 @@ required:
   - persistentVolumes
   - pgBouncer
   - podAnnotations
+  - podLabels
   - podManagementPolicy
   - prometheus
   - rbac
@@ -436,6 +437,10 @@ properties:
   nodeSelector:
     type: object
   podAnnotations:
+    type: object
+    additionalProperties:
+      type: string
+  podLabels:
     type: object
     additionalProperties:
       type: string
