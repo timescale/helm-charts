@@ -125,7 +125,7 @@ data:
   pgbackrest_archive_get.sh: |
     #!/bin/sh
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
-    [ ${PGBACKREST_BACKUP_ENABLED} -ne 0 ] || exit 0
+    [ ${PGBACKREST_BACKUP_ENABLED} -ne 0 ] || exit 1
 
     . "{{ template "pgbackrest_environment_file" }}"
     exec pgbackrest --stanza=poddb archive-get "${1}" "${2}"
