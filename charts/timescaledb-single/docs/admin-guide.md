@@ -74,7 +74,6 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `pgBouncer.userListSecretName`    | If set, a [user authentication file](https://www.pgbouncer.org/config.html#authentication-file-format) to be used by pgBouncer. | `nil` |
 | `podManagementPolicy`             | Either [`OrderedReady` or `Parallel`](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies) | `OrderedReady` |
 | `podMonitor.enabled`          | Enable deployment of podMonitor used with prometheus-operator. | `false` |
-| `podMonitor.portName`         | Name of the port (not number!) on which prometheus metrics are exposed. | `metrics` |
 | `podMonitor.path`             | Path on which prometheus metrics are exposed. | `/metrics` |
 | `podMonitor.interval`         | Prometheus scrape interval. Lower values increase resolution, higher values reduce prometheus memory consumption. Do not set over 2m. | `10s` |
 | `podMonitor.scrapeTimeout`    | Prometheus scrape timeout. Value cannot be lower than scrape interval. | `nil` |
