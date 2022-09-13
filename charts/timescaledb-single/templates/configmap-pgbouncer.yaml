@@ -7,11 +7,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "timescaledb.fullname" . }}-pgbouncer
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+{{ include "timescaledb-helm.labels" . | indent 4}}
+    app.kubernetes.io/component: pgbouncer
 data:
   pg_hba.conf: |
   {{- range $hba := (.Values.pgBouncer.pg_hba | default (list "local all all peer")) }}

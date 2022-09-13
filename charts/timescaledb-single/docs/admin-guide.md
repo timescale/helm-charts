@@ -64,7 +64,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `persistentVolumes.<name>.subPath`| Subdirectory of Persistent Volume to mount  | `""`                                                |
 | `persistentVolumes.data.enabled`  | If enabled, use a Persistent Data Volume    | `true`                                              |
 | `persistentVolumes.data.mountPath`| Persistent Data Volume mount root path      | `/var/lib/postgresql/`                              |
-| `persistentVolumes.tablespaces`   | A mapping of tablespaces and Volumes        | `nil`, see [multiple-tablespaces.yaml](values/multiple-tablespaces.yaml) for a full example |
+| `persistentVolumes.tablespaces`   | A mapping of tablespaces and Volumes        | `nil`, see [multiple-tablespaces.yaml](ci/multiple-tablespaces.yaml) for a full example |
 | `persistentVolumes.wal.enabled`   | If enabled, use a Persistent Wal Volume. If disabled, WAL will be on the Data Volume | `true`     |
 | `persistentVolumes.wal.mountPath` | Persistent Wal Volume mount root path       | `/var/lib/postgresql/wal/`                          |
 | `pgBouncer.config`                | Additional pgBouncer [configuration](https://www.pgbouncer.org/config.html) items | A reasonable set of defaults |
@@ -73,10 +73,19 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `pgBouncer.pg_hba`                | The `pg_hba` to be used by pgBouncer        | A `pg_hba` allowing non-superuser ssl-only connections |
 | `pgBouncer.userListSecretName`    | If set, a [user authentication file](https://www.pgbouncer.org/config.html#authentication-file-format) to be used by pgBouncer. | `nil` |
 | `podManagementPolicy`             | Either [`OrderedReady` or `Parallel`](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies) | `OrderedReady` |
+| `podMonitor.enabled`          | Enable deployment of podMonitor used with prometheus-operator. | `false` |
+| `podMonitor.portName`         | Name of the port (not number!) on which prometheus metrics are exposed. | `metrics` |
+| `podMonitor.path`             | Path on which prometheus metrics are exposed. | `/metrics` |
+| `podMonitor.interval`         | Prometheus scrape interval. Lower values increase resolution, higher values reduce prometheus memory consumption. Do not set over 2m. | `10s` |
+| `podMonitor.scrapeTimeout`    | Prometheus scrape timeout. Value cannot be lower than scrape interval. | `nil` |
+| `podMonitor.namespace`        | Setting this will cause deploying podMonitor in a different namespace than TimescaleDB. | `nil` |
+| `podMonitor.labels`           | Additional labels that can be set on podMonitor object. | `nil` |
+| `podMonitor.metricRelabelings` | Additional prometheus metric relabelings. | `nil` |
+| `podMonitor.targetLabels`     | List of additional kubernetes labels that need to be transferred from Service object into metrics. | `nil` |
 | `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/prometheus-community/postgres_exporter) sidecar | `false` |
 | `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
-| `prometheus.image.repository`     | The postgres\_exporter docker repo          | `wrouesnel/postgres_exporter`                       |
-| `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.7.0`                                            |
+| `prometheus.image.repository`     | The postgres\_exporter docker repo          | `quay.io/prometheuscommunity/postgres_exporter`     |
+| `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.11.0`                                           |
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
 | `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
 | `replicaLoadBalancer.annotations` | Deprecated(0.10.0): Pass on annotations to the Load Balancer | An AWS ELB annotation to increase the idle timeout |
@@ -92,15 +101,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `secrets.pgbackrestSecretName`    | Existing secret that contains env vars that influence pgBackRest (e.g. PGBACKREST_REPO1_S3_KEY_SECRET). This setting takes precedence over everything set in `secrets.pgbackrest` | `""` |
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |
-| `serviceMonitor.enabled`          | Enable deployment of ServiceMonitor used with prometheus-operator. | `false` |
-| `serviceMonitor.portName`         | Name of the port (not number!) on which prometheus metrics are exposed. | `metrics` |
-| `serviceMonitor.path`             | Path on which prometheus metrics are exposed. | `/metrics` |
-| `serviceMonitor.interval`         | Prometheus scrape interval. Lower values increase resolution, higher values reduce prometheus memory consumption. Do not set over 2m. | `10s` |
-| `serviceMonitor.scrapeTimeout`    | Prometheus scrape timeout. Value cannot be lower than scrape interval. | `nil` |
-| `serviceMonitor.namespace`        | Setting this will cause deploying ServiceMonitor in a different namespace than TimescaleDB. | `nil` |
-| `serviceMonitor.labels`           | Additional labels that can be set on ServiceMonitor object. | `nil` |
-| `serviceMonitor.metricRelabelings` | Additional prometheus metric relabelings. | `nil` |
-| `serviceMonitor.targetLabels`     | List of additional kubernetes labels that need to be transferred from Service object into metrics. | `nil` |
+| `serviceAccount.annotations`      | A map of annotations to be set on the service account       | `{}`                                              |
 | `sharedMemory.useMount`           | Mount `/dev/shm` as a Memory disk           | `false`                                             |
 | `timescaledbTune.enabled`         | If true, runs `timescaledb-tune` before starting PostgreSQL | `true`                              |
 | `tolerations`                     | List of node taints to tolerate             | `[]`                                                |
@@ -186,9 +187,9 @@ at: https://pgbackrest.org/command.html#introduction
     ```console
     helm upgrade --install my-release charts/timescaledb-single -f myvalues.yaml
     ```
-- Use an example values file to match an AWS EC2 Instance type, for example, using `charts/timescaledb-single/values/m5.large.example.yaml`:
+- Use an example values file to match an AWS EC2 Instance type, for example, using `charts/timescaledb-single/ci/m5.large.example.yaml`:
     ```console
-    helm upgrade --install my-release charts/timescaledb-single -f charts/timescaledb-single/values/m5.large.example.yaml
+    helm upgrade --install my-release charts/timescaledb-single -f charts/timescaledb-single/ci/m5.large.example.yaml
     ```
 
 ## Connecting

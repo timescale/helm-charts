@@ -3,12 +3,10 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
   name: {{ template "clusterName" . }}-policy
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 4}}
+    app.kubernetes.io/component: policy
 spec:
   podSelector:
     matchLabels:

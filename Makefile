@@ -1,86 +1,83 @@
-SINGLE_CHART_DIR := charts/timescaledb-single
-MULTI_CHART_DIR := charts/timescaledb-multinode
-CI_SINGLE_DIR := $(SINGLE_CHART_DIR)/ci/
-SINGLE_VALUES_FILES := $(SINGLE_CHART_DIR)/values.yaml $(wildcard $(SINGLE_CHART_DIR)/values/*.yaml)
-DEPLOYMENTS := $(SINGLE_VALUES_FILES)
-K8S_NAMESPACE ?= citest
+SHELL=/bin/bash -euo pipefail
 
-export PULL_TIMEOUT ?= 3000s
-export DEPLOYMENT_TIMEOUT ?= 600s
+KUBE_VERSION ?= 1.23
+KIND_CONFIG ?= ./testdata/kind-$(KUBE_VERSION).yaml
 
-.PHONY: publish
-publish: publish-multinode publish-single
-
-.PHONY: publish-multinode
-publish-multinode:
-	helm package charts/timescaledb-multinode --destination charts/repo
-	helm repo index charts/repo
-
-.PHONY: publish-single
-publish-single:
-	helm package charts/timescaledb-single --destination charts/repo
-	helm repo index charts/repo
-
-.PHONY: clean
-clean: clean-ci
-
-.PHONY: assert-schema-equals
-assert-schema-equals:
-	@cat $(SINGLE_CHART_DIR)/values.schema.yaml | python3 ./yaml2json.py | jq '.[0]' | git --no-pager diff --no-index - $(SINGLE_CHART_DIR)/values.schema.json
+TMP_DIR=tmp
 
 .PHONY: json-schema
 json-schema:
-	cat $(SINGLE_CHART_DIR)/values.schema.yaml | python3 ./yaml2json.py | jq '.[0]' > $(SINGLE_CHART_DIR)/values.schema.json
+	find charts/ -name values.schema.yaml -printf 'cat %p | gojsontoyaml -yamltojson | jq -r > $$(dirname %p)/values.schema.json' | sh
 
 .PHONY: lint
-lint: assert-schema-equals
-	@for file in $(SINGLE_VALUES_FILES); do \
-		echo "Linting timescaledb-single using file: $$file" ; \
-		helm lint $(SINGLE_CHART_DIR) -f "$$file" --set backup.enabled=true --set pgBouncer.enabled=true --set prometheus.enabled=true --set unsafe=true || exit 1 ; \
-	done
-	@helm lint $(MULTI_CHART_DIR)
+lint:  ## Lint helm chart using ct (chart-testing).
+	ct lint --config ct.yaml
 
-# We're not symlinking the files, as that generates *a ton* of Helm noise
-.PHONY: refresh-ci-values
-refresh-ci-values: clean-ci
-	@mkdir -p ./$(CI_SINGLE_DIR)/
-	@for file in $(SINGLE_VALUES_FILES); do \
-		cp "$$file" "$(CI_SINGLE_DIR)/$$(basename $$file)-values.yaml"; \
-	done
+.PHONY: clean
+clean:
+	rm -rf $(TMP_DIR)
 
-.PHONY: clean-ci
-clean-ci:
-	@rm -rf ./$(CI_SINGLE_DIR)
-	@mkdir -p ./$(CI_SINGLE_DIR)/
-	@kubectl delete namespace $(K8S_NAMESPACE) 2>/dev/null || true
+$(TMP_DIR):
+	mkdir -p $(TMP_DIR)
 
-.PHONY: shellcheck shellcheck-single
-shellcheck: shellcheck-single
-shellcheck-single:
-	@for vfile in $(SINGLE_VALUES_FILES); do \
-		helm template $(SINGLE_CHART_DIR) -s templates/configmap-scripts.yaml -f $$vfile > $(CI_SINGLE_DIR)/temp.yaml || exit 1 ; \
-		cat $(CI_SINGLE_DIR)/temp.yaml | python3 ./yaml2json.py > $(CI_SINGLE_DIR)/temp.json || exit 1; \
-		for script in $$(jq '.[0].data | keys | sort | .[] | select(endswith(".sh"))' -r $(CI_SINGLE_DIR)/temp.json); do \
-			echo "shellcheck - $$script (from values file $$vfile)" ; \
-			jq ".[0].data.\"$${script}\"" -r $(CI_SINGLE_DIR)/temp.json | shellcheck - --exclude=SC1090 || exit 1; \
-		done ; \
-		rm $(CI_SINGLE_DIR)/temp.* ; \
+.PHONY: extract-scripts
+extract-scripts: $(TMP_DIR)  ## Extract shell scripts from helm templates
+	./scripts/extract-scripts.sh
+
+.PHONY: shellcheck
+shellcheck: extract-scripts
+	for f in $$(find scripts/ -name "*.sh" -type f) $$(find $(TMP_DIR)/ -name "*.sh" -type f); do \
+		shellcheck $$f --exclude=SC1090,SC1091,SC2148 ;\
 	done
 
-.PHONY: install-example
-install-example: prepare-ci
-	DELETE_DEPLOYMENT=0 TEST_REPLICA=0 ./tests/verify_deployment.sh $(SINGLE_CHART_DIR)/values.yaml example
+.PHONY: promscale-mixin
+promscale-mixin:
+	./scripts/generate-promscale-alerts.sh
 
-.PHONY: smoketest
-smoketest: prepare-ci
-	./tests/verify_deployment.sh $(SINGLE_CHART_DIR)/values.yaml smoketest
+.PHONY: delete-kind
+delete-kind:  ## This is a phony target that is used to delete the local kubernetes kind cluster.
+	kind delete cluster && sleep 10
+
+.PHONY: start-kind
+start-kind: delete-kind  ## This is a phony target that is used to create a local kubernetes kind cluster.
+	kind create cluster --config $(KIND_CONFIG)
+	kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=300s
+
+.PHONY: load-images
+load-images:  ## Load images into the local kubernetes kind cluster.
+	./scripts/load-images.sh
+
+.PHONY: install-db
+install-db:  ## Install the testing database into the local kubernetes kind cluster.
+	helm install \
+		--namespace ext-db \
+		--create-namespace db \
+		--wait \
+		--timeout 15m \
+		--debug \
+		charts/timescaledb-single \
+		--set replicaCount=1 \
+		--set secrets.credentials.PATRONI_SUPERUSER_PASSWORD="temporarypassword" \
+		--set loadBalancer.enabled=false \
+		--set image.tag=pg14.4-ts2.7.2-p0
+
+.PHONY: e2e
+e2e: load-images  ## Run e2e installation tests using ct (chart-testing).
+	ct install --config ct.yaml --exclude-deprecated
+
+### TODO(paulfantom): remove this section once timescaledb-single is using `ct` and `helm test` for testing.
+
+SINGLE_CHART_DIR := charts/timescaledb-single
+SINGLE_VALUES_FILES := $(SINGLE_CHART_DIR)/values.yaml $(wildcard $(SINGLE_CHART_DIR)/values/*.yaml)
+DEPLOYMENTS := $(SINGLE_VALUES_FILES)
+K8S_NAMESPACE ?= citest
 
 # We test sequentially, as in GitHub actions we do not have a lot of CPU available,
 # so scheduling the pods concurrently does not work
 .PHONY: test
 test: prepare-ci
 	for f in $(SINGLE_VALUES_FILES); do \
-		./tests/verify_deployment.sh $${f} || exit 1; \
+		./tests/verify_deployment.sh $${f}; \
 	done
 
 .PHONY: prepare-ci
@@ -98,3 +95,5 @@ prepare-ci:
 			| kubectl create -f - ; \
 	done ; \
 	exit 0
+
+### END_OF_SECTION

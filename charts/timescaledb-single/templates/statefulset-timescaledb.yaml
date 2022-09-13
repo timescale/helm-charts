@@ -5,12 +5,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "timescaledb.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 4 }}
+    app.kubernetes.io/component: timescaledb
 spec:
   serviceName: {{ template "timescaledb.fullname" . }}
   replicas: {{ .Values.replicaCount }}
@@ -25,9 +23,8 @@ spec:
     metadata:
       name: {{ template "timescaledb.fullname" . }}
       labels:
-        app: {{ template "timescaledb.fullname" . }}
-        release: {{ .Release.Name }}
-        cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 8 }}
+        app.kubernetes.io/component: timescaledb
 {{- if .Values.podAnnotations }}
       annotations:
 {{ toYaml .Values.podAnnotations | indent 8 }}

@@ -26,7 +26,7 @@ High Availability (HA) configuration on Kubernetes. This chart will do the follo
 - Each of the containers runs a TimescaleDB instance and [Patroni](https://patroni.readthedocs.io/en/latest/) agent.
 - Each TimescaleDB instance is configured for replication (1 Master + 2 Replicas).
 
-<img src="./timescaledb-single.png" width="640" />
+<img src="./docs/timescaledb-single.png" width="640" />
 
 When deploying on AWS EKS:
 - The pods will be scheduled on nodes which run in different Availability Zones (AZs).

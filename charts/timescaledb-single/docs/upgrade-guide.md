@@ -4,13 +4,18 @@ Before you upgrade your deployment, you should ensure you have
 followed the version specific upgrade guides.
 
 ##### Upgrade guides
-- [0.10 to 0.11](#upgrading-from-010x-to-011x)
-- [0.9 to 0.10](#upgrading-from-09x-to-010x)
-- [0.8 to 0.9](#upgrading-from-08x-to-09x)
-- [0.7 to 0.8](#upgrading-from-07x-to-08x)
-- [0.6 to 0.7](#upgrading-from-06x-to-07x)
-- [0.5 to 0.6](#upgrading-from-05x-to-06x)
-- [0.4 to 0.5](#upgrading-from-04x-to-05x)
+- [Upgrade your deployment](#upgrade-your-deployment)
+        - [Upgrade guides](#upgrade-guides)
+- [Upgrading to 0.16](#upgrading-to-016)
+- [Upgrading from 0.10 to 0.11](#upgrading-from-010-to-011)
+- [Upgrading from 0.9 to 0.10](#upgrading-from-09-to-010)
+- [Upgrading from 0.8 to 0.9](#upgrading-from-08-to-09)
+- [Upgrading from 0.7 to 0.8](#upgrading-from-07-to-08)
+- [Upgrading from 0.6 to 0.7](#upgrading-from-06-to-07)
+- [Upgrading from 0.5 to 0.6](#upgrading-from-05-to-06)
+  - [Migrate the Secrets](#migrate-the-secrets)
+- [Upgrading from 0.4 to 0.5](#upgrading-from-04-to-05)
+  - [Delete the config Service](#delete-the-config-service)
 
 After you have followed the upgrade guide you should be able to upgrade your deployment as follows:
 
@@ -19,6 +24,10 @@ After you have followed the upgrade guide you should be able to upgrade your dep
 ```sh
 helm upgrade --install my-release ./charts/timescaledb-single -f values/my-release.yaml
 ```
+
+# Upgrading to 0.16
+
+Gethering metrics from postgres-exporter was changed and this helm chart no longer creates a Service dedicated to metrics exposition. It is advised to use `pod` role when using prometheus `kubernetes_sd_config`. Additionally `ServiceMonitor` object was deprecated and replaced with `PodMonitor`. Due to this change `.values.serviceMonitor` option was renamed to `.values.podMonitor`.
 
 # Upgrading from 0.10 to 0.11
 

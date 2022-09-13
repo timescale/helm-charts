@@ -3,6 +3,10 @@
 
 # This configuration assumes there will be roughly the same number of m5.large instances available
 # as Database pods that will be scheduled, pretty much having a dedicated node per pod.
+
+loadBalancer:
+  enabled: false
+
 resources:
   limits:
     cpu: 2000m

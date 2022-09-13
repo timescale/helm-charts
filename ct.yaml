@@ -3,13 +3,10 @@
 ---
 # See https://github.com/helm/chart-testing#configuration
 remote: origin
-target-branch: master
+target-branch: main
 chart-dirs:
-  - deploy
+- charts
 chart-repos: []
 # Some of tests require longer than default timeout
-helm-extra-args: --timeout 600s
-# We do not want to bump the Chart version for every single commit,
-# but only once we release
-check-version-increment: false
-
+helm-extra-args: --timeout 15m --debug
+check-version-increment: true

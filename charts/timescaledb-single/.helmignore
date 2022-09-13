@@ -1,2 +1,3 @@
 *.png
-values.schema.json
+values.schema.yaml
+tmp/

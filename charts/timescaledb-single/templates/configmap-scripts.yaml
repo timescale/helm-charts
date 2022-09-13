@@ -10,12 +10,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "timescaledb.fullname" . }}-scripts
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 4}}
+    app.kubernetes.io/component: scripts
 data:
   # If no backup is configured, archive_command would normally fail. A failing archive_command on a cluster
   # is going to cause WAL to be kept around forever, meaning we'll fill up Volumes we have quite quickly.
@@ -229,7 +227,7 @@ data:
     ```
 
     For more information, consult the admin guide:
-    https://github.com/timescale/timescaledb-kubernetes/blob/master/charts/timescaledb-single/admin-guide.md#bootstrap-from-backup
+    https://github.com/timescale/helm-charts/blob/main/charts/timescaledb-single/admin-guide.md#bootstrap-from-backup
 
 
     __EOT__

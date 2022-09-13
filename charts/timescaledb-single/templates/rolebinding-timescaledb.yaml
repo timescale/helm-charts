@@ -6,11 +6,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: {{ template "timescaledb.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+{{ include "timescaledb-helm.labels" . | indent 4}}
+    app.kubernetes.io/component: rbac
 subjects:
   - kind: ServiceAccount
     name: {{ template "timescaledb.serviceAccountName" . }}

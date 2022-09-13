@@ -20,7 +20,7 @@ image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescale/timescaledb-ha
-  tag: pg14.3-ts2.7.0-p0
+  tag: pg14.5-ts2.8.0-p1
   pullPolicy: Always
 
 # By default those secrets are randomly generated.
@@ -37,7 +37,7 @@ secrets:
 
   # Selector used to provision your own Secret containing patroni configuration details
   # This is mutually exclusive with `credentials` option and takes precedence over it.
-  # WARNING: Use this option with caution  
+  # WARNING: Use this option with caution
   credentialsSecretName: ""
 
   # This map should contain tls key and certifiacte. When empty,
@@ -492,7 +492,7 @@ pgBouncer:
   # However, for flexibility, we do allow the override of any pg_bouncer setting
   # many of which are vital to the operation of this helm chart.
   # The values we do not suggest altering are set in the template
-  # https://github.com/timescale/timescaledb-kubernetes/blob/master/charts/timescaledb-single/templates/configmap-pgbouncer.yaml#L35-L50
+  # https://github.com/timescale/helm-charts/blob/main/charts/timescaledb-single/templates/configmap-pgbouncer.yaml#L35-L50
   # Only override these settings if you are confident of  what you are doing.
     server_reset_query: DISCARD ALL
     max_client_conn: 500
@@ -536,8 +536,8 @@ nodeSelector: {}
 prometheus:
   enabled: false
   image:
-    repository: prometheuscommunity/postgres-exporter
-    tag: v0.9.0
+    repository: quay.io/prometheuscommunity/postgres-exporter
+    tag: v0.11.1
     pullPolicy: Always
   # Extra custom environment variables for prometheus.
   # These should be an EnvVar, as this allows you to inject secrets into the environment
@@ -566,14 +566,14 @@ prometheus:
   # - name: exporter-config
   #   mountPath: /var/exporter
 
-serviceMonitor:
-  # Specifies whether ServiceMonitor for Prometheus operator should be created
+podMonitor:
+  # Specifies whether PodMonitor for Prometheus operator should be created
   enabled: false
   portName: metrics
   path: /metrics
   interval: 10s
   # scrapeTimeout: 30s
-  # Specifies namespace, where ServiceMonitor should be installed
+  # Specifies namespace, where PodMonitor should be installed
   # namespace: monitoring
   # labels:
   #   release: prometheus
@@ -630,6 +630,8 @@ serviceAccount:
   # The name of the ServiceAccount to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+  # A map of annotations to be set on the ServiceAccount
+  annotations: {}
 
 debug:
   # This setting is mainly for during development, debugging or troubleshooting.

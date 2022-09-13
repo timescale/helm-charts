@@ -9,12 +9,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "timescaledb.fullname" . }}-patroni
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "timescaledb.fullname" . }}
-    chart: {{ template "timescaledb.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    cluster-name: {{ template "clusterName" . }}
+{{ include "timescaledb-helm.labels" . | indent 4 }}
+    app.kubernetes.io/component: patroni
 data:
   patroni.yaml: |
 {{ .Values.patroni | toYaml | indent 4 }}

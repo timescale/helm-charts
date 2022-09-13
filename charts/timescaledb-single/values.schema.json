@@ -231,6 +231,9 @@
       },
       "type": "object"
     },
+    "enabled": {
+      "additionalProperties": true
+    },
     "env": {
       "type": [
         "array",
@@ -276,6 +279,9 @@
         }
       },
       "type": "object"
+    },
+    "global": {
+      "additionalProperties": true
     },
     "image": {
       "additionalProperties": false,
@@ -596,6 +602,9 @@
         "string"
       ]
     },
+    "podMonitor": {
+      "type": "object"
+    },
     "postInit": {
       "description": "postInit allows you to configure additional scripts that will be run once\ndirectly after initialization of the database. It takes a list of VolumeProjection,\nevery .sh, .sql, and .sql.gz script will be executed in sorted order and they should\nreturn exitcode 0 on success.\n",
       "items": {
@@ -765,6 +774,9 @@
     "serviceAccount": {
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "type": "object"
+        },
         "create": {
           "type": "boolean"
         },
@@ -775,9 +787,6 @@
           ]
         }
       },
-      "type": "object"
-    },
-    "serviceMonitor": {
       "type": "object"
     },
     "sharedMemory": {
@@ -851,7 +860,7 @@
     "resources",
     "secrets",
     "serviceAccount",
-    "serviceMonitor",
+    "podMonitor",
     "sharedMemory",
     "timescaledbTune",
     "tolerations"

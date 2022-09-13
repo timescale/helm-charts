@@ -1,0 +1,47 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "avalanche.fullname" . }}
+  labels:
+{{ include "avalanche-helm.labels" . | indent 4 }}
+    app.kubernetes.io/component: avalanche
+  {{- if .Values.annotations }}
+  annotations: {{ toYaml .Values.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "avalanche.fullname" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ template "avalanche.fullname" . }}
+      labels:
+{{ include "avalanche-helm.labels" . | indent 8 }}
+        app.kubernetes.io/component: avalanche
+{{- if .Values.podAnnotations }}
+      annotations:
+{{ toYaml .Values.podAnnotations | indent 8 }}
+{{- end }}
+    spec:
+      serviceAccountName: {{ template "avalanche.serviceAccountName" . }}
+      containers:
+        - name: avalanche
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --port=9001
+            {{- with .Values.extraArgs }}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+          - containerPort: 9001
+            name: metrics
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
