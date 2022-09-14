@@ -32,6 +32,19 @@ extraEnv: []
 # Allows reference of secrets
 extraEnvFrom: []
 
+# Extra volumes to be able to add extra files to the configuration like the alertmanager and alerting rules configuration files or any other configuration require in a extra file
+# More info about volumes: https://kubernetes.io/docs/concepts/storage/volumes/
+extraVolumes: []
+#   - name: alertmanager
+#     configMap:
+#       name: alerting-configs
+
+extraVolumeMounts: []
+#   - name: alertmanager
+#     mountPath: "/etc/alertmanager/"
+#     readOnly: true
+
+
 # Annotations to be added to the promscale Deployment
 annotations: {}
 
