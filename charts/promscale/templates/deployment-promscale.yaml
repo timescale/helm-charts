@@ -73,10 +73,16 @@ spec:
           volumeMounts:
             - name: configs
               mountPath: /etc/promscale/
+          {{- if .Values.extraVolumeMounts }}
+          {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- end }}
       volumes:
         - name: configs
           configMap:
             name: {{ include "promscale.fullname" . }}
+      {{- if .Values.extraVolumes }}
+      {{- toYaml .Values.extraVolumes | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "promscale.fullname" . }}
       automountServiceAccountToken: false
       {{- with .Values.nodeSelector }}
