@@ -32,7 +32,80 @@
             "default": {},
             "title": "The affinity Schema",
             "required": [],
-            "properties": {},
+            "properties": {
+                "nodeAffinity": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "default": {},
+                    "title": "The nodeAffinity Schema",
+                    "required": [],
+                    "properties": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": {
+                            "additionalProperties": true,
+                            "type": "object",
+                            "default": {}
+                        },
+                        "preferredDuringSchedulingIgnoredDuringExecution": {
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "additionalProperties": true,
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "podAffinity": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "default": {},
+                    "title": "The podAffinity Schema",
+                    "required": [],
+                    "properties": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": {
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "additionalProperties": true,
+                                "type": "object"
+                            }
+                        },
+                        "preferredDuringSchedulingIgnoredDuringExecution": {
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "additionalProperties": true,
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "podAntiAffinity": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "default": {},
+                    "title": "The podAntiAffinity Schema",
+                    "required": [],
+                    "properties": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": {
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "additionalProperties": true,
+                                "type": "object"
+                            }
+                        },
+                        "preferredDuringSchedulingIgnoredDuringExecution": {
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "additionalProperties": true,
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            },
             "examples": [
                 {}
             ]
