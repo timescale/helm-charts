@@ -10,8 +10,27 @@ image:
 replicaCount: 1
 
 # Arguments that will be passed onto deployment pods
-# The list of available cli flags can be found by
-# running avalanche --help
+# The list of available cli flags can be found here
+# extraArgs:
+#   - --metric-count=500                              Number of metrics to serve.
+#   - --label-count=10                                Number of labels per-metric.
+#   - --series-count=10                               Number of series per-metric.
+#   - --metricname-length=5                           Modify length of metric names.
+#   - --labelname-length=5                            Modify length of label names.
+#   - --const-label=CONST-LABEL ...                   Constant label to add to every metric. Format is labelName=labelValue. Flag can be specified multiple times.
+#   - --value-interval=30                             Change series values every {interval} seconds.
+#   - --series-interval=60                            Change series_id label values every {interval} seconds.
+#   - --metric-interval=120                           Change __name__ label values every {interval} seconds.
+#   - --port=9001                                     Port to serve at
+#   - --remote-url=REMOTE-URL                         URL to send samples via remote_write API.
+#   - --remote-pprof-urls=REMOTE-PPROF-URLS ...       a list of urls to download pprofs during the remote write: --remote-pprof-urls=http://127.0.0.1:10902/debug/pprof/heap --remote-pprof-urls=http://127.0.0.1:10902/debug/pprof/profile
+#   - --remote-pprof-interval=REMOTE-PPROF-INTERVAL   how often to download pprof profiles.When not provided it will download a profile once before the end of the test.
+#   - --remote-batch-size=2000                        how many samples to send with each remote_write API request.
+#   - --remote-requests-count=100                     how many requests to send in total to the remote_write API.
+#   - --remote-write-interval=100ms                   delay between each remote write request.
+#   - --remote-tenant="0"                             Tenant ID to include in remote_write send
+#   - --tls-client-insecure                           Skip certificate check on tls connection
+#   - --remote-tenant-header="X-Scope-OrgID"          Tenant ID to include in remote_write send. The default, is the default tenant header expected by Cortex.
 extraArgs: []
 
 # Annotations to be added to the avalanche Deployment

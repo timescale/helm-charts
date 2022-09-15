@@ -35,8 +35,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --port=9001
-            {{- with .Values.extraArgs }}
-            {{ toYaml . | nindent 12 }}
+            {{- with .Values.extraArgs -}}
+            {{ tpl (toYaml . | nindent 12) $ }}
             {{- end }}
           ports:
           - containerPort: 9001
