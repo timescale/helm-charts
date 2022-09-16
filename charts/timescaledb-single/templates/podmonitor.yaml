@@ -19,7 +19,7 @@ spec:
     scrapeTimeout: {{ .Values.podMonitor.scrapeTimeout }}
     {{- end }}
     honorLabels: true
-    port: {{ .Values.podMonitor.portName }}
+    port: pg-exporter
     path: {{ .Values.podMonitor.path }}
     {{- if .Values.podMonitor.metricRelabelings }}
     metricRelabelings: {{ toYaml .Values.podMonitor.metricRelabelings | nindent 6 }}
@@ -29,7 +29,6 @@ spec:
     matchLabels:
       app: {{ template "timescaledb.fullname" . }}
       release: "{{ .Release.Name }}"
-      component: postgres-exporter
   {{- if .Values.podMonitor.targetLabels }}
   targetLabels: {{ toYaml .Values.podMonitor.targetLabels | nindent 4 }}
   {{- end }}

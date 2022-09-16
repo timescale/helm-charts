@@ -550,7 +550,6 @@ prometheus:
 podMonitor:
   # Specifies whether PodMonitor for Prometheus operator should be created
   enabled: false
-  portName: metrics
   path: /metrics
   interval: 10s
   # scrapeTimeout: 30s
