@@ -13,14 +13,13 @@ jobs:
   assign_issue:
     runs-on: ubuntu-latest
     name: Assign Issue to a Project
-    if: github.event_name == 'issues'
+    if: github.event_name == 'issues' || github.event_name == 'pull_request_target'
     steps:
-    - name: Assign NEW issues to project O11y Applications
+    - name: Assign NEW issues/PRs to project O11y Applications
       uses: actions/add-to-project@main
       with:
         project-url: 'https://github.com/orgs/timescale/projects/54'
-        # PAT token is managed by @paulfantom
-        github-token: ${{ secrets.ORG_PROJECT_PAT }}
+        github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
 
   stale-issues-handler:
     runs-on: ubuntu-latest
