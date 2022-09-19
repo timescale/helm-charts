@@ -27,4 +27,10 @@ spec:
     targetPort: otel-port
     protocol: TCP
   {{- end }}
+  {{ if .Values.service.thanosStoreAPI.enabled }}
+  - name: thanos-storeapi
+    port: {{ .Values.service.thanosStoreAPI.port }}
+    targetPort: thanos-storeapi
+    protocol: TCP
+  {{- end }}
 {{- end }}
