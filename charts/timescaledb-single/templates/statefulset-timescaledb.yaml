@@ -90,7 +90,7 @@ spec:
               fi
 
               touch "${TSTUNE_FILE}"
-              timescaledb-tune -quiet -pg-version 11 -conf-path "${TSTUNE_FILE}" -cpus "${CPUS}" -memory "${MEMORY}MB" \
+              timescaledb-tune -quiet -conf-path "${TSTUNE_FILE}" -cpus "${CPUS}" -memory "${MEMORY}MB" \
                 {{ range $key, $value := .Values.timescaledbTune.args | default dict }}{{ printf "--%s %s " $key (quote $value)}}{{ end }} -yes
 
               # If there is a dedicated WAL Volume, we want to set max_wal_size to 60% of that volume
