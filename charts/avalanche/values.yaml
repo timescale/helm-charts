@@ -62,24 +62,15 @@ serviceAccount:
 # set your own limits
 resources: {}
 
-# set a custom readiness probe e.g. when basic auth is enabled
-# readinessProbe:
-#   httpGet: null
-#   exec:
-#     command:
-#     - sh
-#     - -c
-#     - |-
-#       status_code=$(wget --server-response "http://${WEB_AUTH_USERNAME}:${WEB_AUTH_PASSWORD}@localhost:9001/health" 2>&1 | awk '/^  HTTP/{print $2}');
-#       if [[ "${status_code}" == "200" ]]; then exit 0; else exit 1; fi
 # NOTE: This readinessProbe will fail when remote_write is used, as avalanche
 # does not enable the healthcheck endpoint when remote write is used instead
 # of the /metrics endpoint.
-readinessProbe:
-  httpGet:
-    path: /health
-    port: metrics
-    scheme: HTTP
-  failureThreshold: 3
-  timeoutSeconds: 15
-  periodSeconds: 15
+# readinessProbe:
+#   httpGet:
+#     path: /health
+#     port: metrics
+#     scheme: HTTP
+#   failureThreshold: 3
+#   timeoutSeconds: 15
+#   periodSeconds: 15
+readinessProbe: {}
