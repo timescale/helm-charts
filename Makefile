@@ -6,7 +6,9 @@ KIND_CONFIG ?= ./testdata/kind-$(KUBE_VERSION).yaml
 TMP_DIR=tmp
 
 .PHONY: json-schema
-json-schema:
+json-schema: charts/timescaledb-single/values.schema.json
+
+charts/timescaledb-single/values.schema.json:
 	find charts/ -name values.schema.yaml -printf 'cat %p | gojsontoyaml -yamltojson | jq -r > $$(dirname %p)/values.schema.json' | sh
 
 .PHONY: lint

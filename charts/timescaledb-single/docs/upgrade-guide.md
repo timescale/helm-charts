@@ -6,6 +6,7 @@ followed the version specific upgrade guides.
 ##### Upgrade guides
 - [Upgrade your deployment](#upgrade-your-deployment)
         - [Upgrade guides](#upgrade-guides)
+- [Upgrading to 0.20](#upgrading-to-020)
 - [Upgrading to 0.16](#upgrading-to-016)
 - [Upgrading from 0.10 to 0.11](#upgrading-from-010-to-011)
 - [Upgrading from 0.9 to 0.10](#upgrading-from-09-to-010)
@@ -24,6 +25,10 @@ After you have followed the upgrade guide you should be able to upgrade your dep
 ```sh
 helm upgrade --install my-release ./charts/timescaledb-single -f values/my-release.yaml
 ```
+
+# Upgrading to 0.20
+
+In 0.10.0 release we announced deprecation of `loadBalancer` and `replicaLoadBalancer` fields. In this release we are removing those deprecated fields in favor of `service.primary` and `serivce.replica`. If you were still using deprecated fields, please update your values file to use the new fields. This change also makes creation of `LoadBalancer` Service an explicit action that needs to be enabled by user.
 
 # Upgrading to 0.16
 

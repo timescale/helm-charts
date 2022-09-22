@@ -14,10 +14,7 @@ metadata:
 {{- if .Values.service.replica.labels }}
 {{ .Values.service.replica.labels | toYaml | indent 4 }}
 {{- end }}
-{{- if and .Values.replicaLoadBalancer.enabled .Values.replicaLoadBalancer.annotations }}
-  annotations:
-{{ .Values.replicaLoadBalancer.annotations | toYaml | indent 4 }}
-{{- else if .Values.service.replica.annotations }}
+{{- if .Values.service.replica.annotations }}
   annotations:
 {{ .Values.service.replica.annotations | toYaml | indent 4 }}
 {{- end }}
@@ -26,11 +23,7 @@ spec:
     app: {{ template "timescaledb.fullname" . }}
     cluster-name: {{ template "clusterName" . }}
     role: replica
-{{- if .Values.replicaLoadBalancer.enabled }}
-  type: LoadBalancer
-{{- else }}
   type: {{ .Values.service.replica.type }}
-{{- end }}
   ports:
 {{- if .Values.pgBouncer.enabled }}
   - name: pgbouncer
@@ -39,20 +32,13 @@ spec:
     protocol: TCP
 {{- end }}
   - name: postgresql
-    # This always defaults to 5432, even if `!replicaLoadBalancer.enabled`.
-    port: {{ if .Values.replicaLoadBalancer.enabled }}
-      {{- .Values.replicaLoadBalancer.port }}
-    {{- else }}
-      {{- .Values.service.replica.port }}
-    {{- end }}
+    # This always defaults to 5432
+    port: {{ .Values.service.replica.port }}
     targetPort: postgresql
     protocol: TCP
-    {{- if and (and (not .Values.replicaLoadBalancer.enabled) (eq .Values.service.replica.type "NodePort")) .Values.service.replica.nodePort }}
-    # Enabled if `!.Values.replicaLoadBalancer.enabled` and `.Values.service.replica.type == "NodePort"` and `.Values.service.replica.nodePort != nil`
+    {{- if and (eq .Values.service.replica.type "NodePort") .Values.service.replica.nodePort }}
     nodePort: {{ .Values.service.replica.nodePort }}
     {{- end }}
-{{- if and .Values.replicaLoadBalancer.enabled .Values.replicaLoadBalancer.spec }}
-{{ .Values.replicaLoadBalancer.spec | toYaml | indent 2 }}
-{{- else if .Values.service.replica.spec }}
+{{- if .Values.service.replica.spec }}
 {{ .Values.service.replica.spec | toYaml | indent 2 }}
 {{- end }}

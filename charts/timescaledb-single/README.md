@@ -71,7 +71,7 @@ For details about what parameters you can set, have a look at the [Administrator
 
 ### Installing from the Timescale Helm Repo
 
-We have a Helm Repository that you can use, instead of cloning this Git repo. 
+We have a Helm Repository that you can use, instead of cloning this Git repo.
 
 First add the repository with:
 ```console
@@ -89,7 +89,7 @@ helm install my-release .
 To keep the repo up to date with new versions you can do:
 ```console
 helm repo update
-``` 
+```
 ## Connecting to TimescaleDBs
 
 To connect to the TimescaleDB instance, we first need to know to which host we need to connect. Use `kubectl` to get that information:

@@ -37,9 +37,6 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `image.repository`                | The image to pull                           | `timescale/timescaledb-ha`                       |
 | `image.tag`                       | The version of the image to pull            | `pg13-ts2.1-latest`
-| `loadBalancer.annotations` | Deprecated(0.10.0): Pass on annotations to the Load Balancer | An AWS ELB annotation to increase the idle timeout |
-| `loadBalancer.enabled`     | Deprecated(0.10.0): If enabled, creates a LB for the primary | `true`                           |
-| `loadBalancer.spec`        | Deprecated(0.10.0): Extra configuration for service spec     | `nil`                            |
 | `service.primary.type`        | The service type to use for the primary service | `ClusterIP`                          |
 | `service.primary.port`        | The service port to use for the primary service | `5432`                               |
 | `service.primary.nodePort`    | The service nodePort to use for the primary service when `type` is `NodePort` | `null` |
@@ -88,9 +85,6 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.11.0`                                           |
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
 | `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
-| `replicaLoadBalancer.annotations` | Deprecated(0.10.0): Pass on annotations to the Load Balancer | An AWS ELB annotation to increase the idle timeout |
-| `replicaLoadBalancer.enabled` | Deprecated(0.10.0): If enabled, creates a LB for replica's only  | `false` |
-| `replicaLoadBalancer.spec`    | Deprecated(0.10.0): Extra configuration for replica service spec | `nil`   |
 | `resources`                       | Any resources you wish to assign to the timescaledb container | `{}`   |
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
 | `secrets.credentials`             | A map of environment variables that influence Patroni, for example PATRONI_SUPERUSER_PASSWORD or PATRONI_REPLICATION_PASSWORD | Randomly generated |
