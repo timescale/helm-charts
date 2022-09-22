@@ -68,6 +68,10 @@ spec:
               name: metrics-port
             - containerPort: 9202
               name: otel-port
+            {{- if .Values.service.thanosStoreAPI.enabled }}
+            - containerPort: {{ .Values.service.thanosStoreAPI.port }}
+              name: thanos-storeapi
+            {{- end }}
           readinessProbe:
           {{- toYaml .Values.readinessProbe | nindent 12 }}
           volumeMounts:
