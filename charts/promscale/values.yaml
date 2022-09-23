@@ -111,6 +111,12 @@ service:
     enabled: true
     port: 9202
 
+  # Set port to enable Thanos StoreAPI
+  # Enable Thanos StoreAPI according to the configuration param "thanos.store-api.server-address" in https://github.com/timescale/promscale/blob/master/docs/configuration.md
+  thanosStoreAPI:
+    enabled: false
+    port: 9203
+
 # set your own limits
 resources: {}
 
