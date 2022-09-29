@@ -67,7 +67,7 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 helm install --name my-release -f myvalues.yaml charts/timescaledb-single
 ```
 
-For details about what parameters you can set, have a look at the [Administrator Guide](admin-guide.md#configure)
+For details about what parameters you can set, have a look at the [Administrator Guide](docs/admin-guide.md#configure)
 
 ### Installing from the Timescale Helm Repo
 
@@ -141,7 +141,7 @@ kubectl exec -ti $(kubectl get pod -o name -l role=master,release=$RELEASE) psql
 
 ## Create backups to S3
 The backup is disabled by default, look at the
-[Administrator Guide](admin-guide.md#backups) on how to configure backup location, credentials, schedules, etc.
+[Administrator Guide](docs/admin-guide.md#backups) on how to configure backup location, credentials, schedules, etc.
 
 ## Cleanup
 
@@ -150,9 +150,9 @@ To remove the spawned pods you can run a simple
 helm delete my-release
 ```
 Some items, (pvc's and S3 backups for example) are not immediately removed.
-To also purge these items, have a look at the [Administrator Guide](admin-guide.md#cleanup)
+To also purge these items, have a look at the [Administrator Guide](docs/admin-guide.md#cleanup)
 
 ## Further reading
 
-- [Administrator Guide](admin-guide.md)
+- [Administrator Guide](docs/admin-guide.md)
 - [TimescaleDB Documentation](https://docs.timescale.com/latest/main)
