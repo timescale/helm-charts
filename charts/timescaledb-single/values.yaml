@@ -20,7 +20,7 @@ image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescale/timescaledb-ha
-  tag: pg14.3-ts2.7.0-p0
+  tag: pg14.5-ts2.8.0-p1
   pullPolicy: Always
 
 # By default those secrets are randomly generated.
@@ -518,7 +518,7 @@ prometheus:
   enabled: false
   image:
     repository: quay.io/prometheuscommunity/postgres-exporter
-    tag: v0.11.0
+    tag: v0.11.1
     pullPolicy: Always
   # Extra custom environment variables for prometheus.
   # These should be an EnvVar, as this allows you to inject secrets into the environment
@@ -550,7 +550,6 @@ prometheus:
 podMonitor:
   # Specifies whether PodMonitor for Prometheus operator should be created
   enabled: false
-  portName: metrics
   path: /metrics
   interval: 10s
   # scrapeTimeout: 30s

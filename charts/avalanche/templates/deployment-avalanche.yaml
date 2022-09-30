@@ -35,13 +35,17 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --port=9001
-            {{- with .Values.extraArgs }}
-            {{ toYaml . | nindent 12 }}
+            {{- with .Values.extraArgs -}}
+            {{ tpl (toYaml . | nindent 12) $ }}
             {{- end }}
           ports:
           - containerPort: 9001
             name: metrics
+{{- if .Values.readinessProbe }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
+{{- end }}
+{{- if .Values.resources }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
+{{- end }}

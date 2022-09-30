@@ -28,7 +28,7 @@ spec:
         prometheus.io/scrape: {{ not .Values.serviceMonitor.enabled | quote }}
         {{- if .Values.podAnnotations }}
         {{- range $key, $value := .Values.podAnnotations }}
-          {{ $key }}: {{ $value | quote }}
+        {{ $key }}: {{ $value | quote }}
         {{- end }}
         {{- end }}
     spec:
@@ -68,15 +68,25 @@ spec:
               name: metrics-port
             - containerPort: 9202
               name: otel-port
+            {{- if .Values.service.thanosStoreAPI.enabled }}
+            - containerPort: {{ .Values.service.thanosStoreAPI.port }}
+              name: thanos-storeapi
+            {{- end }}
           readinessProbe:
           {{- toYaml .Values.readinessProbe | nindent 12 }}
           volumeMounts:
             - name: configs
               mountPath: /etc/promscale/
+          {{- if .Values.extraVolumeMounts }}
+          {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- end }}
       volumes:
         - name: configs
           configMap:
             name: {{ include "promscale.fullname" . }}
+      {{- if .Values.extraVolumes }}
+      {{- toYaml .Values.extraVolumes | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "promscale.fullname" . }}
       automountServiceAccountToken: false
       {{- with .Values.nodeSelector }}
