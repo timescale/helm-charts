@@ -570,6 +570,10 @@ podManagementPolicy: OrderedReady
 # https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 podAnnotations: {}
 
+# Labels that are applied to each pod in the stateful set
+# https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
 # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
 
