@@ -31,7 +31,8 @@ replicaCount: 1
 #   - --remote-tenant="0"                             Tenant ID to include in remote_write send
 #   - --tls-client-insecure                           Skip certificate check on tls connection
 #   - --remote-tenant-header="X-Scope-OrgID"          Tenant ID to include in remote_write send. The default, is the default tenant header expected by Cortex.
-extraArgs: []
+extraArgs:
+  - --const-label=avalanche_replica=$(POD_NAME)
 
 # Annotations to be added to the avalanche Deployment
 annotations: {}

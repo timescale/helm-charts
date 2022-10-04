@@ -36,7 +36,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --port=9001
-            - --const-label=replica=$(POD_NAME)
             {{- with .Values.extraArgs -}}
             {{ tpl (toYaml . | nindent 12) $ }}
             {{- end }}
