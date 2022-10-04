@@ -2,7 +2,7 @@
 # Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ template "avalanche.fullname" . }}
   labels:
@@ -13,6 +13,7 @@ metadata:
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  serviceName: {{ template "avalanche.fullname" . }}
   selector:
     matchLabels:
       app: {{ template "avalanche.fullname" . }}
@@ -35,12 +36,18 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --port=9001
+            - --const-label=replica=$(POD_NAME)
             {{- with .Values.extraArgs -}}
             {{ tpl (toYaml . | nindent 12) $ }}
             {{- end }}
           ports:
           - containerPort: 9001
             name: metrics
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
 {{- if .Values.readinessProbe }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}

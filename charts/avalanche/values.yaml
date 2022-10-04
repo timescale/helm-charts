@@ -52,7 +52,9 @@ service:
   annotations: {}
   port: 9001
   # properties to be added to service.spec
-  spec: {}
+  spec:
+    # Headless service is required for stable network IDs of statefulset pods.
+    clusterIP: None
 
 # create and attach a service account
 serviceAccount:
