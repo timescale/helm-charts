@@ -381,6 +381,8 @@ spec:
         ports:
         - containerPort: 8081
           name: pgbackrest
+        resources:
+{{ toYaml .Values.backup.resources | indent 10 }}
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}

@@ -490,6 +490,10 @@ properties:
         type:
           - array
           - "null"
+      resources:
+        type:
+          - object
+          - "null"
   secrets:
     type: object
     additionalProperties: false

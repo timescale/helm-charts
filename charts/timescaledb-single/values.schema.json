@@ -169,6 +169,12 @@
             "object",
             "null"
           ]
+        },
+        "resources": {
+          "type": [
+            "object",
+            "null"
+          ]
         }
       },
       "required": [

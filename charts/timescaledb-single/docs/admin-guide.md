@@ -28,6 +28,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `backup.pgBackRest:archive-get`   | [pgBackRest global:archive-get configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)  | empty |
 | `backup.pgBackRest:archive-push`  | [pgBackRest global:archive-push configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza) | empty |
 | `backup.pgBackRest`               | [pgBackRest global configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)              | Working defaults, using `lz4` compression |
+| `backup.resources`                | Any resources you wish to assign to the pgbackrest container                                                       | `{}` |
 | `callbacks.configMap`             | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks). You can use templates in the name. | `nil`                         |
 | `clusterName`                     | Override the name of the PostgreSQL cluster | Equal to the Helm release name                      |
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)   | `[]`                                                |
@@ -90,7 +91,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `replicaLoadBalancer.annotations` | Deprecated(0.10.0): Pass on annotations to the Load Balancer | An AWS ELB annotation to increase the idle timeout |
 | `replicaLoadBalancer.enabled` | Deprecated(0.10.0): If enabled, creates a LB for replica's only  | `false` |
 | `replicaLoadBalancer.spec`    | Deprecated(0.10.0): Extra configuration for replica service spec | `nil`   |
-| `resources`                       | Any resources you wish to assign to the pod | `{}`                                                |
+| `resources`                       | Any resources you wish to assign to the timescaledb container | `{}`   |
 | `schedulerName`                   | Alternate scheduler name                    | `nil`                                               |
 | `secrets.credentials`             | A map of environment variables that influence Patroni, for example PATRONI_SUPERUSER_PASSWORD or PATRONI_REPLICATION_PASSWORD | Randomly generated |
 | `secrets.credentialsSecretName`   | Existing secret that contains env vars that influence Patroni (e.g. PATRONI_SUPERUSER_PASSWORD). This setting takes precedence over everything set in `secrets.credentials` | `""` |
