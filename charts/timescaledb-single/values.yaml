@@ -111,6 +111,15 @@ backup:
   #     secretKeyRef:
   #       name: pgbackrest-dev-secrets
   #       key: repo1-s3-key-secret
+  resources: {}
+  # If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 # When creating a *new* deployment, the default is to initialize (using initdb) the database.
 # If however, you want to initialize the database using an existing backup, you can do so by
