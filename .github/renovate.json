@@ -7,6 +7,7 @@
     "dependencyDashboardLabels": ["dependencies"],
     "dependencyDashboardAutoclose": "true",
     "labels": ["dependencies"],
+    "bumpVersion": "minor",
     "regexManagers": [
       {
         "fileMatch": ["^\\.github\\/workflows\\/[^/]+\\.ya?ml$"],
@@ -19,6 +20,12 @@
         "matchStrings": ["go-version:\\s(?<currentValue>.*?)\\n"],
         "datasourceTemplate": "golang-version",
         "depNameTemplate": "golang"
+      },
+      {
+        "fileMatch": ["^\\charts\\/promscale\\/Chart\\.yaml$"],
+        "matchStrings": ["appVersion:\\s(?<currentValue>.*?)\\n"],
+        "datasourceTemplate": "github-tags",
+        "depNameTemplate": "timescale/promscale"
       }
     ],
     "packageRules": [
@@ -29,7 +36,7 @@
       },
       {
         "groupName": "helm charts",
-        "matchManagers": ["helmv3","helm-values"]
+        "matchPaths": ["charts/**"]
       }
     ]
   }
