@@ -1,32 +1,6 @@
 {
   "additionalProperties": false,
   "definitions": {
-    "loadBalancer": {
-      "additionalProperties": false,
-      "properties": {
-        "annotations": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "type": "object"
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "port": {
-          "maximum": 65535,
-          "minimum": 1000,
-          "type": "integer"
-        },
-        "spec": {
-          "type": [
-            "object",
-            "null"
-          ]
-        }
-      },
-      "type": "object"
-    },
     "percent": {
       "maximum": 100,
       "mimimum": 0,
@@ -310,9 +284,6 @@
         }
       },
       "type": "object"
-    },
-    "loadBalancer": {
-      "$ref": "#/definitions/loadBalancer"
     },
     "nameOverride": {
       "minLength": 1,
@@ -718,9 +689,6 @@
       "minimum": 0,
       "type": "integer"
     },
-    "replicaLoadBalancer": {
-      "$ref": "#/definitions/loadBalancer"
-    },
     "resources": {
       "additionalProperties": false,
       "properties": {
@@ -855,7 +823,6 @@
     "debug",
     "fullWalPrevention",
     "image",
-    "loadBalancer",
     "nameOverride",
     "networkPolicy",
     "nodeSelector",
@@ -869,7 +836,6 @@
     "rbac",
     "readinessProbe",
     "replicaCount",
-    "replicaLoadBalancer",
     "resources",
     "secrets",
     "serviceAccount",
