@@ -59,8 +59,7 @@ install-db:  ## Install the testing database into the local kubernetes kind clus
 		--debug \
 		charts/timescaledb-single \
 		--set replicaCount=1 \
-		--set secrets.credentials.PATRONI_SUPERUSER_PASSWORD="temporarypassword" \
-		--set loadBalancer.enabled=false
+		--set secrets.credentials.PATRONI_SUPERUSER_PASSWORD="temporarypassword"
 
 .PHONY: e2e
 e2e: load-images  ## Run e2e installation tests using ct (chart-testing).
