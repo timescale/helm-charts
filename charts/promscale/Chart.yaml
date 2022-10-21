@@ -3,7 +3,7 @@ name: promscale
 description: Promscale Connector deployment
 
 version: 14.3.0
-appVersion: 0.15.0
+appVersion: 0.16.0
 
 home: https://github.com/timescale/promscale
 sources:
