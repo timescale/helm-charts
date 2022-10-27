@@ -1,0 +1,43 @@
+---
+{{ if .Values.tracegen.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: synthetic-load-gen
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: synthetic-load-gen
+  template:
+    metadata:
+      labels:
+        app: synthetic-load-gen
+    spec:
+      containers:
+      - name: synthetic-load-gen
+        image: omnition/synthetic-load-generator:1.0.25
+        resources:
+          requests:
+            cpu: {{ .Values.tracegen.resources.requests.cpu }}
+            memory: {{ .Values.tracegen.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.tracegen.resources.limits.cpu }}
+            memory: {{ .Values.tracegen.resources.limits.memory }}
+        volumeMounts:
+        - name: topology-volume
+          mountPath: /etc/synthetic-load-generator
+        env:
+          - name: TOPOLOGY_FILE
+            value: /etc/synthetic-load-generator/topology.json
+          - name: JAEGER_COLLECTOR_URL
+            value: http://simple-prod-collector.{{ .Release.Namespace }}.svc.cluster.local:14268
+      volumes:
+        - name: topology-volume
+          configMap:
+            name: topology
+            items:
+            - key: topology
+              path: topology.json
+{{- end }}

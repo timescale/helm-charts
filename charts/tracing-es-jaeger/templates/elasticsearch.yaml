@@ -1,0 +1,47 @@
+---
+{{ if .Values.elasticsearch.enabled }}
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: elasticsearch-sample
+  namespace: {{ .Release.Namespace }}
+spec:
+  version: {{ .Values.elasticsearch.version }}
+  auth:
+    fileRealm:
+    - secretName: es-bench-user
+  nodeSets:
+  - name: default
+    config:
+      node.roles: ["master", "data", "ingest", "ml"]
+      node.store.allow_mmap: false
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch
+          resources:
+            requests: 
+              memory: {{ .Values.elasticsearch.resources.requests.memory }}
+              cpu: {{ .Values.elasticsearch.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.elasticsearch.resources.limits.memory }}
+              cpu: {{ .Values.elasticsearch.resources.limits.cpu }}
+          env:
+          {{- if .Values.elasticsearch.env }}
+            {{- range $.Values.elasticsearch.env }}
+            - name: {{ .name }}
+              value: {{ tpl (.value | quote) $ }}
+            {{- end }}
+          {{- end }}
+
+    count: 3
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data # Do not change this name unless you set up a volume mount for the data path.
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.elasticsearch.volumes.resources.requests.storage }}
+{{- end }}

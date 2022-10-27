@@ -1,0 +1,17 @@
+---
+apiVersion: v2
+name: tracing-es-jaeger
+description: A Helm chart for tracing-es-jaeger, benchmarking scenario
+home: https://github.com/timescale/helm-charts
+sources:
+  - https://github.com/timescale/helm-charts
+maintainers:
+  - name: timescale
+    url: https://www.timescale.com/
+keywords:
+  - observability
+  - monitoring
+  - tracing
+  - opentelemetry
+  - benchmarking
+version: 0.0.1

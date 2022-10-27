@@ -1,0 +1,49 @@
+---
+elasticsearch:
+  enabled: true
+  version: 7.17.0
+  resources:
+    requests:
+      memory: 25Gi
+      cpu: 10
+    limits:
+      memory: 30Gi
+      cpu: 15
+  env:
+    - name: ES_JAVA_OPTS
+      value: "-Xms25g -Xmx25g"
+  volumes:
+    resources:
+      requests:
+        storage: 1100Gi
+
+jaeger:
+  enabled: true
+  query:
+    replicas: 1
+    serviceType: ClusterIP
+    resources:
+      requests:
+        cpu: 4000m
+        memory: 2Gi
+  collector:
+    replicas: 4
+    autoscale: false
+    resources:
+      requests:
+        cpu: 4000m
+        memory: 2Gi
+    options:
+      collector:
+        queueSize: 100000
+        numWorkers: 1000
+
+tracegen:
+  enabled: true
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi

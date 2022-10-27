@@ -1,0 +1,11 @@
+---
+{{ if .Values.tracegen.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: topology
+  namespace: {{ .Release.Namespace }}
+data: 
+  topology: |
+{{ .Values.tracegen.config | default (.Files.Get "default-tracegen-config.json" | indent 4) }}
+{{- end }}

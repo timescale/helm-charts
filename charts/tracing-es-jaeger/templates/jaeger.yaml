@@ -1,0 +1,44 @@
+---
+{{ if .Values.jaeger.enabled }}
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: simple-prod
+  namespace: {{ .Release.Namespace }}
+spec:
+  strategy: production
+  query:
+    replicas: {{ .Values.jaeger.query.replicas }}
+    serviceType: {{ .Values.jaeger.query.serviceType }} 
+    resources:
+      requests:
+        cpu: {{ .Values.jaeger.query.resources.requests.cpu }}
+        memory: {{ .Values.jaeger.query.resources.requests.memory }}
+  collector:
+    replicas: {{ .Values.jaeger.collector.replicas }}
+    autoscale: {{ .Values.jaeger.collector.autoscale }}
+    resources:
+      requests:
+        cpu: {{ .Values.jaeger.collector.resources.requests.cpu }}
+        memory: {{ .Values.jaeger.collector.resources.requests.memory }}
+    options:
+      collector:
+        queue-size: {{ .Values.jaeger.collector.options.collector.queueSize }}
+        num-workers: {{ .Values.jaeger.collector.options.collector.numWorkers }}
+  storage:
+    type: elasticsearch
+    options:
+      es:
+        server-urls: https://elasticsearch-sample-es-http:9200
+        tls.skip-host-verify: true
+        username: admin
+        password: admin
+  volumeMounts:
+    - name: secrets
+      mountPath: /es/secrets/
+      readOnly: true
+  volumes:
+    - name: secrets
+      secret:
+        secretName: elasticsearch-sample-es-http-certs-public
+{{- end }}
