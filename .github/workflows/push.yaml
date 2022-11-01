@@ -27,7 +27,7 @@ jobs:
         id: install-kubectl
         if: steps.single_chart_changed.outputs.changes != ''
 
-      - uses: azure/setup-helm@v3.3
+      - uses: azure/setup-helm@v3.4
         id: install-helm
         if: steps.single_chart_changed.outputs.changes != ''
         with:
