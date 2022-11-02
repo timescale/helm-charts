@@ -18,6 +18,10 @@ metadata:
 {{ .Values.service.primary.annotations | toYaml | indent 4 }}
 {{- end }}
 spec:
+  selector:
+    app: {{ template "timescaledb.fullname" . }}
+    cluster-name: {{ template "clusterName" . }}
+    role: master
   type: {{ .Values.service.primary.type }}
   ports:
 {{- if .Values.pgBouncer.enabled }}
