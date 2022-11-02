@@ -6,7 +6,7 @@ kind: StatefulSet
 metadata:
   name: {{ template "avalanche.fullname" . }}
   labels:
-{{ include "avalanche-helm.labels" . | indent 4 }}
+    {{ include "avalanche-helm.labels" . | nindent 4 }}
     app.kubernetes.io/component: avalanche
   {{- if .Values.annotations }}
   annotations: {{ toYaml .Values.annotations | nindent 4 }}
@@ -22,12 +22,12 @@ spec:
     metadata:
       name: {{ template "avalanche.fullname" . }}
       labels:
-{{ include "avalanche-helm.labels" . | indent 8 }}
+        {{ include "avalanche-helm.labels" . | nindent 8 }}
         app.kubernetes.io/component: avalanche
-{{- if .Values.podAnnotations }}
+      {{- if .Values.podAnnotations }}
       annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
-{{- end }}
+      {{ toYaml .Values.podAnnotations | nindent 8 }}
+      {{- end }}
     spec:
       serviceAccountName: {{ template "avalanche.serviceAccountName" . }}
       containers:
@@ -47,11 +47,21 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-{{- if .Values.readinessProbe }}
+          {{- if .Values.readinessProbe }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
-{{- end }}
-{{- if .Values.resources }}
+          {{- end }}
+          {{- if .Values.resources }}
           resources:
-{{ toYaml .Values.resources | indent 12 }}
-{{- end }}
+          {{ toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+      {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}

@@ -80,3 +80,12 @@ resources: {}
 #   timeoutSeconds: 15
 #   periodSeconds: 15
 readinessProbe: {}
+
+# Set tolerations for avalanche deployment
+tolerations: {}
+
+# Set nodeSelector for avalanche deployment
+nodeSelector: {}
+
+# Set affinity for pod assignment
+affinity: {}

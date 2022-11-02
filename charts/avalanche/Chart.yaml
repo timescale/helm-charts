@@ -4,7 +4,7 @@
 apiVersion: v2
 name: avalanche
 description: A Helm chart run avalanche for benchmarking Prometheus and remote write storage backends.
-version: 0.5.0
+version: 0.6.0
 
 home: https://github.com/timescale/helm-charts
 
