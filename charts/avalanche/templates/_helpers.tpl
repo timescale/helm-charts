@@ -60,4 +60,7 @@ heritage: {{ .Release.Service }}
 {{ include "avalanche.labels" . }}
 app.kubernetes.io/name: {{ include "avalanche.fullname" . | quote }}
 app.kubernetes.io/version: {{ .Chart.Version }}
+{{ if .Values.labels }}
+{{ .Values.labels | toYaml | nindent 0 }}
+{{- end }}
 {{- end }}

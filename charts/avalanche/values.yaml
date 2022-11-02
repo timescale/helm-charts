@@ -40,6 +40,9 @@ annotations: {}
 # Annotations to be added to the avalanche Pods
 podAnnotations: {}
 
+# Labels to be added to the avalanche k8s resources
+labels: {}
+
 # Enable ServiceMonitor used by prometheus-operator to configure prometheus for metrics scraping.
 # Note that by enabling the service monitor, the cluster's Prometheus will start scraping the metrics
 # generated as load and intended for benchmarking.
