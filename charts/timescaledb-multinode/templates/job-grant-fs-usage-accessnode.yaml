@@ -1,0 +1,83 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+{{- range $pod, $e := until ( .Values.dataNodes | int) }}
+{{- range $key, $role := $.Values.postgresql.roles }}
+{{- range $index, $dbname := $.Values.postgresql.databases }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "grant-fs-usage-an-%s-%s-%s-%s" $.Release.Name ($pod | toString) ($key | toString) $dbname | trunc 63 }}
+  labels:
+    app: {{ template "timescaledb.fullname" $ }}
+    chart: {{ template "timescaledb.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+  annotations:
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: {{ template "timescaledb.fullname" $ }}
+        chart: {{ template "timescaledb.chart" $ }}
+        release: {{ $.Release.Name }}
+        heritage: {{ $.Release.Service }}
+    spec:
+      containers:
+      - name: grant-fs-{{ $pod }}-{{ $key }}
+        image: postgres:11-alpine # A relatively small official image that can run psql
+        command:
+          - sh
+          - -c
+          - >
+              while ! pg_isready -U postgres -h {{ template "timescaledb.fullname" $ }}; do sleep 1; done;
+              while ! psql -U postgres -d "${ACCESS_SVC_CONNSTR}" --set dbname="${DBNAME}" --set ON_ERROR_STOP=1 --command '\c :"dbname"'; do sleep 1; done;
+              while ! [[ "1" == "$(echo ${CHECKROLESQLCOMMAND} | psql -U postgres -qtA -d ${ACCESS_SVC_CONNSTR} --set ON_ERROR_STOP=1 --set rolename=${ROLENAME} )" ]]; do sleep 1; done;
+              while ! [[ "1" == "$(echo ${CHECKFSSQLCOMMAND} | psql -U postgres -qtA -d ${ACCESS_SVC_CONNSTR} --set ON_ERROR_STOP=1 --set fsname=${FSNAME})" ]]; do sleep 1; done;
+              echo "${SQLCOMMAND}" | psql -U postgres -d "${ACCESS_SVC_CONNSTR}" --echo-queries --set ON_ERROR_STOP=1 \
+                --set rolename="${ROLENAME}" \
+                --set fsname="${FSNAME}" \
+                --set dbname="${DBNAME}"
+        env:
+        - name: DBNAME
+          value: {{ $dbname | quote }}
+        - name: FSNAME
+          value: {{ template "timescaledb.dataname" $ }}-{{ $pod }}
+        - name: ROLENAME
+          value: {{ $key }}
+        - name: CLIENTPASS 
+          valueFrom:
+            secretKeyRef:
+              name: timescaledb-client-{{ $key }}
+              key: password-superuser
+        - name: INTERNALPASS 
+          valueFrom:
+            secretKeyRef:
+              name: timescaledb-internal-{{ $key }}
+              key: password-superuser
+        - name: ACCESS_SVC_CONNSTR
+          value: host={{ template "timescaledb.fullname" $ }} connect_timeout=3 sslmode=disable
+        - name: CHECKROLESQLCOMMAND
+          value: |
+            SELECT 1 FROM pg_roles WHERE rolname=:'rolename';
+        - name: CHECKFSSQLCOMMAND
+          value: |
+            SELECT 1 from pg_foreign_server WHERE srvname = :'fsname';
+        - name: SQLCOMMAND
+          value: |
+                 \c :"dbname"
+                  GRANT USAGE ON FOREIGN SERVER :"fsname" TO :rolename;
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.accessname" $ }}
+              key: password-superuser
+      restartPolicy: OnFailure
+  backoffLimit: 10
+...
+{{ end }}
+{{ end }}
+{{ end }}

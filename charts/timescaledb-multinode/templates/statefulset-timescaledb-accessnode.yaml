@@ -79,9 +79,13 @@ spec:
             echo "*:*:*:postgres:${POSTGRES_PASSWORD_DATA_NODE}" > "${PGDATA}/../.pgpass"
             chown postgres:postgres "${PGDATA}/../.pgpass" "${PGDATA}/postgresql_helm_customizations.conf"
             chmod 0600 "${PGDATA}/../.pgpass"
-            echo "Adding host all all all md5 in pg_hba.conf"
-            grep -qxF "host all all all md5" "${PGDATA}/pg_hba.conf" \
-                || echo "host all all all md5" >> ${PGDATA}/pg_hba.conf
+            echo "Adding host all all all {{ .Values.postgresql.parameters.password_encryption }} in pg_hba.conf"
+            grep -qxF "host all all all {{ .Values.postgresql.parameters.password_encryption }}" "${PGDATA}/pg_hba.conf" \
+                || echo "host all all all {{ .Values.postgresql.parameters.password_encryption }}" >> ${PGDATA}/pg_hba.conf
+            {{- range $key, $role := $.Values.postgresql.roles }}
+            grep -qxF "*:*:*:"{{ $key }}":"{{ $role.internalPassword }} \
+                || echo "*:*:*:"{{ $key }}":"{{ $role.internalPassword }} >> "${PGDATA}/../.pgpass"
+            {{ end }}
         volumeMounts:
         - name: storage-volume
           mountPath: "{{ .Values.persistentVolume.mountPath }}"

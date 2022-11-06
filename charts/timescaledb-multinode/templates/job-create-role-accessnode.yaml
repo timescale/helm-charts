@@ -1,0 +1,69 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+{{- range $key, $role := $.Values.postgresql.roles }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "createrole-an-role-%s-%s" $.Release.Name ($key | toString) | trunc 63 }}
+  labels:
+    app: {{ template "timescaledb.fullname" $ }}
+    chart: {{ template "timescaledb.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+  annotations:
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: {{ template "timescaledb.fullname" $ }}
+        chart: {{ template "timescaledb.chart" $ }}
+        release: {{ $.Release.Name }}
+        heritage: {{ $.Release.Service }}
+    spec:
+      containers:
+      - name: createrole-{{ $key }}
+        image: postgres:11-alpine # A relatively small official image that can run psql
+        command:
+          - sh
+          - -c
+          - >
+              while ! pg_isready -U postgres -h {{ template "timescaledb.fullname" $ }}; do sleep 1; done;
+              while ! [[ "1" == "$(echo ${CHECKFDWSQLCOMMAND} | psql -U postgres -qtA -d ${ACCESS_SVC_CONNSTR} --set ON_ERROR_STOP=1 )" ]]; do sleep 1; done;
+              echo "${SQLCOMMANDS}" | psql -U postgres -d "${ACCESS_SVC_CONNSTR}" --file=- --set ON_ERROR_STOP=1 \
+                --set rolename="${ROLENAME}" \
+                --set clientpass="${CLIENTPASS}"
+        env:
+        - name: ROLENAME
+          value: {{ $key }}
+        - name: CLIENTPASS 
+          valueFrom:
+            secretKeyRef:
+              name: timescaledb-client-{{ $key }}
+              key: password-superuser
+        - name: INTERNALPASS 
+          valueFrom:
+            secretKeyRef:
+              name: timescaledb-internal-{{ $key }}
+              key: password-superuser
+        - name: ACCESS_SVC_CONNSTR
+          value: host={{ template "timescaledb.fullname" $ }} connect_timeout=3 sslmode=disable
+        - name: CHECKFDWSQLCOMMAND
+          value: |
+            SELECT 1 FROM pg_foreign_data_wrapper WHERE fdwname='timescaledb_fdw';
+        - name: SQLCOMMANDS
+          value: |
+            CREATE ROLE :rolename WITH LOGIN PASSWORD :'clientpass' CONNECTION LIMIT -1;
+            GRANT USAGE ON FOREIGN DATA WRAPPER timescaledb_fdw TO :rolename;
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "timescaledb.accessname" $ }}
+              key: password-superuser
+      restartPolicy: OnFailure
+  backoffLimit: 10
+...
+{{ end }}

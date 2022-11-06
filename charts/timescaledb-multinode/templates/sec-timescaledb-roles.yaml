@@ -1,0 +1,31 @@
+{{- range $key, $role := $.Values.postgresql.roles }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: timescaledb-client-{{ $key }}
+  labels:
+    app: {{ template "timescaledb.fullname" $ }}
+    chart: {{ template "timescaledb.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+type: Opaque
+data:
+  password-superuser: {{ $role.clientPassword | b64enc }}
+...
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: timescaledb-internal-{{ $key }}
+  labels:
+    app: {{ template "timescaledb.fullname" $ }}
+    chart: {{ template "timescaledb.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+type: Opaque
+data:
+  password-superuser: {{ $role.internalPassword | b64enc }}
+...
+{{ end }}

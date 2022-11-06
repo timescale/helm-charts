@@ -11,7 +11,7 @@ image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescale/timescaledb-ha
-  tag: pg12-ts2.0.0-p0
+  tag: pg14.2-ts2.6.1-p3
   pullPolicy: IfNotPresent
 
 # Credentials used by PostgreSQL
@@ -66,6 +66,35 @@ postgresql:
   databases:
     - postgres
     - example
+  roles:
+    admin:
+      clientPassword: taurine
+      internalPassword: caffeine
+  userToDatabase:
+    - user: user1
+      databases:
+        - example
+        - example2
+    - user: user2
+      databases:
+        - example3
+  databaseToSchema:
+    - database: example
+      schemas:
+        - schema1
+        - schema2
+    - user: example2
+      schemas:
+        - schema2
+  userToSchemaInDatabase:
+    - user: user1
+      databases:
+        - example
+        - example2
+    - user: user2
+      databases:
+        - example3
+
   parameters:
     max_connections: 100
     max_prepared_transactions: 150
@@ -86,6 +115,8 @@ postgresql:
     min_wal_size: 256MB
     max_wal_size: 512MB
     temp_file_limit: 1GB
+    password_encryption: 'md5' 
+
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
 nodeSelector: {}
