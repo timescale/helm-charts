@@ -115,7 +115,7 @@ postgresql:
     min_wal_size: 256MB
     max_wal_size: 512MB
     temp_file_limit: 1GB
-    password_encryption: 'md5' 
+    password_encryption: 'md5'
 
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
