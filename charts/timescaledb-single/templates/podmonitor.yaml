@@ -29,8 +29,8 @@ spec:
     matchLabels:
       app: {{ template "timescaledb.fullname" . }}
       release: "{{ .Release.Name }}"
-  {{- if .Values.podMonitor.targetLabels }}
-  targetLabels: {{ toYaml .Values.podMonitor.targetLabels | nindent 4 }}
+  {{- if .Values.podMonitor.podTargetLabels }}
+  podTargetLabels: {{ toYaml .Values.podMonitor.podTargetLabels | nindent 4 }}
   {{- end }}
   namespaceSelector:
     matchNames:
