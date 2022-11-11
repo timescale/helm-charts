@@ -533,7 +533,7 @@ podMonitor:
   #   release: prometheus
   # honorLabels: true
   # metricRelabelings: []
-  # targetLabels:
+  # podTargetLabels:
   #   - foo
 
 # For new deployments, we would advise Parallel here, however as that change breaks previous

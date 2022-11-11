@@ -78,7 +78,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `podMonitor.namespace`        | Setting this will cause deploying podMonitor in a different namespace than TimescaleDB. | `nil` |
 | `podMonitor.labels`           | Additional labels that can be set on podMonitor object. | `nil` |
 | `podMonitor.metricRelabelings` | Additional prometheus metric relabelings. | `nil` |
-| `podMonitor.targetLabels`     | List of additional kubernetes labels that need to be transferred from Service object into metrics. | `nil` |
+| `podMonitor.podTargetLabels`  | List of additional kubernetes labels that need to be transferred from Pod object into metrics. | `nil` |
 | `prometheus.enabled`              | If enabled, run a [postgres\_exporter](https://github.com/prometheus-community/postgres_exporter) sidecar | `false` |
 | `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
 | `prometheus.image.repository`     | The postgres\_exporter docker repo          | `quay.io/prometheuscommunity/postgres_exporter`     |
