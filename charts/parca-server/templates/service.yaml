@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "parca-server.fullname" . }}
+  namespace: {{ include "parca-server.namespace" . }}
+  labels:
+{{- include "parca-server-helm.labels" . | nindent 4 }}
+  {{- if .Values.service.annotations }}
+  annotations:
+    {{- .Values.service.annotations | toYaml | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: {{ include "parca-server.fullname" . }}
+    release: {{ .Release.Name }}
+  type: {{ .Values.service.type }}
+  ports:
+  - name: http
+    port: {{ .Values.service.port }}
+    targetPort: http
+    protocol: TCP
+    {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
+    nodePort: {{ .Values.service.nodePort }}
+    {{- end }}
+{{- if .Values.service.spec }}
+{{ .Values.service.spec | toYaml | nindent 2 }}
+{{- end }}
