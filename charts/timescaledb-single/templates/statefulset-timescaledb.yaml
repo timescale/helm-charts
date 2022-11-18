@@ -441,6 +441,12 @@ spec:
           {{- if .Values.prometheus.volumeMounts }}
 {{ .Values.prometheus.volumeMounts | default list | toYaml | indent 8 }}
           {{- end }}
+        {{- if .Values.prometheus.args }}
+        args:
+          {{- with .Values.prometheus.args }}
+          {{ toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
         env:
         - name: DATA_SOURCE_NAME
           value: "host={{ template "socket_directory" . }} user=postgres application_name=postgres_exporter"

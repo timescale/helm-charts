@@ -613,6 +613,15 @@
         "enabled": {
           "type": "boolean"
         },
+        "args": {
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "env": {
           "items": {
             "type": "object"
