@@ -508,6 +508,10 @@ prometheus:
   # Additional volumes for prometheus, e.g., to support additional queries.
   # These should be a Volume, as this allows you to inject any kind of Volume
   # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#volume-v1-core
+
+  # Extra custom CLI arguments for postgres_exporter.
+  args: []
+  # - --collector.database=disabled
   volumes:
   # - name: exporter-config
   #   configMap:

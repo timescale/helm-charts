@@ -358,6 +358,12 @@ properties:
     type: object
     additionalProperties: false
     properties:
+      args:
+        type:
+          - array
+          - "null"
+        items:
+          type: string
       enabled:
         type: boolean
       env:
