@@ -79,13 +79,13 @@ jobs:
       - name: Check changed charts
         id: changed-charts
         run: |
-          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }} | grep promscale)
           if [ -n $changed ]; then
-            echo "::set-output  name=charts::${changed}"
+            echo "CHARTS=${changed}" >> $GITHUB_OUTPUT
           fi
 
       - name: Pre-install DB
-        if: steps.changed-charts.outputs.charts == 'charts/promscale'
+        if: steps.changed-charts.outputs.CHARTS != ''
         run: make install-db
 
       - name: Run e2e chart-testing

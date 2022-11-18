@@ -231,6 +231,7 @@ properties:
             type: string
             enum:
               - 0.0.0.0:8008
+              - :::8008
       bootstrap:
         type: object
         properties:
@@ -312,6 +313,7 @@ properties:
             type: string
             enum:
               - "0.0.0.0:5432"
+              - ":::5432"
           pgbackrest:
             type: object
             properties:
