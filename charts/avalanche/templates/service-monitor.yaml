@@ -10,6 +10,10 @@ spec:
   - interval: 30s
     port: metrics
     path: /metrics
+    metricRelabelings:
+      sourceLabels: ['namespace', 'job']
+      separator: "/"
+      targetLabel: 'instance'
   selector:
     matchLabels:
       prometheus-scrape-enabled: "true"
