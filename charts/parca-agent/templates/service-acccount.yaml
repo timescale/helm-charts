@@ -1,0 +1,14 @@
+{{- if .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "parca-agent.serviceAccountName" . }}
+  namespace: {{ template "parca-agent.namespace" . }}
+  labels:
+{{- include "parca-agent-helm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: rbac
+{{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}

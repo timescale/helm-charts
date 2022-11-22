@@ -1,0 +1,27 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+apiVersion: v2
+name: parca-agent
+description: Parca Agent deployment.
+
+version: 0.1.0
+appVersion: v0.10.0-rc.1
+
+home: https://github.com/timescale/helm-charts
+
+sources:
+  - https://github.com/timescale/helm-charts
+  - https://github.com/parca-dev/parca-agent
+
+maintainers:
+  - name: timescale
+    url: https://www.timescale.com/
+
+keywords:
+  - continuous-profiling
+  - performance
+  - profiling
+  - monitoring
+  - prometheus
+  - ebpf

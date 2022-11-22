@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "parca-agent.fullname" . }}
+  namespace: {{ template "parca-agent.namespace" . }}
+  labels:
+{{- include "parca-agent-helm.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - {{ include "parca-agent.fullname" . }}-policy
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
