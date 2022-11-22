@@ -12,5 +12,6 @@ spec:
     path: /metrics
   selector:
     matchLabels:
+      prometheus-scrape-enabled: "true"
 {{ include "avalanche.labels" . | indent 6 }}
 {{- end }}

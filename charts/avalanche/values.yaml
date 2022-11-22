@@ -52,21 +52,32 @@ labels: {}
 serviceMonitor:
   enabled: false
 
-# Number of fake ServiceMonitor to be created to simulate fake Prometheus
+# Number of Service objects to be created to simulate fake Prometheus
 # targets. This will be useful to generate more series without scaling
 # Avalanche pods when using it as a Prometheus target.
+# To configure these services, take a look at `service.scrape`.
 fakePrometheusTargetCount: 1
 
-# settings for the service to be created that will expose
-# the avalanche deployment
+# Settings for the services to be created that will expose
+# the avalanche deployment.
 service:
-  type: "ClusterIP"
-  annotations: {}
-  port: 9001
-  # properties to be added to service.spec
-  spec:
-    # Headless service is required for stable network IDs of statefulset pods.
-    clusterIP: None
+  # Configures the primary headless service, required for stable network IDs
+  # of statefulset pods.
+  primary:
+    port: 9001
+    labels: {}
+    annotations: {}
+    # properties to be added to service.spec
+    spec: {}
+  # Configures the services that are scraped by ServiceMonitor. The number of these
+  # services will be equal to fakePrometheusTargetCount.
+  scrape:
+    type: "ClusterIP"
+    port: 9001
+    labels: {}
+    annotations: {}
+    # properties to be added to service.spec
+    spec: {}
 
 # create and attach a service account
 serviceAccount:

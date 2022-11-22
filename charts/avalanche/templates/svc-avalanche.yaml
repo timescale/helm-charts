@@ -7,24 +7,25 @@ metadata:
   labels:
 {{ include "avalanche-helm.labels" . | indent 4 }}
     app.kubernetes.io/component: avalanche
-{{- if .Values.service.labels }}
-{{ .Values.service.labels | toYaml | indent 4 }}
+    prometheus-scrape-enabled: "true"
+{{- if .Values.service.scrape.labels }}
+{{ .Values.service.scrape.labels | toYaml | indent 4 }}
 {{- end }}
-{{- if .Values.service.annotations }}
+{{- if .Values.service.scrape.annotations }}
   annotations:
-{{ .Values.service.annotations | toYaml | indent 4 }}
+{{ .Values.service.scrape.annotations | toYaml | indent 4 }}
 {{- end }}
 spec:
   selector:
 {{ include "avalanche.labels" . | indent 4}}
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.scrape.type }}
   ports:
   - name: metrics
-    port: {{ .Values.service.port }}
+    port: {{ .Values.service.scrape.port }}
     targetPort: metrics
     protocol: TCP
-{{- if .Values.service.spec }}
-{{ .Values.service.spec | toYaml | indent 2 }}
+{{- if .Values.service.scrape.spec }}
+{{ .Values.service.scrape.spec | toYaml | indent 2 }}
 {{- end }}
 {{- end }}
 ---

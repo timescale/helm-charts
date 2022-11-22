@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "avalanche.fullname" . }}
+  labels:
+{{ include "avalanche-helm.labels" . | indent 4 }}
+    app.kubernetes.io/component: avalanche
+{{- if .Values.service.primary.labels }}
+{{ .Values.service.primary.labels | toYaml | indent 4 }}
+{{- end }}
+{{- if .Values.service.primary.annotations }}
+  annotations:
+{{ .Values.service.primary.annotations | toYaml | indent 4 }}
+{{- end }}
+spec:
+  selector:
+{{ include "avalanche.labels" . | indent 4}}
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: metrics
+    port: {{ .Values.service.primary.port }}
+    targetPort: metrics
+    protocol: TCP
+{{- if .Values.service.primary.spec }}
+{{ .Values.service.primary.spec | toYaml | indent 2 }}
+{{- end }}
