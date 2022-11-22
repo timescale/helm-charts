@@ -6,7 +6,10 @@ image:
   tag: main
   pullPolicy: IfNotPresent
 
-# number of connector pods to spawn
+# Number of Avalanche pods to spawn. Majorly useful to test Avalanche with
+# remote_write.
+# Use fakePrometheusTargetCount when using Avalanche with
+# Prometheus to generate load.
 replicaCount: 1
 
 # Arguments that will be passed onto deployment pods
@@ -48,6 +51,11 @@ labels: {}
 # generated as load and intended for benchmarking.
 serviceMonitor:
   enabled: false
+
+# Number of fake ServiceMonitor to be created to simulate fake Prometheus
+# targets. This will be useful to generate more series without scaling
+# Avalanche pods when using it as a Prometheus target.
+fakePrometheusTargetCount: 1
 
 # settings for the service to be created that will expose
 # the avalanche deployment

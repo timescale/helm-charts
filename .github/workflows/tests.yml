@@ -79,7 +79,7 @@ jobs:
       - name: Check changed charts
         id: changed-charts
         run: |
-          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }} | grep promscale)
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }} | grep promscale || true)
           if [ -n $changed ]; then
             echo "CHARTS=${changed}" >> $GITHUB_OUTPUT
           fi
