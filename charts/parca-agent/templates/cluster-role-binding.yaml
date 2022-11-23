@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "parca-agent.fullname" . }}
+  labels:
+{{- include "parca-agent-helm.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "parca-agent.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "parca-agent.serviceAccountName" . }}
+  namespace: {{ template "parca-agent.namespace" . }}

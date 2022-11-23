@@ -1,0 +1,41 @@
+{{ if .Values.podSecurityPolicy.enabled }}
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: {{ include "parca-agent.fullname" . }}-policy
+  namespace: {{ template "parca-agent.namespace" . }}
+  labels:
+{{- include "parca-agent-helm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: policy
+spec:
+  allowPrivilegeEscalation: true
+  allowedCapabilities:
+    - '*'
+  allowedHostPaths:
+    - pathPrefix: /sys
+    - pathPrefix: /boot
+    - pathPrefix: /var/run/dbus
+    - pathPrefix: /run
+    - pathPrefix: /lib/modules
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: true
+  hostNetwork: true
+  hostPID: true
+  privileged: true
+  readOnlyRootFilesystem: true
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+    - configMap
+    - emptyDir
+    - projected
+    - secret
+    - downwardAPI
+    - persistentVolumeClaim
+    - hostPath
+{{ end }}
