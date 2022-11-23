@@ -11,4 +11,4 @@ roleRef:
   name: {{ include "parca-server.fullname" . }}
 subjects:
 - kind: ServiceAccount
-  name: {{ include "parca-server.fullname" . }}
+  name: {{ template "parca-server.serviceAccountName" . }}

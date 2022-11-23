@@ -73,7 +73,7 @@ spec:
       {{- with .Values.podSecurityContext }}
       securityContext: {{ toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "parca-server.fullname" . }}
+      serviceAccountName: {{ template "parca-server.serviceAccountName" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
