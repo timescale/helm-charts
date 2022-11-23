@@ -1,0 +1,114 @@
+image:
+  repository: ghcr.io/parca-dev/parca
+  tag: "{{ .Chart.AppVersion }}"
+  pullPolicy: IfNotPresent
+
+# number of parca-server pods to spawn
+replicaCount: 1
+
+# Override the deployment namespace
+namespaceOverride: ""
+
+# Arguments that will be passed onto deployment pods
+extraArgs:
+  - --log-level=info
+  - --cors-allowed-origins=*
+  - --debug-infod-upstream-servers=https://debuginfod.systemtap.org
+  - --debug-infod-http-request-timeout=5m
+
+# Environment variables that will be passed onto deployment pods
+extraEnv: []
+
+# Extra volumes to be able to add extra files like certificates for example, to start a TLS server.
+# More info about volumes: https://kubernetes.io/docs/concepts/storage/volumes/
+extraVolumes: []
+#   - name: certs
+#     configMap:
+#       name: parca-tls-certs
+
+extraVolumeMounts: []
+#   - name: parca-tls-certs
+#     mountPath: "/etc/parca-server/tls"
+#     readOnly: true
+
+# Annotations to be added to the parca-server Deployment
+annotations: {}
+
+# Annotations to be added to the parca-server Pods
+podAnnotations: {}
+
+# Parca configuration block. Reference: https://www.parca.dev/docs/configuration.
+config:
+  object_storage:
+    bucket:
+      type: FILESYSTEM
+      config:
+        directory: ./data
+
+# Set custom resource limits.
+resources: {}
+
+# Set custom security context for parca-server pods.
+podSecurityContext:
+  fsGroup: 65534
+  runAsUser: 65534
+
+# Values for defining the Kubernetes Service.
+service:
+  # One of (ClusterIP | LoadBalancer | NodePort).
+  type: ClusterIP
+  # The port used by the service.
+  port: 7070
+  # Optional NodePort, only used for type `NodePort`.
+  nodePort: null
+  # Additional labels to be added to the Service.
+  labels: {}
+  # Additional annotations to be added to the Service.
+  annotations: {}
+  # Define extra fields to be interpolated into the Service spec.
+  #
+  # This allows for adding support for new features and functionality which may not yet
+  # be directly supported in this chart.
+  spec: {}
+  # loadBalancerSourceRanges:
+  # - "0.0.0.0/0"
+
+podSecurityPolicy:
+  enabled: true
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+  # The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+  # A map of annotations to be set on the ServiceAccount
+  annotations: {}
+
+# Set a custom readiness probe e.g. when basic auth is enabled.
+readinessProbe:
+  exec:
+    command:
+    - /grpc_health_probe
+    - -v
+    - -addr=:7070
+  initialDelaySeconds: 10
+
+# Set a custom liveness probe e.g. when basic auth is enabled.
+livenessProbe:
+  exec:
+    command:
+    - /grpc_health_probe
+    - -v
+    - -addr=:7070
+  initialDelaySeconds: 5
+
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+nodeSelector:
+  kubernetes.io/os: linux
+
+# https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+# https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}

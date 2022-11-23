@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "parca-server.fullname" . }}
+  namespace: {{ template "parca-server.namespace" . }}
+  labels:
+{{- include "parca-server-helm.labels" . | nindent 4 }}
+  {{- if .Values.annotations }}
+  annotations: {{ toYaml .Values.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "parca-server.fullname" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+{{- include "parca-server-helm.labels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ printf "%s" .Values.config | sha256sum }}
+        {{- if .Values.podAnnotations }}
+        {{- range $key, $value := .Values.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+    spec:
+      containers:
+        - image: {{ .Values.image.repository }}:{{ tpl .Values.image.tag . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: parca
+          args:
+          - "/parca"
+          - "--config-path=/var/parca/parca.yaml"
+          {{- with .Values.extraArgs }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          env:
+            - name: TOBS_TELEMETRY_INSTALLED_BY
+              value: "promscale"
+          {{- if .Values.extraEnv }}
+            {{- range $.Values.extraEnv }}
+            - name: {{ .name }}
+              value: {{ tpl (.value | quote) $ }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          ports:
+            - containerPort: 7070
+              name: http
+          readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 12 }}
+          livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 12 }}
+          volumeMounts:
+            - name: parca-config
+              mountPath: /var/parca/
+          {{- if .Values.extraVolumeMounts }}
+          {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- end }}
+      terminationGracePeriodSeconds: 120
+      volumes:
+        - name: parca-config
+          configMap:
+            name: {{ include "parca-server.fullname" . }}-config
+      {{- if .Values.extraVolumes }}
+      {{- toYaml .Values.extraVolumes | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "parca-server.serviceAccountName" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
