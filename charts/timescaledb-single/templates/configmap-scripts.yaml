@@ -15,6 +15,8 @@ metadata:
 {{ include "timescaledb-helm.labels" . | indent 4}}
     app.kubernetes.io/component: scripts
 data:
+  tstune.sh: |-
+    {{- .Files.Get "scripts/tstune.sh" | nindent 4 }}
   # If no backup is configured, archive_command would normally fail. A failing archive_command on a cluster
   # is going to cause WAL to be kept around forever, meaning we'll fill up Volumes we have quite quickly.
   #
