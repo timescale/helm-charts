@@ -53,17 +53,17 @@ spec:
         env:
         - name: TSTUNE_FILE
           value: {{ template "tstune_config" . }}
-        - name: RESOURCES_WAL_VOLUME
+        - name: WAL_VOLUME_SIZE
           value: {{ if .Values.persistentVolumes.wal.enabled }}{{ .Values.persistentVolumes.wal.size }}{{ else }}"0"{{ end }}
-        - name: RESOURCES_DATA_VOLUME
+        - name: DATA_VOLUME_SIZE
           value: {{ .Values.persistentVolumes.data.size }}
-        - name: CPUS
+        - name: RESOURCES_CPU_REQUESTS
           valueFrom:
             resourceFieldRef:
               containerName: timescaledb
               resource: requests.cpu
               divisor: "1"
-        - name: MEMORY
+        - name: RESOURCES_MEMORY_REQUESTS
           valueFrom:
             resourceFieldRef:
               containerName: timescaledb
@@ -81,44 +81,17 @@ spec:
               containerName: timescaledb
               resource: limits.memory
               divisor: 1Mi
+        # Command below will run the timescaledb-tune utility and configure min/max wal size based on PVCs size
         command:
           - sh
           - "-c"
-          - |
-              set -e
-              [ $CPUS -eq 0 ]   && CPUS="${RESOURCES_CPU_LIMIT}"
-              [ $MEMORY -eq 0 ] && MEMORY="${RESOURCES_MEMORY_LIMIT}"
-
-              if [ -f "${PGDATA}/postgresql.base.conf" ] && ! grep "include_if_exists = '${TSTUNE_FILE}'" postgresql.base.conf -qxF; then
-                echo "include_if_exists = '${TSTUNE_FILE}'" >> "${PGDATA}/postgresql.base.conf"
-              fi
-
-              touch "${TSTUNE_FILE}"
-              timescaledb-tune -quiet -conf-path "${TSTUNE_FILE}" -cpus "${CPUS}" -memory "${MEMORY}MB" \
-                {{ range $key, $value := .Values.timescaledbTune.args | default dict }}{{ printf "--%s %s " $key (quote $value)}}{{ end }} -yes
-
-              # If there is a dedicated WAL Volume, we want to set max_wal_size to 60% of that volume
-              # If there isn't a dedicated WAL Volume, we set it to 20% of the data volume
-              if [ "${RESOURCES_WAL_VOLUME}" = "0" ]; then
-                WALMAX="${RESOURCES_DATA_VOLUME}"
-                WALPERCENT=20
-              else
-                WALMAX="${RESOURCES_WAL_VOLUME}"
-                WALPERCENT=60
-              fi
-
-              WALMAX=$(numfmt --from=auto ${WALMAX})
-
-              # Wal segments are 16MB in size, in this way we get a "nice" number of the nearest
-              # 16MB
-              WALMAX=$(( $WALMAX / 100 * $WALPERCENT / 16777216 * 16 ))
-              WALMIN=$(( $WALMAX / 2 ))
-
-              echo "max_wal_size=${WALMAX}MB" >> "${TSTUNE_FILE}"
-              echo "min_wal_size=${WALMIN}MB" >> "${TSTUNE_FILE}"
+          - '{{ template "scripts_dir" . }}/tstune.sh {{ range $key, $value := .Values.timescaledbTune.args | default dict }}{{ printf "--%s %s " $key (quote $value)}}{{ end }}'
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
+        - name: timescaledb-scripts
+          mountPath: {{ template "scripts_dir" . }}
+          readOnly: true
         resources:
           {{ toYaml .Values.resources | nindent 10 }}
       {{- end }}
