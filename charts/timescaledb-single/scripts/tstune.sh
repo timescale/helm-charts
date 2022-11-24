@@ -40,12 +40,13 @@ else
     WALPERCENT=60
 fi
 
-WALMAX=$(numfmt --from=auto ${WALMAX})
+WALMAX=$(numfmt --from=auto "${WALMAX}")
 
 # Wal segments are 16MB in size, in this way we get a "nice" number of the nearest
 # 16MB
-WALMAX=$(( $WALMAX / 100 * $WALPERCENT / 16777216 * 16 ))
-WALMIN=$(( $WALMAX / 2 ))
+# walmax / 100 * walpercent / 16MB # below is a refactored with increased precision
+WALMAX=$(( WALMAX * WALPERCENT * 16 / 16777216 / 100  ))
+WALMIN=$(( WALMAX / 2 ))
 
 echo "max_wal_size=${WALMAX}MB" >> "${TSTUNE_FILE}"
 echo "min_wal_size=${WALMIN}MB" >> "${TSTUNE_FILE}"
