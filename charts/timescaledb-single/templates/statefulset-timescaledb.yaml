@@ -23,15 +23,15 @@ spec:
     metadata:
       name: {{ template "timescaledb.fullname" . }}
       labels:
-{{ include "timescaledb-helm.labels" . | indent 8 }}
+        {{ include "timescaledb-helm.labels" . | nindent 8 }}
         app.kubernetes.io/component: timescaledb
       {{- if .Values.podLabels }}
-{{ toYaml .Values.podLabels | indent 8 }}
+        {{ toYaml .Values.podLabels | nindent 8 }}
       {{- end }}
-{{- if .Values.podAnnotations }}
+      {{- if .Values.podAnnotations }}
       annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
-{{- end }}
+        {{ toYaml .Values.podAnnotations | nindent 8 }}
+      {{- end }}
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
@@ -42,7 +42,7 @@ spec:
         runAsNonRoot: true
         runAsUser: {{ template "postgres.uid" }}
       initContainers:
-{{- if .Values.timescaledbTune.enabled }}
+      {{- if .Values.timescaledbTune.enabled }}
       - name: tstune
         securityContext:
           allowPrivilegeEscalation: false
@@ -117,8 +117,8 @@ spec:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
-{{- end }}
+          {{ toYaml .Values.resources | nindent 10 }}
+      {{- end }}
       # Issuing the final checkpoints on a busy database may take considerable time.
       # Unfinished checkpoints will require more time during startup, so the tradeoff
       # here is time spent in shutdown/time spent in startup.
@@ -323,9 +323,9 @@ spec:
           name: pgbackrest-bootstrap
           readOnly: true
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+          {{ toYaml .Values.resources | nindent 10 }}
 
-{{- if .Values.pgBouncer.enabled }}
+      {{- if .Values.pgBouncer.enabled }}
       - name: pgbouncer
         securityContext:
           allowPrivilegeEscalation: false
@@ -351,11 +351,11 @@ spec:
           - mountPath: /etc/pgbouncer/
             name: pgbouncer
             readOnly: true
-{{- if .Values.pgBouncer.userListSecretName }}
+          {{- if .Values.pgBouncer.userListSecretName }}
           - mountPath: /etc/pgbouncer/userlist/
             name: pgbouncer-userlist
             readOnly: true
-{{- end }}
+          {{- end }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
@@ -366,9 +366,9 @@ spec:
         - -i
         - /usr/sbin/pgbouncer
         - /etc/pgbouncer/pgbouncer-sidecar.ini
-{{- end }}
+      {{- end }}
 
-{{- if or .Values.backup.enabled .Values.backup.enable }}
+      {{- if or .Values.backup.enabled .Values.backup.enable }}
       - name: pgbackrest
         securityContext:
           allowPrivilegeEscalation: false
@@ -380,7 +380,7 @@ spec:
         - containerPort: 8081
           name: pgbackrest
         resources:
-{{ toYaml .Values.backup.resources | indent 10 }}
+          {{ toYaml .Values.backup.resources | nindent 10 }}
         volumeMounts:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
@@ -421,9 +421,9 @@ spec:
         {{- if or .Values.envFrom .Values.backup.envFrom -}}
         {{- .Values.backup.envFrom | default list | concat (.Values.envFrom | default list) | toYaml | nindent 8 -}}
         {{- end }}
-{{ end }}
+      {{- end }}
 
-{{- if .Values.prometheus.enabled }}
+      {{- if .Values.prometheus.enabled }}
       - name: postgres-exporter
         image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
         imagePullPolicy: {{ .Values.prometheus.image.pullPolicy }}
@@ -436,9 +436,9 @@ spec:
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
           readOnly: true
-          {{- if .Values.prometheus.volumeMounts }}
-{{ .Values.prometheus.volumeMounts | default list | toYaml | indent 8 }}
-          {{- end }}
+        {{- if .Values.prometheus.volumeMounts }}
+        {{ .Values.prometheus.volumeMounts | default list | toYaml | nindent 8 }}
+        {{- end }}
         {{- if .Values.prometheus.args }}
         args:
           {{- with .Values.prometheus.args }}
@@ -450,28 +450,28 @@ spec:
           value: "host={{ template "socket_directory" . }} user=postgres application_name=postgres_exporter"
         - name: PG_EXPORTER_CONSTANT_LABELS
           value: release={{ .Release.Name }},namespace={{ .Release.Namespace }}
-          {{- if .Values.prometheus.env }}
-{{ .Values.prometheus.env | default list | toYaml | indent 8 }}
-          {{- end }}
-{{ end }}
+        {{- if .Values.prometheus.env }}
+        {{ .Values.prometheus.env | default list | toYaml | nindent 8 }}
+        {{- end }}
+      {{- end }}
 
     {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml . | indent 8 }}
+        {{ toYaml . | nindent 8 }}
     {{- end }}
     {{- with .Values.tolerations }}
       tolerations:
-{{ toYaml . | indent 8 }}
+        {{ toYaml . | nindent 8 }}
     {{- end }}
     {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName }}
     {{- end }}
     {{- if .Values.affinity }}
       affinity:
-{{ .Values.affinity | toYaml | indent 8 }}
+        {{ .Values.affinity | toYaml | nindent 8 }}
     {{- else if .Values.affinityTemplate }}
       affinity:
-{{ tpl .Values.affinityTemplate . | indent 8 }}
+        {{ tpl .Values.affinityTemplate . | nindent 8 }}
     {{- end }}
       volumes:
       - name: socket-directory
@@ -498,19 +498,19 @@ spec:
         projected:
           defaultMode: 0750
           sources:
-{{ .Values.postInit | default list | toYaml | indent 12 }}
+            {{ .Values.postInit | default list | toYaml | nindent 12 }}
       - name: pgbouncer
         configMap:
           name: {{ template "timescaledb.fullname" . }}-pgbouncer
           defaultMode: 416 # 0640 permissions
           optional: true
-{{- if .Values.pgBouncer.userListSecretName }}
+      {{- if .Values.pgBouncer.userListSecretName }}
       - name: pgbouncer-userlist
         secret:
           secretName: {{ .Values.pgBouncer.userListSecretName }}
           defaultMode: 416 # 0640 permissions
           optional: True
-{{- end }}
+      {{- end }}
       - name: pgbackrest
         configMap:
           name: {{ template "timescaledb.fullname" . }}-pgbackrest
@@ -529,7 +529,7 @@ spec:
         emptyDir: {}
       {{- end }}
       {{- if .Values.prometheus.volumes }}
-{{ .Values.prometheus.volumes | toYaml | indent 6 }}
+        {{ .Values.prometheus.volumes | toYaml | nindent 6 }}
       {{- end }}
   volumeClaimTemplates:
   {{- if .Values.persistentVolumes.data.enabled }}
@@ -537,7 +537,7 @@ spec:
         name: storage-volume
         annotations:
         {{- if .Values.persistentVolumes.data.annotations }}
-{{ toYaml .Values.persistentVolumes.data.annotations | indent 10 }}
+          {{ toYaml .Values.persistentVolumes.data.annotations | nindent 10 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
@@ -547,7 +547,7 @@ spec:
           purpose: data-directory
       spec:
         accessModes:
-{{ toYaml .Values.persistentVolumes.data.accessModes | indent 8 }}
+          {{ toYaml .Values.persistentVolumes.data.accessModes | nindent 8 }}
         resources:
           requests:
             storage: "{{ .Values.persistentVolumes.data.size }}"
@@ -564,7 +564,7 @@ spec:
         name: wal-volume
         annotations:
         {{- if .Values.persistentVolumes.wal.annotations }}
-{{ toYaml .Values.persistentVolumes.wal.annotations | indent 10 }}
+          {{ toYaml .Values.persistentVolumes.wal.annotations | nindent 10 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
@@ -574,7 +574,7 @@ spec:
           purpose: wal-directory
       spec:
         accessModes:
-{{ toYaml .Values.persistentVolumes.wal.accessModes | indent 8 }}
+          {{ toYaml .Values.persistentVolumes.wal.accessModes | nindent 8 }}
         resources:
           requests:
             storage: "{{ .Values.persistentVolumes.wal.size }}"
@@ -590,7 +590,7 @@ spec:
     - metadata:
         name: {{ $tablespaceName }}
         annotations:
-{{ $volume.annotations | default dict | toYaml | indent 10 }}
+          {{ $volume.annotations | default dict | toYaml | nindent 10 }}
         labels:
           app: {{ template "timescaledb.fullname" $ }}
           release: {{ $.Release.Name }}
@@ -600,7 +600,7 @@ spec:
           purpose: tablespace
       spec:
         accessModes:
-{{ $volume.accessModes | default (list "ReadWriteOnce") | toYaml | indent 8 }}
+          {{ $volume.accessModes | default (list "ReadWriteOnce") | toYaml | nindent 8 }}
         resources:
           requests:
             storage: "{{ $volume.size }}"
