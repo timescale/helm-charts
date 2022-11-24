@@ -295,7 +295,7 @@ data:
 
     for suffix in "$1" all
     do
-      CALLBACK="{{ template "callbacks_dir" .}}/${suffix}"
+      CALLBACK="/etc/timescaledb/callbacks/${suffix}"
       if [ -f "${CALLBACK}" ]
       then
         "${CALLBACK}" "$@"

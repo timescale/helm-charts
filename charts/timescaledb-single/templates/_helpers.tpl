@@ -70,10 +70,6 @@ ${HOME}/.pgbackrest_environment
 {{ printf "%s/data" .Values.persistentVolumes.data.mountPath }}
 {{- end -}}
 
-{{- define "callbacks_dir" -}}
-/etc/timescaledb/callbacks
-{{- end -}}
-
 {{- define "tablespaces_dir" -}}
 {{ printf "%s/tablespaces" .Values.persistentVolumes.data.mountPath }}
 {{- end -}}

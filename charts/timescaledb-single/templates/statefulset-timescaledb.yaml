@@ -289,7 +289,7 @@ spec:
           mountPath: /var/run/postgresql
         {{ if .Values.callbacks.configMap -}}
         - name: patroni-callbacks
-          mountPath: {{ template "callbacks_dir" . }}
+          mountPath: /etc/timescaledb/callbacks
           readOnly: true
         {{- end }}
         - mountPath: /etc/pgbackrest
