@@ -54,8 +54,6 @@ spec:
           value: {{ if .Values.persistentVolumes.wal.enabled }}{{ .Values.persistentVolumes.wal.size }}{{ else }}"0"{{ end }}
         - name: RESOURCES_DATA_VOLUME
           value: {{ .Values.persistentVolumes.data.size }}
-        - name: INCLUDE_DIRECTIVE
-          value: include_if_exists = '{{ template "tstune_config" . }}'
         - name: CPUS
           valueFrom:
             resourceFieldRef:
@@ -88,8 +86,8 @@ spec:
               [ $CPUS -eq 0 ]   && CPUS="${RESOURCES_CPU_LIMIT}"
               [ $MEMORY -eq 0 ] && MEMORY="${RESOURCES_MEMORY_LIMIT}"
 
-              if [ -f "${PGDATA}/postgresql.base.conf" ] && ! grep "${INCLUDE_DIRECTIVE}" postgresql.base.conf -qxF; then
-                echo "${INCLUDE_DIRECTIVE}" >> "${PGDATA}/postgresql.base.conf"
+              if [ -f "${PGDATA}/postgresql.base.conf" ] && ! grep "include_if_exists = '${TSTUNE_FILE}'" postgresql.base.conf -qxF; then
+                echo "include_if_exists = '${TSTUNE_FILE}'" >> "${PGDATA}/postgresql.base.conf"
               fi
 
               touch "${TSTUNE_FILE}"
