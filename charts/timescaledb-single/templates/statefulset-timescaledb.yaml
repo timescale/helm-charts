@@ -88,7 +88,7 @@ spec:
           - '{{ template "scripts_dir" . }}/tstune.sh {{ range $key, $value := .Values.timescaledbTune.args | default dict }}{{ printf "--%s %s " $key (quote $value)}}{{ end }}'
         volumeMounts:
         - name: socket-directory
-          mountPath: {{ template "socket_directory" . }}
+          mountPath: /var/run/postgresql
         - name: timescaledb-scripts
           mountPath: {{ template "scripts_dir" . }}
           readOnly: true
@@ -214,7 +214,7 @@ spec:
         - name: PGDATA
           value: "$(PATRONI_POSTGRESQL_DATA_DIR)"
         - name: PGHOST
-          value: "{{ template "socket_directory" . }}"
+          value: "/var/run/postgresql"
         - name: BOOTSTRAP_FROM_BACKUP
           value: {{ .Values.bootstrapFromBackup.enabled | int | quote }}
         {{- if .Values.env }}{{ .Values.env | default list | toYaml | nindent 8 }}{{- end }}
@@ -248,7 +248,7 @@ spec:
             command:
               - pg_isready
               - -h
-              - {{ template "socket_directory" . }}
+              - /var/run/postgresql
           initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -286,7 +286,7 @@ spec:
           name: certificate
           readOnly: true
         - name: socket-directory
-          mountPath: {{ template "socket_directory" . }}
+          mountPath: /var/run/postgresql
         {{ if .Values.callbacks.configMap -}}
         - name: patroni-callbacks
           mountPath: {{ template "callbacks_dir" . }}
@@ -313,13 +313,13 @@ spec:
               - -c
               # Only shutdown pgBouncer if PostgreSQL is no longer listening
               - |
-                while test -S {{ template "socket_directory" . }}/.s.PGSQL.5432; do sleep 1; done
+                while test -S /var/run/postgresql/.s.PGSQL.5432; do sleep 1; done
         volumeMounts:
           - mountPath: /etc/certificate
             name: certificate
             readOnly: true
           - name: socket-directory
-            mountPath: {{ template "socket_directory" . }}
+            mountPath: /var/run/postgresql
             readOnly: false
           - mountPath: {{ template "scripts_dir" . }}
             name: timescaledb-scripts
@@ -359,7 +359,7 @@ spec:
           {{ toYaml .Values.backup.resources | nindent 10 }}
         volumeMounts:
         - name: socket-directory
-          mountPath: {{ template "socket_directory" . }}
+          mountPath: /var/run/postgresql
           readOnly: true
         - name: storage-volume
           mountPath: {{ .Values.persistentVolumes.data.mountPath | quote }}
@@ -381,7 +381,7 @@ spec:
           readOnly: true
         env:
           - name: PGHOST
-            value: {{ template "socket_directory" . }}
+            value: /var/run/postgresql
           - name: PGBACKREST_STANZA
             value: poddb
           - name: PGBACKREST_CONFIG
@@ -410,7 +410,7 @@ spec:
           name: pg-exporter
         volumeMounts:
         - name: socket-directory
-          mountPath: {{ template "socket_directory" . }}
+          mountPath: /var/run/postgresql
           readOnly: true
         {{- if .Values.prometheus.volumeMounts }}
         {{ .Values.prometheus.volumeMounts | default list | toYaml | nindent 8 }}
@@ -423,7 +423,7 @@ spec:
         {{- end }}
         env:
         - name: DATA_SOURCE_NAME
-          value: "host={{ template "socket_directory" . }} user=postgres application_name=postgres_exporter"
+          value: "host=/var/run/postgresql user=postgres application_name=postgres_exporter"
         - name: PG_EXPORTER_CONSTANT_LABELS
           value: release={{ .Release.Name }},namespace={{ .Release.Namespace }}
         {{- if .Values.prometheus.env }}

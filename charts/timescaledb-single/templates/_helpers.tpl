@@ -50,10 +50,6 @@ Create the name of the service account to use.
 {{- end -}}
 {{- end -}}
 
-{{- define "socket_directory" -}}
-/var/run/postgresql
-{{- end -}}
-
 {{- define "pod_environment_file" -}}
 ${HOME}/.pod_environment
 {{- end -}}
@@ -95,11 +91,11 @@ ${HOME}/.pgbackrest_environment
 {{- end -}}
 
 {{- define "tstune_config" -}}
-{{ printf "%s/timescaledb.conf" (include "socket_directory" .) }}
+{{ printf "/var/run/postgresql/timescaledb.conf" }}
 {{- end -}}
 
 {{- define "wal_status_file" -}}
-{{ printf "%s/wal_status" (include "socket_directory" .) }}
+{{ printf "/var/run/postgresql/wal_status" }}
 {{- end -}}
 
 {{- define "secrets_credentials" -}}
