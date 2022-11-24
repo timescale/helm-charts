@@ -338,7 +338,7 @@ data:
     SELECT
         pg_is_in_recovery() AS in_recovery,
         format(:'dsn_fmt', patroni_scope,                       :'hostname') AS primary_dsn,
-        format(:'dsn_fmt', '{{ template "socket_directory" }}', :'hostname') AS local_dsn
+        format(:'dsn_fmt', '/var/run/postgresql', :'hostname') AS local_dsn
     FROM
         current_setting('cluster_name') AS cs(patroni_scope)
     \gset
