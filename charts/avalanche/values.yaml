@@ -51,6 +51,7 @@ labels: {}
 # generated as load and intended for benchmarking.
 serviceMonitor:
   enabled: false
+  interval: 30s
 
 # Number of fake ServiceMonitor to be created to simulate fake Prometheus
 # targets. This will be useful to generate more series without scaling
