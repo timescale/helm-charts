@@ -7,7 +7,7 @@ metadata:
 {{ include "avalanche-helm.labels" . | indent 4 }}
 spec:
   endpoints:
-  - interval: 30s
+  - interval: {{ .Values.serviceMonitor.interval }}
     port: metrics
     path: /metrics
   selector:
