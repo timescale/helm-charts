@@ -308,9 +308,11 @@ spec:
         - mountPath: {{ template "post_init_dir" . | quote }}
           name: post-init
           readOnly: true
+        {{ if eq .Values.patroni.bootstrap.dcs.postgresql.parameters.ssl "on" -}}
         - mountPath: /etc/certificate
           name: certificate
           readOnly: true
+        {{- end }}
         - name: socket-directory
           mountPath: {{ template "socket_directory" . }}
         {{ if .Values.callbacks.configMap -}}
@@ -341,9 +343,11 @@ spec:
               - |
                 while test -S {{ template "socket_directory" . }}/.s.PGSQL.5432; do sleep 1; done
         volumeMounts:
+          {{ if eq .Values.patroni.bootstrap.dcs.postgresql.parameters.ssl "on" -}}
           - mountPath: /etc/certificate
             name: certificate
             readOnly: true
+          {{- end }}
           - name: socket-directory
             mountPath: {{ template "socket_directory" . }}
             readOnly: false
@@ -518,10 +522,12 @@ spec:
           name: {{ template "timescaledb.fullname" . }}-pgbackrest
           defaultMode: 416 # 0640 permissions
           optional: true
+      {{- if eq .Values.patroni.bootstrap.dcs.postgresql.parameters.ssl "on" }}
       - name: certificate
         secret:
           secretName: {{ template "secrets_certificate" . }}
           defaultMode: 416 # 0640 permissions
+      {{- end }}
       - name: pgbackrest-bootstrap
         secret:
           secretName: {{ .Values.bootstrapFromBackup.secretName }}
