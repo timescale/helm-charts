@@ -17,12 +17,13 @@ metadata:
 data:
   tstune.sh: |-
     {{- .Files.Get "scripts/tstune.sh" | nindent 4 }}
-  # If no backup is configured, archive_command would normally fail. A failing archive_command on a cluster
-  # is going to cause WAL to be kept around forever, meaning we'll fill up Volumes we have quite quickly.
-  #
-  # Therefore, if the backup is disabled, we always return exitcode 0 when archiving
   pgbackrest_archive.sh: |
     #!/bin/sh
+
+    # If no backup is configured, archive_command would normally fail. A failing archive_command on a cluster
+    # is going to cause WAL to be kept around forever, meaning we'll fill up Volumes we have quite quickly.
+    #
+    # Therefore, if the backup is disabled, we always return exitcode 0 when archiving
 
     log() {
         echo "$(date '+%Y-%m-%d %H:%M:%S') - archive - $1"
@@ -45,26 +46,7 @@ data:
   pgbackrest_bootstrap.sh: |-
     {{- .Files.Get "scripts/pgbackrest_bootstrap.sh" | nindent 4 }}
   pgbackrest_restore.sh: |
-    #!/bin/sh
-    # PGBACKREST_BACKUP_ENABLED variable is passed in StatefulSet template
-    [ "${PGBACKREST_BACKUP_ENABLED}" = "true" ] || exit 1
-
-    : "${ENV_FILE:=${HOME}/.pod_environment}"
-    if [ -f "${ENV_FILE}" ]; then
-      echo "Sourcing ${ENV_FILE}"
-      . "${ENV_FILE}"
-    fi
-
-    PGDATA={{ include "data_directory" . | quote }}
-    WALDIR={{ include "wal_directory" . | quote }}
-
-    # A missing PGDATA points to Patroni removing a botched PGDATA, or manual
-    # intervention. In this scenario, we need to recreate the DATA and WALDIRs
-    # to keep pgBackRest happy
-    [ -d "${PGDATA}" ] || install -o postgres -g postgres -d -m 0700 "${PGDATA}"
-    [ -d "${WALDIR}" ] || install -o postgres -g postgres -d -m 0700 "${WALDIR}"
-
-    exec pgbackrest --force --delta --log-level-console=detail restore
+    {{- .Files.Get "scripts/pgbackrest_restore.sh" | nindent 4 }}
   restore_or_initdb.sh: |
     #!/bin/sh
 
