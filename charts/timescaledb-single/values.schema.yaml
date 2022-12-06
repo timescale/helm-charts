@@ -16,7 +16,6 @@ required:
   - bootstrapFromBackup
   - callbacks
   - debug
-  - fullWalPrevention
   - image
   - nameOverride
   - networkPolicy
@@ -143,30 +142,6 @@ properties:
       "$ref": "#/definitions/service"
     replica:
       "$ref": "#/definitions/service"
-  fullWalPrevention:
-    type: object
-    additionalProperties: false
-    properties:
-      enabled:
-        type: boolean
-      checkFrequency:
-        type: integer
-        minimum: 1
-        maximum: 900
-      thresholds:
-        type: object
-        additionalProperties: false
-        properties:
-          readOnlyFreePercent:
-            "$ref": "#/definitions/percent"
-          readOnlyFreeMB:
-            type: integer
-            minimum: 0
-          readWriteFreePercent:
-            "$ref": "#/definitions/percent"
-          readWriteFreeMB:
-            type: integer
-            minimum: 0
   sharedMemory:
     type: object
     additionalProperties: false
