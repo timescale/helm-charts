@@ -27,7 +27,7 @@ __SQL__
 for tablespace in $POSTGRES_TABLESPACES
 do
     log "Creating tablespace ${tablespace}"
-    tablespacedir="{{ include "tablespaces_dir" . }}/${tablespace}/data"
+    tablespacedir="${PGDATA}/tablespaces/${tablespace}/data"
     psql -d "$URL" --set tablespace="${tablespace}" --set directory="${tablespacedir}" --set ON_ERROR_STOP=1 <<__SQL__
     SET synchronous_commit to 'off';
     CREATE TABLESPACE :"tablespace" LOCATION :'directory';
