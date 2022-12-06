@@ -37,8 +37,8 @@ data:
     exec pgbackrest --stanza=poddb archive-push "$@"
   pgbackrest_archive_get.sh: |
     #!/bin/sh
-    PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
-    [ ${PGBACKREST_BACKUP_ENABLED} -ne 0 ] || exit 1
+    # PGBACKREST_BACKUP_ENABLED variable is passed in StatefulSet template
+    [ "${PGBACKREST_BACKUP_ENABLED}" = "true" ] || exit 1
 
     . "{{ template "pgbackrest_environment_file" }}"
     exec pgbackrest --stanza=poddb archive-get "${1}" "${2}"
@@ -82,8 +82,8 @@ data:
     exec python3 /scripts/pgbackrest-rest.py --stanza=poddb --loglevel=debug
   pgbackrest_restore.sh: |
     #!/bin/sh
-    PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
-    [ ${PGBACKREST_BACKUP_ENABLED} -ne 0 ] || exit 1
+    # PGBACKREST_BACKUP_ENABLED variable is passed in StatefulSet template
+    [ "${PGBACKREST_BACKUP_ENABLED}" = "true" ] || exit 1
 
     . "{{ template "pod_environment_file" }}"
 
