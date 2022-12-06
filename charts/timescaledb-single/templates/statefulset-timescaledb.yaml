@@ -217,6 +217,8 @@ spec:
           value: "/var/run/postgresql"
         - name: BOOTSTRAP_FROM_BACKUP
           value: {{ .Values.bootstrapFromBackup.enabled | int | quote }}
+        - name: PGBACKREST_BACKUP_ENABLED
+          value: {{ .Values.backup.enabled | quote }}
         {{- if .Values.env }}{{ .Values.env | default list | toYaml | nindent 8 }}{{- end }}
           # pgBackRest is also called using the archive_command if the backup is enabled.
           # this script will also need access to the environment variables specified for
