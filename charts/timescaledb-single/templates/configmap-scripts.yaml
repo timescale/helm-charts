@@ -85,7 +85,11 @@ data:
     # PGBACKREST_BACKUP_ENABLED variable is passed in StatefulSet template
     [ "${PGBACKREST_BACKUP_ENABLED}" = "true" ] || exit 1
 
-    . "{{ template "pod_environment_file" }}"
+    : "${ENV_FILE:=${HOME}/.pod_environment}"
+    if [ -f "${ENV_FILE}" ]; then
+      echo "Sourcing ${ENV_FILE}"
+      . "${ENV_FILE}"
+    fi
 
     PGDATA={{ include "data_directory" . | quote }}
     WALDIR={{ include "wal_directory" . | quote }}
@@ -100,7 +104,11 @@ data:
   restore_or_initdb.sh: |
     #!/bin/sh
 
-    . "{{ template "pod_environment_file" }}"
+    : "${ENV_FILE:=${HOME}/.pod_environment}"
+    if [ -f "${ENV_FILE}" ]; then
+      echo "Sourcing ${ENV_FILE}"
+      . "${ENV_FILE}"
+    fi
 
     log() {
         echo "$(date '+%Y-%m-%d %H:%M:%S') - restore_or_initdb - $1"
@@ -214,7 +222,11 @@ data:
     echo "include_if_exists = '{{ template "tstune_config". }}'" >> "${PGDATA}/postgresql.conf"
   post_init.sh: |
     #!/bin/sh
-    . "{{ template "pod_environment_file" }}"
+    : "${ENV_FILE:=${HOME}/.pod_environment}"
+    if [ -f "${ENV_FILE}" ]; then
+      echo "Sourcing ${ENV_FILE}"
+      . "${ENV_FILE}"
+    fi
 
     log() {
         echo "$(date '+%Y-%m-%d %H:%M:%S') - post_init - $1"
@@ -291,7 +303,11 @@ data:
     #!/bin/sh
     set -e
 
-    . "{{ template "pod_environment_file" }}"
+    : "${ENV_FILE:=${HOME}/.pod_environment}"
+    if [ -f "${ENV_FILE}" ]; then
+      echo "Sourcing ${ENV_FILE}"
+      . "${ENV_FILE}"
+    fi
 
     for suffix in "$1" all
     do
