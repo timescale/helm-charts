@@ -223,8 +223,14 @@ spec:
           value: {{ include "wal_directory" . | quote }}
         - name: BOOTSTRAP_FROM_BACKUP
           value: {{ .Values.bootstrapFromBackup.enabled | int | quote }}
+        {{- if .Values.bootstrapFromBackup.enabled }}
+        - name: PGBACKREST_REPO1_PATH
+          value: {{ index .Values.bootstrapFromBackup "repo1-path" | quote }}
+        {{- end }}
         - name: PGBACKREST_BACKUP_ENABLED
           value: {{ .Values.backup.enabled | quote }}
+        - name: TSTUNE_FILE
+          value: {{ template "tstune_config" . }}
         {{- if .Values.env }}{{ .Values.env | default list | toYaml | nindent 8 }}{{- end }}
           # pgBackRest is also called using the archive_command if the backup is enabled.
           # this script will also need access to the environment variables specified for
@@ -303,7 +309,7 @@ spec:
         - mountPath: /etc/pgbackrest
           name: pgbackrest
           readOnly: true
-        - mountPath: {{ template "pgbackrest_bootstrap_environment_dir" . }}
+        - mountPath: /etc/pgbackrest/bootstrap
           name: pgbackrest-bootstrap
           readOnly: true
         resources:
