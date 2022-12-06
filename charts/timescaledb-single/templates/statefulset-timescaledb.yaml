@@ -207,6 +207,10 @@ spec:
           value: {{ printf "{app: %s, cluster-name: %s, release: %s}" (include "timescaledb.fullname" .) (include "clusterName" .) .Release.Name  | quote }}
         - name: PATRONI_SCOPE
           value: {{ template "clusterName" . }}
+        {{- if .Values.persistentVolumes.tablespaces }}
+        - name: POSTGRES_TABLESPACES
+          value: {{ .Values.persistentVolumes.tablespaces | default dict | keys | join " " | quote }}
+        {{- end }}
         - name: PGBACKREST_CONFIG
           value: /etc/pgbackrest/pgbackrest.conf
         # PGDATA and PGHOST are not required to let Patroni/PostgreSQL run correctly,
@@ -281,7 +285,7 @@ spec:
         - mountPath: {{ template "scripts_dir" . }}
           name: timescaledb-scripts
           readOnly: true
-        - mountPath: {{ template "post_init_dir" . | quote }}
+        - mountPath: "/etc/timescaledb/post_init.d"
           name: post-init
           readOnly: true
         - mountPath: /etc/certificate
