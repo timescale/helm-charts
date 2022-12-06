@@ -33,14 +33,23 @@ data:
     PGBACKREST_BACKUP_ENABLED={{ or .Values.backup.enable .Values.backup.enabled | int }}
     [ ${PGBACKREST_BACKUP_ENABLED} -ne 0 ] || exit 0
 
-    . "{{ template "pgbackrest_environment_file" }}"
+    : "${ENV_FILE:=${HOME}/.pgbackrest_environment}"
+    if [ -f "${ENV_FILE}" ]; then
+      echo "Sourcing ${ENV_FILE}"
+      . "${ENV_FILE}"
+    fi
+
     exec pgbackrest --stanza=poddb archive-push "$@"
   pgbackrest_archive_get.sh: |
     #!/bin/sh
     # PGBACKREST_BACKUP_ENABLED variable is passed in StatefulSet template
     [ "${PGBACKREST_BACKUP_ENABLED}" = "true" ] || exit 1
 
-    . "{{ template "pgbackrest_environment_file" }}"
+    : "${ENV_FILE:=${HOME}/.pgbackrest_environment}"
+    if [ -f "${ENV_FILE}" ]; then
+      echo "Sourcing ${ENV_FILE}"
+      . "${ENV_FILE}"
+    fi
     exec pgbackrest --stanza=poddb archive-get "${1}" "${2}"
   pgbackrest_bootstrap.sh: |
     #!/bin/sh

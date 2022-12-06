@@ -50,10 +50,6 @@ Create the name of the service account to use.
 {{- end -}}
 {{- end -}}
 
-{{- define "pgbackrest_environment_file" -}}
-${HOME}/.pgbackrest_environment
-{{- end -}}
-
 {{- define "pgbackrest_bootstrap_environment_dir" -}}
 /etc/pgbackrest/bootstrap
 {{- end -}}

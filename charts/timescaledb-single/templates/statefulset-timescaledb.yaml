@@ -152,7 +152,7 @@ spec:
             # to have the environment available to them
             set -o posix
             export -p > "${HOME}/.pod_environment"
-            export -p | grep PGBACKREST > "{{ template "pgbackrest_environment_file" }}"
+            export -p | grep PGBACKREST > "${HOME}/.pgbackrest_environment"
 
             for UNKNOWNVAR in $(env | awk -F '=' '!/^(PATRONI_.*|HOME|PGDATA|PGHOST|LC_.*|LANG|PATH|KUBERNETES_SERVICE_.*|AWS_ROLE_ARN|AWS_WEB_IDENTITY_TOKEN_FILE)=/ {print $1}')
             do
