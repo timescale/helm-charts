@@ -50,10 +50,6 @@ Create the name of the service account to use.
 {{- end -}}
 {{- end -}}
 
-{{- define "pod_environment_file" -}}
-${HOME}/.pod_environment
-{{- end -}}
-
 {{- define "pgbackrest_environment_file" -}}
 ${HOME}/.pgbackrest_environment
 {{- end -}}
