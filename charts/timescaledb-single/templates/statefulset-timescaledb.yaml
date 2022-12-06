@@ -219,6 +219,8 @@ spec:
           value: "$(PATRONI_POSTGRESQL_DATA_DIR)"
         - name: PGHOST
           value: "/var/run/postgresql"
+        - name: WALDIR
+          value: {{ include "wal_directory" . | quote }}
         - name: BOOTSTRAP_FROM_BACKUP
           value: {{ .Values.bootstrapFromBackup.enabled | int | quote }}
         - name: PGBACKREST_BACKUP_ENABLED
