@@ -308,24 +308,8 @@ data:
 
     # We exit 0 this script, otherwise the database initialization fails.
     exit 0
-  patroni_callback.sh: |
-    #!/bin/sh
-    set -e
-
-    : "${ENV_FILE:=${HOME}/.pod_environment}"
-    if [ -f "${ENV_FILE}" ]; then
-      echo "Sourcing ${ENV_FILE}"
-      . "${ENV_FILE}"
-    fi
-
-    for suffix in "$1" all
-    do
-      CALLBACK="{{ template "callbacks_dir" .}}/${suffix}"
-      if [ -f "${CALLBACK}" ]
-      then
-        "${CALLBACK}" "$@"
-      fi
-    done
+  patroni_callback.sh: |-
+    {{- .Files.Get "scripts/patroni_callback.sh" | nindent 4 }}
   lifecycle_preStop.psql: |-
     {{- .Files.Get "scripts/prestop.psql" | nindent 4 }}
 ...
