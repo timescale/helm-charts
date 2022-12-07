@@ -10,7 +10,7 @@ metadata:
   labels:
 {{ include "timescaledb-helm.labels" . | indent 4}}
     app.kubernetes.io/component: pgbackrest
-{{- $globalDefaults := dict "spool-path" (include "socket_directory" .) "compress-level" "3" "repo1-path" (printf "/%s/%s/" .Release.Namespace (include "clusterName" .)) }}
+{{- $globalDefaults := dict "spool-path" "/var/run/postgresql" "compress-level" "3" "repo1-path" (printf "/%s/%s/" .Release.Namespace (include "clusterName" .)) }}
 {{- $globals := merge .Values.backup.pgBackRest $globalDefaults }}
 {{- $push := index .Values.backup "pgBackRest:archive-push" | default dict }}
 {{- $get := index .Values.backup "pgBackRest:archive-get" | default dict }}
@@ -25,7 +25,7 @@ data:
     pg1-port=5432
     pg1-host-user=postgres
     pg1-path={{ template "data_directory" . }}
-    pg1-socket-path={{ template "socket_directory" . }}
+    pg1-socket-path=/var/run/postgresql
 
     link-all=y
 
