@@ -114,7 +114,7 @@ spec:
               - psql
               - -X
               - --file
-              - "{{ template "scripts_dir" . }}/lifecycle_preStop.psql"
+              - "{{ template "scripts_dir" . }}/lifecycle_preStop.sql"
         # When reusing an already existing volume it sometimes happens that the permissions
         # of the PGDATA and/or wal directory are incorrect. To guard against this, we always correctly
         # set the permissons of these directories before we hand over to Patroni.

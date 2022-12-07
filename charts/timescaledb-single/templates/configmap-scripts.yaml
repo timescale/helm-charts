@@ -31,6 +31,6 @@ data:
     {{- .Files.Get "scripts/post_init.sh" | nindent 4 }}
   patroni_callback.sh: |-
     {{- .Files.Get "scripts/patroni_callback.sh" | nindent 4 }}
-  lifecycle_preStop.psql: |-
-    {{- .Files.Get "scripts/prestop.psql" | nindent 4 }}
+  lifecycle_preStop.sql: |-
+    {{- .Files.Get "scripts/prestop.sql" | nindent 4 }}
 ...
