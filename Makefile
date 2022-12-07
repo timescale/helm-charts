@@ -22,13 +22,10 @@ clean:
 $(TMP_DIR):
 	mkdir -p $(TMP_DIR)
 
-.PHONY: extract-scripts
-extract-scripts: $(TMP_DIR)  ## Extract shell scripts from helm templates
-	./scripts/extract-scripts.sh
-
 .PHONY: shellcheck
-shellcheck: extract-scripts
-	for f in $$(find scripts/ -name "*.sh" -type f) $$(find $(TMP_DIR)/ -name "*.sh" -type f); do \
+shellcheck:
+	for f in $$(find charts/ -name "*.sh" -type f); do \
+		echo Checking $$f; \
 		shellcheck $$f --exclude=SC1090,SC1091,SC2148 ;\
 	done
 
