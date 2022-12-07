@@ -261,7 +261,8 @@ patroni:
     pg_hba:
     - local     all             postgres                              peer
     - local     all             all                                   md5
-    # replace reject with md5 for patroni.bootstrap.dcs.postgresql.parameters.ssl: off
+    # Replace `reject` with `md5` to allow connections when SSL
+    # is disabled with `patroni.bootstrap.dcs.postgresql.parameters.ssl: off`.
     - hostnossl all,replication all                all                reject
     - hostssl   all             all                127.0.0.1/32       md5
     - hostssl   all             all                ::1/128            md5
