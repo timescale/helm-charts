@@ -226,40 +226,6 @@
         "null"
       ]
     },
-    "fullWalPrevention": {
-      "additionalProperties": false,
-      "properties": {
-        "checkFrequency": {
-          "maximum": 900,
-          "minimum": 1,
-          "type": "integer"
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "thresholds": {
-          "additionalProperties": false,
-          "properties": {
-            "readOnlyFreeMB": {
-              "minimum": 0,
-              "type": "integer"
-            },
-            "readOnlyFreePercent": {
-              "$ref": "#/definitions/percent"
-            },
-            "readWriteFreeMB": {
-              "minimum": 0,
-              "type": "integer"
-            },
-            "readWriteFreePercent": {
-              "$ref": "#/definitions/percent"
-            }
-          },
-          "type": "object"
-        }
-      },
-      "type": "object"
-    },
     "global": {
       "additionalProperties": true
     },
@@ -832,7 +798,6 @@
     "bootstrapFromBackup",
     "callbacks",
     "debug",
-    "fullWalPrevention",
     "image",
     "nameOverride",
     "networkPolicy",

@@ -50,22 +50,6 @@ Create the name of the service account to use.
 {{- end -}}
 {{- end -}}
 
-{{- define "socket_directory" -}}
-/var/run/postgresql
-{{- end -}}
-
-{{- define "pod_environment_file" -}}
-${HOME}/.pod_environment
-{{- end -}}
-
-{{- define "pgbackrest_environment_file" -}}
-${HOME}/.pgbackrest_environment
-{{- end -}}
-
-{{- define "pgbackrest_bootstrap_environment_dir" -}}
-/etc/pgbackrest/bootstrap
-{{- end -}}
-
 {{- define "postgres.uid" -}}
 {{- default .Values.uid "1000" -}}
 {{- end -}}
@@ -95,11 +79,11 @@ ${HOME}/.pgbackrest_environment
 {{- end -}}
 
 {{- define "tstune_config" -}}
-{{ printf "%s/timescaledb.conf" (include "socket_directory" .) }}
+{{ printf "/var/run/postgresql/timescaledb.conf" }}
 {{- end -}}
 
 {{- define "wal_status_file" -}}
-{{ printf "%s/wal_status" (include "socket_directory" .) }}
+{{ printf "/var/run/postgresql/wal_status" }}
 {{- end -}}
 
 {{- define "secrets_credentials" -}}
