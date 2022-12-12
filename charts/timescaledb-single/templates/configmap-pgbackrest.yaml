@@ -8,7 +8,7 @@ metadata:
   name: {{ template "timescaledb.fullname" . }}-pgbackrest
   namespace: {{ .Release.Namespace }}
   labels:
-{{ include "timescaledb-helm.labels" . | indent 4}}
+    {{ include "timescaledb-helm.labels" . | nindent 4 }}
     app.kubernetes.io/component: pgbackrest
 {{- $globalDefaults := dict "spool-path" "/var/run/postgresql" "compress-level" "3" "repo1-path" (printf "/%s/%s/" .Release.Namespace (include "clusterName" .)) }}
 {{- $globals := merge .Values.backup.pgBackRest $globalDefaults }}

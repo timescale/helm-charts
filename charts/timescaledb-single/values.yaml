@@ -4,13 +4,13 @@
 replicaCount: 3
 
 # To prevent very long names, we override the name, otherwise it would default to
-# timescaledb-single (the name of the chart)
-nameOverride: timescaledb
+# timescaledb-single (the name of the chart). This field is always truncated to 63 characters.
+fullnameOverride: "{{ .Release.Name }}-timescaledb"
 
 # The default Patroni name of the cluster ("scope") is derived from the name of the release,
 # but you can override this behaviour here
 # https://patroni.readthedocs.io/en/latest/SETTINGS.html#global-universal
-clusterName:
+clusterName: ""
 
 # The major PostgreSQL version to use, defaults to the default version of the Docker image
 # However, in pg_upgrade scenarios, you may need to specify an explicit version

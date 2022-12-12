@@ -26,6 +26,10 @@ After you have followed the upgrade guide you should be able to upgrade your dep
 helm upgrade --install my-release ./charts/timescaledb-single -f values/my-release.yaml
 ```
 
+# Upgrading to 0.27
+
+This release removes `nameOverride` field from `values.yaml` in favor of `fullnameOverride`. If you were using `nameOverride` field, please update your values file to use the new field.
+
 # Upgrading to 0.25
 
 This release removes an experimental feature of automated prevention for full WAL volume (`fullWalPrevention`). Going forward we recommend using monitoring and alerting to prevent such scenario from happening.

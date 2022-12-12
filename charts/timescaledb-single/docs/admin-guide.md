@@ -49,7 +49,6 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `service.replica.labels`      | Labels to add to the replica service            | `{}`                                 |
 | `service.replica.annotations` | Annotations to add to the replica service       | `{}`                                 |
 | `service.replica.spec`        | The service type to use for the replica service | `{}`                                 |
-| `nameOverride`                    | Override the name of the chart              | `timescaledb`                                       |
 | `networkPolicy.enabled`           | If enabled, creates a NetworkPolicy for controlling network access | `false`                      |
 | `networkPolicy.ingress`           | A list of Ingress rules to extend the base NetworkPolicy | `nil`                                  |
 | `networkPolicy.prometheusApp`     | Name of Prometheus app to allow it to scrape exporters | `prometheus`

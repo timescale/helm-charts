@@ -9,7 +9,7 @@ metadata:
   labels:
     component: postgres
     role: replica
-{{ include "timescaledb-helm.labels" . | indent 4 }}
+    {{ include "timescaledb-helm.labels" . | nindent 4 }}
     app.kubernetes.io/component: postgres
 {{- if .Values.service.replica.labels }}
 {{ .Values.service.replica.labels | toYaml | indent 4 }}

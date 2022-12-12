@@ -22,7 +22,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     component: patroni
-{{ include "timescaledb-helm.labels" . | indent 4 }}
+    {{ include "timescaledb-helm.labels" . | nindent 4 }}
     app.kubernetes.io/component: patroni
 spec:
   selector:
