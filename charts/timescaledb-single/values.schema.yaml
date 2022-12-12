@@ -175,7 +175,7 @@ properties:
           type: string
   affinity:
     type: object
-    additionalProperties: false
+    additionalProperties: true
   affinityTemplate:
     type: string
   serviceAccount:
