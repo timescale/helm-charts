@@ -7,8 +7,8 @@ Dynamic Configuration[1] in the DCS.
 As the configuration may change between every invocation of Helm, we
 need to run this trigger after every update.
 
-To prevent Helm failing to update a deployment, we add some random characters
-to the created job; Helm cannot create a job with the same name,
+To prevent Helm failing to update a deployment, we add helm release revision
+number to the created job name; Helm cannot create a job with the same name,
 however, (completed) jobs will not immediately be removed by Kubernetes.
 
 1: https://patroni.readthedocs.io/en/latest/dynamic_configuration.html
@@ -16,7 +16,7 @@ however, (completed) jobs will not immediately be removed by Kubernetes.
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ template "timescaledb.fullname" . }}-patroni-{{ randAlphaNum 2 | lower }}"
+  name: "{{ template "timescaledb.fullname" . }}-patroni-{{ .Release.Revision }}"
   namespace: {{ .Release.Namespace }}
   labels:
     {{ include "timescaledb-helm.labels" . | nindent 4 }}
