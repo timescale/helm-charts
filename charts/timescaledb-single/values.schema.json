@@ -102,9 +102,6 @@
       "additionalProperties": true,
       "type": "object"
     },
-    "affinityTemplate": {
-      "type": "string"
-    },
     "backup": {
       "additionalProperties": false,
       "properties": {
@@ -778,6 +775,9 @@
     "tolerations": {
       "type": "array"
     },
+    "topologySpreadConstraints": {
+      "type": "array"
+    },
     "version": {
       "maximum": 14,
       "minimum": 11,
@@ -789,7 +789,6 @@
   },
   "required": [
     "affinity",
-    "affinityTemplate",
     "backup",
     "bootstrapFromBackup",
     "callbacks",
@@ -814,7 +813,8 @@
     "podMonitor",
     "sharedMemory",
     "timescaledbTune",
-    "tolerations"
+    "tolerations",
+    "topologySpreadConstraints"
   ],
   "schema": "http://json-schema.org/draft-07/schema#"
 }

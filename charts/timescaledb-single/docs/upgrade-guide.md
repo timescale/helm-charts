@@ -26,6 +26,37 @@ After you have followed the upgrade guide you should be able to upgrade your dep
 helm upgrade --install my-release ./charts/timescaledb-single -f values/my-release.yaml
 ```
 
+# Upgrading to 0.28
+
+This release removes `affinityTemplate` field and removes default settings. If you were using `affinityTemplate` field, please migrate your values to `affinity` field.
+
+Removal of default values shouldn't affect topology spread as helm chart defaults are also a kubernetes default behavior since version 1.24 (as defined in [`topologySpreadConstrains` doc](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#internal-default-constraints)). This behavior was also enabled in kubernetes 1.20+ as kube-scheduler beta option.
+
+However if you need to keep the default behavior, please add the similar value your `affinity` field:
+
+```yaml
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        topologyKey: "kubernetes.io/hostname"
+        labelSelector:
+          matchLabels:
+            app: '{{ template "timescaledb.fullname" . }}'
+            release: "{{ .Release.Name | quote }}"
+            cluster-name: '{{ template "clusterName" . }}'
+    - weight: 50
+      podAffinityTerm:
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+        labelSelector:
+          matchLabels:
+            app: {{ template "timescaledb.fullname" . }}
+            release: {{ .Release.Name | quote }}
+            cluster-name: {{ template "clusterName" . }}
+```
+
+If you need to keep this rule, please add it to your `affinity` field.
+
 # Upgrading to 0.27
 
 This release removes `nameOverride` field from `values.yaml` in favor of `fullnameOverride`. If you were using `nameOverride` field, please update your values file to use the new field.
