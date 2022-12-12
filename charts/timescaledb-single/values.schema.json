@@ -99,7 +99,7 @@
   },
   "properties": {
     "affinity": {
-      "additionalProperties": false,
+      "additionalProperties": true,
       "type": "object"
     },
     "affinityTemplate": {
