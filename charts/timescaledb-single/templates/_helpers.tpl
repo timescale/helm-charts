@@ -3,12 +3,6 @@ This file and its contents are licensed under the Apache License 2.0.
 Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 */}}
 {{/* vim: set filetype=mustache: */}}
-{{/*
-Expand the name of the chart.
-*/}}
-{{- define "timescaledb.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
 
 {{- define "clusterName" -}}
 {{- default .Release.Name .Values.clusterName | trunc 63 -}}
@@ -21,14 +15,9 @@ If release name contains chart name it will be used as a full name.
 */}}
 {{- define "timescaledb.fullname" -}}
 {{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{-   (tpl .Values.fullnameOverride .) | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
+{{-   printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 

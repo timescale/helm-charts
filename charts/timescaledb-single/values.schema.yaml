@@ -16,8 +16,8 @@ required:
   - bootstrapFromBackup
   - callbacks
   - debug
+  - fullnameOverride
   - image
-  - nameOverride
   - networkPolicy
   - nodeSelector
   - patroni
@@ -524,7 +524,7 @@ properties:
       - "null"
     minimum: 11
     maximum: 14
-  nameOverride:
+  fullnameOverride:
     type:
       - string
       - "null"
