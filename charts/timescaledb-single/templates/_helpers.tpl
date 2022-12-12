@@ -4,10 +4,6 @@ Please see the included NOTICE for copyright information and LICENSE for a copy 
 */}}
 {{/* vim: set filetype=mustache: */}}
 
-{{- define "clusterName" -}}
-{{- default .Release.Name .Values.clusterName | trunc 63 -}}
-{{- end -}}
-
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
@@ -19,6 +15,10 @@ If release name contains chart name it will be used as a full name.
 {{- else -}}
 {{-   printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+{{- end -}}
+
+{{- define "clusterName" -}}
+{{- default timescaledb.fullname (tpl .Values.clusterName .) | trunc 63 -}}
 {{- end -}}
 
 {{/*

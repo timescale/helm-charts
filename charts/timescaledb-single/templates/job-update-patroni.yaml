@@ -16,7 +16,7 @@ however, (completed) jobs will not immediately be removed by Kubernetes.
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-patroni-{{ randAlphaNum 2 | lower }}"
+  name: "{{ template "timescaledb.fullname" . }}-patroni-{{ randAlphaNum 2 | lower }}"
   namespace: {{ .Release.Namespace }}
   labels:
 {{ include "timescaledb-helm.labels" . | indent 4}}
