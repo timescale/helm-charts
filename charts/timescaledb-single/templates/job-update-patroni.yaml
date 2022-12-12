@@ -19,7 +19,7 @@ metadata:
   name: "{{ template "timescaledb.fullname" . }}-patroni-{{ randAlphaNum 2 | lower }}"
   namespace: {{ .Release.Namespace }}
   labels:
-{{ include "timescaledb-helm.labels" . | indent 4}}
+    {{ include "timescaledb-helm.labels" . | nindent 4 }}
     app.kubernetes.io/component: patroni
   annotations:
     "helm.sh/hook": post-upgrade
@@ -29,10 +29,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "timescaledb.fullname" . }}
-        chart: {{ template "timescaledb.chart" . }}
-        release: {{ .Release.Name }}
-        heritage: {{ .Release.Service }}
+        {{ include "timescaledb-helm.labels" . | nindent 8 }}
     spec:
       restartPolicy: OnFailure
       containers:

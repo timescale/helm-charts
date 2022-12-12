@@ -8,7 +8,7 @@ metadata:
   namespace: {{ .Values.podMonitor.namespace }}
   {{- end }}
   labels:
-{{ include "timescaledb-helm.labels" . | indent 4}}
+    {{ include "timescaledb-helm.labels" . | nindent 4 }}
     {{- if .Values.podMonitor.labels -}}
     {{ toYaml .Values.podMonitor.labels | nindent 4 }}
     {{- end }}

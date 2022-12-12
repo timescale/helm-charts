@@ -513,10 +513,7 @@ properties:
     type: integer
     minimum: 0
   clusterName:
-    type:
-      - string
-      - "null"
-    minLength: 1
+    type: string
     maxLength: 30
   version:
     type:

@@ -18,7 +18,7 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{- define "clusterName" -}}
-{{- default timescaledb.fullname (tpl .Values.clusterName .) | trunc 63 -}}
+{{- default (include "timescaledb.fullname" .) (tpl .Values.clusterName .) | trunc 63 -}}
 {{- end -}}
 
 {{/*

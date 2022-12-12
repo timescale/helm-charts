@@ -8,7 +8,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     role: master
-{{ include "timescaledb-helm.labels" . | indent 4 }}
+    {{ include "timescaledb-helm.labels" . | nindent 4 }}
     app.kubernetes.io/component: timescaledb
 {{- if .Values.service.primary.labels }}
 {{ .Values.service.primary.labels | toYaml | indent 4 }}
