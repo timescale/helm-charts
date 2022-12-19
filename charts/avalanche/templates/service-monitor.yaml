@@ -8,6 +8,7 @@ metadata:
 spec:
   endpoints:
   - interval: {{ .Values.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
     port: metrics
     path: /metrics
   selector:

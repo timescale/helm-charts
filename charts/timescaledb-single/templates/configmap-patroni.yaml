@@ -11,7 +11,7 @@ metadata:
   name: {{ template "timescaledb.fullname" . }}-patroni
   namespace: {{ .Release.Namespace }}
   labels:
-{{ include "timescaledb-helm.labels" . | indent 4 }}
+    {{ include "timescaledb-helm.labels" . | nindent 4 }}
     app.kubernetes.io/component: patroni
 data:
   patroni.yaml: |

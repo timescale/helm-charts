@@ -99,7 +99,7 @@
   },
   "properties": {
     "affinity": {
-      "additionalProperties": false,
+      "additionalProperties": true,
       "type": "object"
     },
     "affinityTemplate": {
@@ -193,11 +193,7 @@
     },
     "clusterName": {
       "maxLength": 30,
-      "minLength": 1,
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "debug": {
       "additionalProperties": false,
@@ -226,39 +222,12 @@
         "null"
       ]
     },
-    "fullWalPrevention": {
-      "additionalProperties": false,
-      "properties": {
-        "checkFrequency": {
-          "maximum": 900,
-          "minimum": 1,
-          "type": "integer"
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "thresholds": {
-          "additionalProperties": false,
-          "properties": {
-            "readOnlyFreeMB": {
-              "minimum": 0,
-              "type": "integer"
-            },
-            "readOnlyFreePercent": {
-              "$ref": "#/definitions/percent"
-            },
-            "readWriteFreeMB": {
-              "minimum": 0,
-              "type": "integer"
-            },
-            "readWriteFreePercent": {
-              "$ref": "#/definitions/percent"
-            }
-          },
-          "type": "object"
-        }
-      },
-      "type": "object"
+    "fullnameOverride": {
+      "minLength": 1,
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "global": {
       "additionalProperties": true
@@ -284,13 +253,6 @@
         }
       },
       "type": "object"
-    },
-    "nameOverride": {
-      "minLength": 1,
-      "type": [
-        "string",
-        "null"
-      ]
     },
     "networkPolicy": {
       "additionalProperties": false,
@@ -832,9 +794,8 @@
     "bootstrapFromBackup",
     "callbacks",
     "debug",
-    "fullWalPrevention",
+    "fullnameOverride",
     "image",
-    "nameOverride",
     "networkPolicy",
     "nodeSelector",
     "patroni",
