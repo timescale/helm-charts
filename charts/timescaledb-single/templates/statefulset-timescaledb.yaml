@@ -32,7 +32,7 @@ spec:
       annotations:
         {{ toYaml .Values.podAnnotations | nindent 8 }}
         {{- if .Values.timescaledbTune.enabled }}
-        checksum/tstune-args: "{{ .Values.timescaledbTune.args | sha256sum }}"
+        checksum/tstune-args: "{{ printf "%s" .Values.timescaledbTune.args | sha256sum }}"
         {{- end }}
       {{- end }}
     spec:
