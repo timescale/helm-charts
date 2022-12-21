@@ -303,10 +303,12 @@ bootstrapFromBackup:
   secretName: pgbackrest-bootstrap # optional
 ```
 
+**Note**: Once the data has been restored from backup, you may mark `bootstrapFromBackup` as disabled and enable `backup` in helm value file and update the release inorder to setup the backup for restored release.
+
 Restoring a different deployment using an existing deployment is possible, but can be dangerous,
 as at this point you may be having 2 deployments pointing to the same S3 bucket/path.
 Therefore, `bootstrapFromBackup.repo1-path` is required to be set.
-
+ 
 If there are any other changes to be made, for example the bucket itself, you can create a secret containing that
 information, for example:
 
