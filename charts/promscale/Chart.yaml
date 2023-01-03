@@ -2,7 +2,7 @@ apiVersion: v2
 name: promscale
 description: Promscale Connector deployment
 
-version: 14.6.0
+version: 14.6.1
 appVersion: 0.16.0
 
 home: https://github.com/timescale/promscale
