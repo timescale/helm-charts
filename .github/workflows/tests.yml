@@ -4,7 +4,7 @@ on:
   - pull_request
 
 env:
-  go-version: 1.19.4
+  go-version: 1.19.5
 
 jobs:
   lint:
