@@ -22,7 +22,6 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 |       Parameter                   |           Description                       |                         Default                     |
 |-----------------------------------|---------------------------------------------|-----------------------------------------------------|
 | `affinity`                        | Affinity settings. Overrides `affinityTemplate` if set. | `{}`                                    |
-| `affinityTemplate`                | A template string to use to generate the affinity settings | Anti-affinity preferred on hostname and (availability) zone |
 | `backup.enabled`                  | Schedule backups to occur                   | `false`                                             |
 | `backup.jobs`                     | A list of backup schedules and types        | 1 full weekly backup, 1 incremental daily backup    |
 | `backup.pgBackRest:archive-get`   | [pgBackRest global:archive-get configuration](https://pgbackrest.org/user-guide.html#quickstart/configure-stanza)  | empty |

@@ -11,7 +11,6 @@
 schema: http://json-schema.org/draft-07/schema#
 required:
   - affinity
-  - affinityTemplate
   - backup
   - bootstrapFromBackup
   - callbacks
@@ -37,6 +36,7 @@ required:
   - sharedMemory
   - timescaledbTune
   - tolerations
+  - topologySpreadConstraints
 additionalProperties: false
 properties:
   podMonitor:
@@ -422,6 +422,8 @@ properties:
     additionalProperties:
       type: string
   tolerations:
+    type: array
+  topologySpreadConstraints:
     type: array
   debug:
     type: object
