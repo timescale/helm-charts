@@ -6,7 +6,9 @@ KIND_CONFIG ?= ./testdata/kind-$(KUBE_VERSION).yaml
 TMP_DIR=tmp
 
 .PHONY: json-schema
-json-schema:
+json-schema: charts/timescaledb-single/values.schema.json
+
+charts/timescaledb-single/values.schema.json:
 	find charts/ -name values.schema.yaml -printf 'cat %p | gojsontoyaml -yamltojson | jq -r > $$(dirname %p)/values.schema.json' | sh
 
 .PHONY: lint
@@ -20,13 +22,10 @@ clean:
 $(TMP_DIR):
 	mkdir -p $(TMP_DIR)
 
-.PHONY: extract-scripts
-extract-scripts: $(TMP_DIR)  ## Extract shell scripts from helm templates
-	./scripts/extract-scripts.sh
-
 .PHONY: shellcheck
-shellcheck: extract-scripts
-	for f in $$(find scripts/ -name "*.sh" -type f) $$(find $(TMP_DIR)/ -name "*.sh" -type f); do \
+shellcheck:
+	for f in $$(find charts/ -name "*.sh" -type f); do \
+		echo Checking $$f; \
 		shellcheck $$f --exclude=SC1090,SC1091,SC2148 ;\
 	done
 
@@ -57,9 +56,7 @@ install-db:  ## Install the testing database into the local kubernetes kind clus
 		--debug \
 		charts/timescaledb-single \
 		--set replicaCount=1 \
-		--set secrets.credentials.PATRONI_SUPERUSER_PASSWORD="temporarypassword" \
-		--set loadBalancer.enabled=false \
-		--set image.tag=pg14.4-ts2.7.2-p0
+		--set secrets.credentials.PATRONI_SUPERUSER_PASSWORD="temporarypassword"
 
 .PHONY: e2e
 e2e: load-images  ## Run e2e installation tests using ct (chart-testing).

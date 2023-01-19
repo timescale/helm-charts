@@ -6,6 +6,7 @@ followed the version specific upgrade guides.
 ##### Upgrade guides
 - [Upgrade your deployment](#upgrade-your-deployment)
         - [Upgrade guides](#upgrade-guides)
+- [Upgrading to 0.20](#upgrading-to-020)
 - [Upgrading to 0.16](#upgrading-to-016)
 - [Upgrading from 0.10 to 0.11](#upgrading-from-010-to-011)
 - [Upgrading from 0.9 to 0.10](#upgrading-from-09-to-010)
@@ -24,6 +25,49 @@ After you have followed the upgrade guide you should be able to upgrade your dep
 ```sh
 helm upgrade --install my-release ./charts/timescaledb-single -f values/my-release.yaml
 ```
+
+# Upgrading to 0.28
+
+This release removes `affinityTemplate` field and removes default settings. If you were using `affinityTemplate` field, please migrate your values to `affinity` field.
+
+Removal of default values shouldn't affect topology spread as helm chart defaults are also a kubernetes default behavior since version 1.24 (as defined in [`topologySpreadConstrains` doc](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#internal-default-constraints)). This behavior was also enabled in kubernetes 1.20+ as kube-scheduler beta option.
+
+However if you need to keep the default behavior, please add the similar value your `affinity` field:
+
+```yaml
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        topologyKey: "kubernetes.io/hostname"
+        labelSelector:
+          matchLabels:
+            app: '{{ template "timescaledb.fullname" . }}'
+            release: "{{ .Release.Name | quote }}"
+            cluster-name: '{{ template "clusterName" . }}'
+    - weight: 50
+      podAffinityTerm:
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+        labelSelector:
+          matchLabels:
+            app: {{ template "timescaledb.fullname" . }}
+            release: {{ .Release.Name | quote }}
+            cluster-name: {{ template "clusterName" . }}
+```
+
+If you need to keep this rule, please add it to your `affinity` field.
+
+# Upgrading to 0.27
+
+This release removes `nameOverride` field from `values.yaml` in favor of `fullnameOverride`. If you were using `nameOverride` field, please update your values file to use the new field.
+
+# Upgrading to 0.25
+
+This release removes an experimental feature of automated prevention for full WAL volume (`fullWalPrevention`). Going forward we recommend using monitoring and alerting to prevent such scenario from happening.
+
+# Upgrading to 0.20
+
+In 0.10.0 release we announced deprecation of `loadBalancer` and `replicaLoadBalancer` fields. In this release we are removing those deprecated fields in favor of `service.primary` and `serivce.replica`. If you were still using deprecated fields, please update your values file to use the new fields. This change also makes creation of `LoadBalancer` Service an explicit action that needs to be enabled by user.
 
 # Upgrading to 0.16
 

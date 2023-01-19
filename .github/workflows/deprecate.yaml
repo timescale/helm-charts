@@ -1,15 +1,15 @@
-name: Deprecate repo
+name: Deprecate multinode chart
 on:
   push:
     paths:
-    - 'charts/repo/**'
+    - 'charts/timescaledb-multinode/**'
   pull_request:
     paths:
-    - 'charts/repo/**'
+    - 'charts/timescaledb-multinode/**'
 
 jobs:
   do-not-commit:
     runs-on: ubuntu-latest
-    name: chart/repo directory shouldn't be modified
+    name: timescaledb-multinode chart is deprecated
     steps:
     - run: exit 1

@@ -27,11 +27,11 @@ spec:
     - alert: PromscaleIngestHighErrorRate
       expr: |
         (
-          sum by (job, instance, type) (
+          sum by (job, instance, namespace, type) (
             rate(promscale_ingest_requests_total{code=~"5.."}[5m])
           )
         /
-          sum by (job, instance, type) (
+          sum by (job, instance, namespace, type) (
             rate(promscale_ingest_requests_total[5m])
           )
         ) > 0.05
@@ -44,11 +44,11 @@ spec:
     - alert: PromscaleIngestHighErrorRate
       expr: |
         (
-          sum by (job, instance, type) (
+          sum by (job, instance, namespace, type) (
             rate(promscale_ingest_requests_total{code=~"5.."}[5m])
           )
         /
-          sum by (job, instance, type) (
+          sum by (job, instance, namespace, type) (
             rate(promscale_ingest_requests_total[5m])
           )
         ) > 0.1
@@ -63,12 +63,12 @@ spec:
         (
           histogram_quantile(
             0.90,
-            sum by (job, instance, type, le) (
+            sum by (job, instance, namespace, type, le) (
               rate(promscale_ingest_duration_seconds_bucket[5m])
             )
           ) > 10
         and
-          sum by (job, instance, type) (
+          sum by (job, instance, namespace, type) (
               rate(promscale_ingest_duration_seconds_bucket[5m])
           )
         ) > 0
@@ -77,19 +77,19 @@ spec:
         severity: warning
       annotations:
         summary: Slow Promscale ingestion.
-        description: "Slowest 10% of ingestion batch took more than {{ $value }} seconds to ingest."
+        description: "Slowest 10% of ingestion batch took more than {{ $value | humanizeDuration }} seconds to ingest."
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleIngestHighLatency.md
     - alert: PromscaleIngestHighLatency
       expr: |
         (
           histogram_quantile(
             0.90,
-            sum by (job, instance, type, le) (
+            sum by (job, instance, namespace, type, le) (
               rate(promscale_ingest_duration_seconds_bucket[5m])
             )
           ) > 30
         and
-          sum by (job, instance, type) (
+          sum by (job, instance, namespace, type) (
               rate(promscale_ingest_duration_seconds_bucket[5m])
           )
         ) > 0
@@ -98,35 +98,62 @@ spec:
         severity: critical
       annotations:
         summary: Slow Promscale ingestion.
-        description: "Slowest 10% of ingestion batch took more than {{ $value }} seconds to ingest."
+        description: "Slowest 10% of ingestion batch took more than {{ $value | humanizeDuration }} seconds to ingest."
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleIngestHighLatency.md
+    - alert: PromscaleIngestHighDataDuplication
+      expr: |
+        sum by (job, namespace) (rate(promscale_ingest_duplicates_total{kind="sample"}[15m])) > 0
+      for: 30m
+      labels:
+        severity: warning
+      annotations:
+        summary: Duplicate data being inserted.
+        description: "More than {{ $value | humanize }} samples/sec are rejected as duplicates by promscale."
+        runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleIngestHighDataDuplication.md
   - name: promscale-query
     rules:
     - alert: PromscaleQueryHighErrorRate
       expr: |
         (
-          sum by (job, instance, type) (
-            rate(promscale_query_requests_total{code=~"5.."}[5m])
+          sum by (job, instance, namespace, type, handler) (
+            rate(promscale_query_requests_total{code=~"5..",handler!="/api/v1/query_range",err!="canceled"}[5m])
           )
         /
-          sum by (job, instance, type) (
-            rate(promscale_query_requests_total[5m])
+          sum by (job, instance, namespace, type, handler) (
+            rate(promscale_query_requests_total{handler!="/api/v1/query_range",err!="canceled"}[5m])
           )
         ) > 0.05
       labels:
         severity: warning
       annotations:
         summary: High error rate in querying Promscale.
-        description: "Evaluating queries via Promscale has {{ $value | humanizePercentage }} error rate."
+        description: "Evaluating queries via Promscale {{ $labels.handler }} endpoint has {{ $value | humanizePercentage }} error rate."
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleQueryHighErrorRate.md
     - alert: PromscaleQueryHighErrorRate
       expr: |
         (
-          sum by (job, instance, type) (
-            rate(promscale_query_requests_total{code=~"5.."}[5m])
+          sum by (job, instance, namespace, type, handler) (
+            rate(promscale_query_requests_total{code=~"5..",handler="/api/v1/query_range",err!="canceled"}[5m])
           )
         /
-          sum by (job, instance, type) (
+          sum by (job, instance, namespace, type, handler) (
+            rate(promscale_query_requests_total{handler="/api/v1/query_range",err!="canceled"}[5m])
+          )
+        ) > 0.1
+      labels:
+        severity: warning
+      annotations:
+        summary: High error rate in querying Promscale.
+        description: "Evaluating queries via Promscale {{ $labels.handler }} endpoint has {{ $value | humanizePercentage }} error rate."
+        runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleQueryHighErrorRate.md
+    - alert: PromscaleQueryHighErrorRate
+      expr: |
+        (
+          sum by (job, instance, namespace, type) (
+            rate(promscale_query_requests_total{code=~"5..",err!="canceled"}[5m])
+          )
+        /
+          sum by (job, instance, namespace, type) (
             rate(promscale_query_requests_total[5m])
           )
         ) > 0.1
@@ -141,12 +168,12 @@ spec:
         (
           histogram_quantile(
             0.90,
-            sum by (job, instance, type, le) (
+            sum by (job, instance, namespace, type, le) (
               rate(promscale_query_duration_seconds_bucket[5m])
             )
           ) > 5
         and
-          sum by (job, instance, type) (
+          sum by (job, instance, namespace, type) (
             rate(promscale_query_duration_seconds_bucket[5m])
           ) > 0
         )
@@ -155,19 +182,19 @@ spec:
         severity: warning
       annotations:
         summary: Slow Promscale querying.
-        description: "Slowest 10% of the queries took more than {{ $value }} seconds to evaluate."
+        description: "Slowest 10% of the queries took more than {{ $value | humanizeDuration }} seconds to evaluate."
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleQueryHighLatency.md
     - alert: PromscaleQueryHighLatency
       expr: |
         (
           histogram_quantile(
             0.90,
-            sum by (job, instance, type, le) (
+            sum by (job, instance, namespace, type, le) (
               rate(promscale_query_duration_seconds_bucket[5m])
             )
           ) > 10
         and
-          sum by (job, instance, type) (
+          sum by (job, instance, namespace, type) (
             rate(promscale_query_duration_seconds_bucket[5m])
           ) > 0
         )
@@ -176,7 +203,7 @@ spec:
         severity: critical
       annotations:
         summary: Slow Promscale querying.
-        description: "Slowest 10% of the queries took {{ $value }} seconds to evaluate."
+        description: "Slowest 10% of the queries took {{ $value | humanizeDuration }} seconds to evaluate."
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleQueryHighLatency.md
   - name: promscale-cache
     rules:
@@ -195,53 +222,52 @@ spec:
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleCacheHighNumberOfEvictions.md
   - name: promscale-database-connection
     rules:
-    - alert: PromscaleDBHighErrorRate
+    - alert: PromscaleStorageHighErrorRate
       expr: |
         (
-          sum by (job) (
-            # Error counter exists for query, query_row & exec, and not for send_batch.
-            rate(promscale_database_request_errors_total{method=~"query.*|exec"}[5m])
+          sum by (job, instance, namespace, method) (
+            rate(promscale_database_request_errors_total[5m])
           )
         /
-          sum by (job) (
-            rate(promscale_database_requests_total{method=~"query.*|exec"}[5m])
+          sum by (job, instance, namespace, method) (
+            rate(promscale_database_requests_total[5m])
           )
         ) > 0.05
       labels:
         severity: warning
       annotations:
         summary: Promscale experiences a high error rate when connecting to the database.
-        description: "Promscale connection with the database has an error of {{ $value | humanizePercentage }}."
+        description: "Promscale connection with the database has an error rate of {{ $value | humanizePercentage }}."
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleDBHighErrorRate.md
     - alert: PromscaleStorageHighLatency
       expr: |
         (
           histogram_quantile(0.9,
-            sum by (le, job, type) (
-              rate(promscale_database_requests_duration_seconds_bucket[5m])
+            sum by (job, instance, namespace, method, le) (
+              rate(promscale_database_requests_duration_seconds_bucket{method!="exec"}[5m])
             )
           ) > 5
         and
-          sum by (job, type) (
-            rate(promscale_database_requests_duration_seconds_count[5m])
+          sum by (job, instance, namespace, method) (
+            rate(promscale_database_requests_duration_seconds_count{method!="exec"}[5m])
           ) > 0
         )
       labels:
         severity: warning
       annotations:
         summary: Slow database response.
-        description: "Slowest 10% of database requests are taking more than {{ $value }} seconds to respond."
+        description: "Slowest 10% of database requests with method {{ $labels.method }} are taking more than {{ $value | humanizeDuration }} seconds to respond."
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleStorageHighLatency.md
   - name: promscale-database
     rules:
     - alert: PromscaleStorageUnhealthy
       expr: |
         (
-          sum by (job) (
+          sum by (job, instance, namespace) (
             rate(promscale_sql_database_health_check_errors_total[5m])
           )
         /
-          sum by (job) (
+          sum by (job, instance, namespace) (
             rate(promscale_sql_database_health_check_total[5m])
           )
         ) > 0.05
@@ -270,7 +296,54 @@ spec:
         severity: warning
       annotations:
         summary: Promscale maintenance jobs taking too long to complete.
-        description: "Promscale Database is taking {{ $value }} seconds to respond to Promscale's requests."
+        description: "Promscale Database is taking {{ $value | humanizeDuration }} seconds to respond to Promscale's requests."
+        runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleMaintenanceJobRunningTooLong.md
+    - alert: PromscaleMaintenanceJobNotKeepingup
+      expr: |
+        (
+            (
+              min_over_time(promscale_sql_database_chunks_metrics_uncompressed_count[1h]) > promscale_sql_database_metric_count
+            )
+          and
+            (
+              delta(promscale_sql_database_chunks_metrics_uncompressed_count[10m]) > 0
+            )
+        )
+        or
+        (
+            (
+              min_over_time(promscale_sql_database_chunks_metrics_expired_count[1h]) > promscale_sql_database_metric_count
+            )
+          and
+            (
+              delta(promscale_sql_database_chunks_metrics_expired_count[10m]) > 0
+            )
+        )
+        or
+        (
+            (
+              min_over_time(promscale_sql_database_chunks_traces_uncompressed_count[1h]) > promscale_sql_database_metric_count
+            )
+          and
+            (
+              delta(promscale_sql_database_chunks_traces_uncompressed_count[10m]) > 0
+            )
+        )
+        or
+        (
+            (
+              min_over_time(promscale_sql_database_chunks_traces_expired_count[1h]) > promscale_sql_database_metric_count
+            )
+          and
+            (
+              delta(promscale_sql_database_chunks_traces_expired_count[10m]) > 0
+            )
+        )
+      labels:
+        severity: warning
+      annotations:
+        summary: Promscale maintenance jobs are not keeping up.
+        description: "The amount of work for the promscale maintenance {{ $labels.name }} job is not decreasing for long time."
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleMaintenanceJobRunningTooLong.md
     - alert: PromscaleMaintenanceJobFailures
       expr: promscale_sql_database_worker_maintenance_job_failed == 1
@@ -297,5 +370,19 @@ spec:
         summary: High uncompressed data.
         description: "High uncompressed data in Promscale, on average, {{ $value }} uncompressed chunks per metric."
         runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscaleCompressionLow.md
+    - alert: PromscalePostgreSQLSharedBuffersLow
+      expr: |
+        (
+          ((promscale_sql_database_open_chunks_total_table_size + promscale_sql_database_open_chunks_total_index_size)
+          /
+          promscale_sql_database_shared_buffers_size)
+          > 1 )
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: Promscale database performance will be affected.
+        description: "Currently open chunks are {{ $value | humanizePercentage }} of PostgreSQL shared_buffers. This will impact database performance."
+        runbook_url: https://github.com/timescale/promscale/blob/master/docs/runbooks/PromscalePostgreSQLSharedBuffersLow.md
 `}}
 {{- end }}

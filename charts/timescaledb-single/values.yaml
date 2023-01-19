@@ -4,13 +4,13 @@
 replicaCount: 3
 
 # To prevent very long names, we override the name, otherwise it would default to
-# timescaledb-single (the name of the chart)
-nameOverride: timescaledb
+# timescaledb-single (the name of the chart). This field is always truncated to 63 characters.
+fullnameOverride: "{{ .Release.Name }}"
 
 # The default Patroni name of the cluster ("scope") is derived from the name of the release,
 # but you can override this behaviour here
 # https://patroni.readthedocs.io/en/latest/SETTINGS.html#global-universal
-clusterName:
+clusterName: ""
 
 # The major PostgreSQL version to use, defaults to the default version of the Docker image
 # However, in pg_upgrade scenarios, you may need to specify an explicit version
@@ -20,7 +20,7 @@ image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescale/timescaledb-ha
-  tag: pg14.5-ts2.8.0-p1
+  tag: pg14.6-ts2.9.1-p1
   pullPolicy: Always
 
 # By default those secrets are randomly generated.
@@ -130,6 +130,15 @@ backup:
   #     secretKeyRef:
   #       name: pgbackrest-dev-secrets
   #       key: repo1-s3-key-secret
+  resources: {}
+  # If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 # When creating a *new* deployment, the default is to initialize (using initdb) the database.
 # If however, you want to initialize the database using an existing backup, you can do so by
@@ -337,41 +346,6 @@ service:
     # loadBalancerSourceRanges:
     # - "0.0.0.0/0"
 
-# DEPRECATED(0.10.0): use the `service.primary` values instead.
-loadBalancer:
-  # If not enabled, we still expose the primary using a so called Headless Service
-  # https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
-  enabled: true
-  port: 5432
-  # Read more about the AWS annotations here:
-  # https://kubernetes.io/docs/concepts/cluster-administration/cloud-providers/#aws
-  # https://docs.aws.amazon.com/eks/latest/userguide/load-balancing.html
-  annotations:
-    # Setting idle-timeout to the maximum allowed value, as in general
-    # database connections are long lived
-    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "4000"
-
-    # service.beta.kubernetes.io/aws-load-balancer-type: nlb            # Use an NLB instead of ELB
-    # service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0  # Internal Load Balancer
-  # Define extra things that should go in the service spec
-  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#servicespec-v1-core
-  spec:
-  # loadBalancerSourceRanges:
-  # - "0.0.0.0/0"
-
-replicaLoadBalancer:
-  # If not enabled, we still expose the replica's using a so called Headless Service
-  # https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
-  enabled: false
-  port: 5432
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "4000"
-  # Define extra things that should go in the service spec
-  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#servicespec-v1-core
-  spec:
-  # loadBalancerSourceRanges:
-  # - "0.0.0.0/0"
-
 readinessProbe:
   enabled: true
   initialDelaySeconds: 5
@@ -422,20 +396,6 @@ persistentVolumes:
     # example2:
     #   size: 5Gi
     #   storageClass: gp2
-
-# EXPERIMENTAL, please do *not* enable on production environments
-# if enabled, fullWalPrevention will switch the default transaction mode from read write
-# to read only if thresholds are breached.
-fullWalPrevention:
-  enabled: false
-  checkFrequency: 30
-  # To prevent the default transaction mode from switching constantly, we have separate
-  # thresholds for switching to read-only and read-write
-  thresholds:
-    readOnlyFreePercent: 5
-    readOnlyFreeMB: 64
-    readWriteFreePercent: 8
-    readWriteFreeMB: 128
 
 resources: {}
   # If you do want to specify resources, uncomment the following
@@ -553,6 +513,10 @@ prometheus:
   # Additional volumes for prometheus, e.g., to support additional queries.
   # These should be a Volume, as this allows you to inject any kind of Volume
   # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#volume-v1-core
+
+  # Extra custom CLI arguments for postgres_exporter.
+  args: []
+  # - --collector.database=disabled
   volumes:
   # - name: exporter-config
   #   configMap:
@@ -569,7 +533,6 @@ prometheus:
 podMonitor:
   # Specifies whether PodMonitor for Prometheus operator should be created
   enabled: false
-  portName: metrics
   path: /metrics
   interval: 10s
   # scrapeTimeout: 30s
@@ -579,7 +542,7 @@ podMonitor:
   #   release: prometheus
   # honorLabels: true
   # metricRelabelings: []
-  # targetLabels:
+  # podTargetLabels:
   #   - foo
 
 # For new deployments, we would advise Parallel here, however as that change breaks previous
@@ -590,30 +553,18 @@ podManagementPolicy: OrderedReady
 # https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 podAnnotations: {}
 
+# Labels that are applied to each pod in the stateful set
+# https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
 # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-affinityTemplate: |
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 100
-      podAffinityTerm:
-        topologyKey: "kubernetes.io/hostname"
-        labelSelector:
-          matchLabels:
-            app: {{ template "timescaledb.fullname" . }}
-            release: {{ .Release.Name | quote }}
-            cluster-name: {{ template "clusterName" . }}
-    - weight: 50
-      podAffinityTerm:
-        topologyKey: failure-domain.beta.kubernetes.io/zone
-        labelSelector:
-          matchLabels:
-            app: {{ template "timescaledb.fullname" . }}
-            release: {{ .Release.Name | quote }}
-            cluster-name: {{ template "clusterName" . }}
 affinity: {}
+
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#topologyspreadconstraints
+topologySpreadConstraints: []
 
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/

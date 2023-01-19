@@ -3,16 +3,6 @@ This file and its contents are licensed under the Apache License 2.0.
 Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 */}}
 {{/* vim: set filetype=mustache: */}}
-{{/*
-Expand the name of the chart.
-*/}}
-{{- define "timescaledb.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "clusterName" -}}
-{{- default .Release.Name .Values.clusterName | trunc 63 -}}
-{{- end -}}
 
 {{/*
 Create a default fully qualified app name.
@@ -21,15 +11,14 @@ If release name contains chart name it will be used as a full name.
 */}}
 {{- define "timescaledb.fullname" -}}
 {{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{-   (tpl .Values.fullnameOverride .) | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{-   printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "clusterName" -}}
+{{- default (include "timescaledb.fullname" .) (tpl .Values.clusterName .) | trunc 63 -}}
 {{- end -}}
 
 {{/*
@@ -48,22 +37,6 @@ Create the name of the service account to use.
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
-{{- end -}}
-
-{{- define "socket_directory" -}}
-/var/run/postgresql
-{{- end -}}
-
-{{- define "pod_environment_file" -}}
-${HOME}/.pod_environment
-{{- end -}}
-
-{{- define "pgbackrest_environment_file" -}}
-${HOME}/.pgbackrest_environment
-{{- end -}}
-
-{{- define "pgbackrest_bootstrap_environment_dir" -}}
-/etc/pgbackrest/bootstrap
 {{- end -}}
 
 {{- define "postgres.uid" -}}
@@ -95,11 +68,11 @@ ${HOME}/.pgbackrest_environment
 {{- end -}}
 
 {{- define "tstune_config" -}}
-{{ printf "%s/timescaledb.conf" (include "socket_directory" .) }}
+{{ printf "/var/run/postgresql/timescaledb.conf" }}
 {{- end -}}
 
 {{- define "wal_status_file" -}}
-{{ printf "%s/wal_status" (include "socket_directory" .) }}
+{{ printf "/var/run/postgresql/wal_status" }}
 {{- end -}}
 
 {{- define "secrets_credentials" -}}

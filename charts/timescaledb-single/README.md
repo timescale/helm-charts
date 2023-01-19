@@ -67,11 +67,11 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 helm install --name my-release -f myvalues.yaml charts/timescaledb-single
 ```
 
-For details about what parameters you can set, have a look at the [Administrator Guide](admin-guide.md#configure)
+For details about what parameters you can set, have a look at the [Administrator Guide](docs/admin-guide.md#configure)
 
 ### Installing from the Timescale Helm Repo
 
-We have a Helm Repository that you can use, instead of cloning this Git repo. 
+We have a Helm Repository that you can use, instead of cloning this Git repo.
 
 First add the repository with:
 ```console
@@ -89,7 +89,7 @@ helm install my-release .
 To keep the repo up to date with new versions you can do:
 ```console
 helm repo update
-``` 
+```
 ## Connecting to TimescaleDBs
 
 To connect to the TimescaleDB instance, we first need to know to which host we need to connect. Use `kubectl` to get that information:
@@ -141,7 +141,8 @@ kubectl exec -ti $(kubectl get pod -o name -l role=master,release=$RELEASE) psql
 
 ## Create backups
 The backup is disabled by default, look at the
-[Administrator Guide](admin-guide.md#backups) on how to configure backup provider (S3, GCS, Azure etc), location, credentials, schedules, etc.
+
+[Administrator Guide](docs/admin-guide.md#backups) on how to configure backup location, credentials, schedules, etc.
 
 ## Cleanup
 
@@ -150,9 +151,9 @@ To remove the spawned pods you can run a simple
 helm delete my-release
 ```
 Some items, (pvc's and S3 backups for example) are not immediately removed.
-To also purge these items, have a look at the [Administrator Guide](admin-guide.md#cleanup)
+To also purge these items, have a look at the [Administrator Guide](docs/admin-guide.md#cleanup)
 
 ## Further reading
 
-- [Administrator Guide](admin-guide.md)
+- [Administrator Guide](docs/admin-guide.md)
 - [TimescaleDB Documentation](https://docs.timescale.com/latest/main)

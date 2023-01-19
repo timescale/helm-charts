@@ -7,7 +7,8 @@ metadata:
 {{ include "avalanche-helm.labels" . | indent 4 }}
 spec:
   endpoints:
-  - interval: 30s
+  - interval: {{ .Values.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
     port: metrics
     path: /metrics
   selector:

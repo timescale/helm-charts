@@ -1,10 +1,9 @@
-# This file and its contents are licensed under the Apache License 2.0.
-# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-
+{{- range $n := until (int .Values.fakePrometheusTargetCount) }}
+{{- with $ -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "avalanche.fullname" . }}
+  name: {{ include "avalanche.fullname" . }}-{{ $n }}
   labels:
 {{ include "avalanche-helm.labels" . | indent 4 }}
     app.kubernetes.io/component: avalanche
@@ -26,4 +25,7 @@ spec:
     protocol: TCP
 {{- if .Values.service.spec }}
 {{ .Values.service.spec | toYaml | indent 2 }}
+{{- end }}
+{{- end }}
+---
 {{- end }}

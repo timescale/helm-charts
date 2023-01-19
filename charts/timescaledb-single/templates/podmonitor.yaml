@@ -8,7 +8,7 @@ metadata:
   namespace: {{ .Values.podMonitor.namespace }}
   {{- end }}
   labels:
-{{ include "timescaledb-helm.labels" . | indent 4}}
+    {{ include "timescaledb-helm.labels" . | nindent 4 }}
     {{- if .Values.podMonitor.labels -}}
     {{ toYaml .Values.podMonitor.labels | nindent 4 }}
     {{- end }}
@@ -19,7 +19,7 @@ spec:
     scrapeTimeout: {{ .Values.podMonitor.scrapeTimeout }}
     {{- end }}
     honorLabels: true
-    port: {{ .Values.podMonitor.portName }}
+    port: pg-exporter
     path: {{ .Values.podMonitor.path }}
     {{- if .Values.podMonitor.metricRelabelings }}
     metricRelabelings: {{ toYaml .Values.podMonitor.metricRelabelings | nindent 6 }}
@@ -29,9 +29,8 @@ spec:
     matchLabels:
       app: {{ template "timescaledb.fullname" . }}
       release: "{{ .Release.Name }}"
-      component: postgres-exporter
-  {{- if .Values.podMonitor.targetLabels }}
-  targetLabels: {{ toYaml .Values.podMonitor.targetLabels | nindent 4 }}
+  {{- if .Values.podMonitor.podTargetLabels }}
+  podTargetLabels: {{ toYaml .Values.podMonitor.podTargetLabels | nindent 4 }}
   {{- end }}
   namespaceSelector:
     matchNames:

@@ -11,27 +11,24 @@
 schema: http://json-schema.org/draft-07/schema#
 required:
   - affinity
-  - affinityTemplate
   - backup
   - bootstrapFromBackup
   - callbacks
   - debug
-  - fullWalPrevention
+  - fullnameOverride
   - image
-  - loadBalancer
-  - nameOverride
   - networkPolicy
   - nodeSelector
   - patroni
   - persistentVolumes
   - pgBouncer
   - podAnnotations
+  - podLabels
   - podManagementPolicy
   - prometheus
   - rbac
   - readinessProbe
   - replicaCount
-  - replicaLoadBalancer
   - resources
   - secrets
   - serviceAccount
@@ -39,6 +36,7 @@ required:
   - sharedMemory
   - timescaledbTune
   - tolerations
+  - topologySpreadConstraints
 additionalProperties: false
 properties:
   podMonitor:
@@ -144,34 +142,6 @@ properties:
       "$ref": "#/definitions/service"
     replica:
       "$ref": "#/definitions/service"
-  loadBalancer:
-    "$ref": "#/definitions/loadBalancer"
-  replicaLoadBalancer:
-    "$ref": "#/definitions/loadBalancer"
-  fullWalPrevention:
-    type: object
-    additionalProperties: false
-    properties:
-      enabled:
-        type: boolean
-      checkFrequency:
-        type: integer
-        minimum: 1
-        maximum: 900
-      thresholds:
-        type: object
-        additionalProperties: false
-        properties:
-          readOnlyFreePercent:
-            "$ref": "#/definitions/percent"
-          readOnlyFreeMB:
-            type: integer
-            minimum: 0
-          readWriteFreePercent:
-            "$ref": "#/definitions/percent"
-          readWriteFreeMB:
-            type: integer
-            minimum: 0
   sharedMemory:
     type: object
     additionalProperties: false
@@ -205,7 +175,7 @@ properties:
           type: string
   affinity:
     type: object
-    additionalProperties: false
+    additionalProperties: true
   affinityTemplate:
     type: string
   serviceAccount:
@@ -236,6 +206,7 @@ properties:
             type: string
             enum:
               - 0.0.0.0:8008
+              - :::8008
       bootstrap:
         type: object
         properties:
@@ -317,6 +288,7 @@ properties:
             type: string
             enum:
               - "0.0.0.0:5432"
+              - ":::5432"
           pgbackrest:
             type: object
             properties:
@@ -363,6 +335,12 @@ properties:
     type: object
     additionalProperties: false
     properties:
+      args:
+        type:
+          - array
+          - "null"
+        items:
+          type: string
       enabled:
         type: boolean
       env:
@@ -439,7 +417,13 @@ properties:
     type: object
     additionalProperties:
       type: string
+  podLabels:
+    type: object
+    additionalProperties:
+      type: string
   tolerations:
+    type: array
+  topologySpreadConstraints:
     type: array
   debug:
     type: object
@@ -485,6 +469,10 @@ properties:
         type:
           - array
           - "null"
+      resources:
+        type:
+          - object
+          - "null"
   secrets:
     type: object
     additionalProperties: false
@@ -527,10 +515,7 @@ properties:
     type: integer
     minimum: 0
   clusterName:
-    type:
-      - string
-      - "null"
-    minLength: 1
+    type: string
     maxLength: 30
   version:
     type:
@@ -538,7 +523,7 @@ properties:
       - "null"
     minimum: 11
     maximum: 14
-  nameOverride:
+  fullnameOverride:
     type:
       - string
       - "null"
@@ -586,24 +571,6 @@ definitions:
         type:
           - object
           - "null"
-        additionalProperties:
-          type: string
-  loadBalancer:
-    type: object
-    additionalProperties: false
-    properties:
-      spec:
-        type:
-          - object
-          - "null"
-      enabled:
-        type: boolean
-      port:
-        type: integer
-        minimum: 1000
-        maximum: 65535
-      annotations:
-        type: object
         additionalProperties:
           type: string
   volume:

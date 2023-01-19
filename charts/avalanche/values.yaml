@@ -6,13 +6,36 @@ image:
   tag: main
   pullPolicy: IfNotPresent
 
-# number of connector pods to spawn
+# Number of Avalanche pods to spawn. Majorly useful to test Avalanche with
+# remote_write.
+# Use fakePrometheusTargetCount when using Avalanche with
+# Prometheus to generate load.
 replicaCount: 1
 
 # Arguments that will be passed onto deployment pods
-# The list of available cli flags can be found by
-# running avalanche --help
-extraArgs: []
+# The list of available cli flags can be found here
+# extraArgs:
+#   - --metric-count=500                              Number of metrics to serve.
+#   - --label-count=10                                Number of labels per-metric.
+#   - --series-count=10                               Number of series per-metric.
+#   - --metricname-length=5                           Modify length of metric names.
+#   - --labelname-length=5                            Modify length of label names.
+#   - --const-label=CONST-LABEL ...                   Constant label to add to every metric. Format is labelName=labelValue. Flag can be specified multiple times.
+#   - --value-interval=30                             Change series values every {interval} seconds.
+#   - --series-interval=60                            Change series_id label values every {interval} seconds.
+#   - --metric-interval=120                           Change __name__ label values every {interval} seconds.
+#   - --port=9001                                     Port to serve at
+#   - --remote-url=REMOTE-URL                         URL to send samples via remote_write API.
+#   - --remote-pprof-urls=REMOTE-PPROF-URLS ...       a list of urls to download pprofs during the remote write: --remote-pprof-urls=http://127.0.0.1:10902/debug/pprof/heap --remote-pprof-urls=http://127.0.0.1:10902/debug/pprof/profile
+#   - --remote-pprof-interval=REMOTE-PPROF-INTERVAL   how often to download pprof profiles.When not provided it will download a profile once before the end of the test.
+#   - --remote-batch-size=2000                        how many samples to send with each remote_write API request.
+#   - --remote-requests-count=100                     how many requests to send in total to the remote_write API.
+#   - --remote-write-interval=100ms                   delay between each remote write request.
+#   - --remote-tenant="0"                             Tenant ID to include in remote_write send
+#   - --tls-client-insecure                           Skip certificate check on tls connection
+#   - --remote-tenant-header="X-Scope-OrgID"          Tenant ID to include in remote_write send. The default, is the default tenant header expected by Cortex.
+extraArgs:
+  - --const-label=avalanche_replica=$(POD_NAME)
 
 # Annotations to be added to the avalanche Deployment
 annotations: {}
@@ -20,11 +43,20 @@ annotations: {}
 # Annotations to be added to the avalanche Pods
 podAnnotations: {}
 
+# Labels to be added to the avalanche k8s resources
+labels: {}
+
 # Enable ServiceMonitor used by prometheus-operator to configure prometheus for metrics scraping.
 # Note that by enabling the service monitor, the cluster's Prometheus will start scraping the metrics
 # generated as load and intended for benchmarking.
 serviceMonitor:
   enabled: false
+  interval: 30s
+
+# Number of fake ServiceMonitor to be created to simulate fake Prometheus
+# targets. This will be useful to generate more series without scaling
+# Avalanche pods when using it as a Prometheus target.
+fakePrometheusTargetCount: 1
 
 # settings for the service to be created that will expose
 # the avalanche deployment
@@ -33,7 +65,9 @@ service:
   annotations: {}
   port: 9001
   # properties to be added to service.spec
-  spec: {}
+  spec:
+    # Headless service is required for stable network IDs of statefulset pods.
+    clusterIP: None
 
 # create and attach a service account
 serviceAccount:
@@ -43,24 +77,24 @@ serviceAccount:
 # set your own limits
 resources: {}
 
-# set a custom readiness probe e.g. when basic auth is enabled
-# readinessProbe:
-#   httpGet: null
-#   exec:
-#     command:
-#     - sh
-#     - -c
-#     - |-
-#       status_code=$(wget --server-response "http://${WEB_AUTH_USERNAME}:${WEB_AUTH_PASSWORD}@localhost:9001/health" 2>&1 | awk '/^  HTTP/{print $2}');
-#       if [[ "${status_code}" == "200" ]]; then exit 0; else exit 1; fi
 # NOTE: This readinessProbe will fail when remote_write is used, as avalanche
 # does not enable the healthcheck endpoint when remote write is used instead
 # of the /metrics endpoint.
-readinessProbe:
-  httpGet:
-    path: /health
-    port: metrics
-    scheme: HTTP
-  failureThreshold: 3
-  timeoutSeconds: 15
-  periodSeconds: 15
+# readinessProbe:
+#   httpGet:
+#     path: /health
+#     port: metrics
+#     scheme: HTTP
+#   failureThreshold: 3
+#   timeoutSeconds: 15
+#   periodSeconds: 15
+readinessProbe: {}
+
+# Set tolerations for avalanche deployment
+tolerations: {}
+
+# Set nodeSelector for avalanche deployment
+nodeSelector: {}
+
+# Set affinity for pod assignment
+affinity: {}
