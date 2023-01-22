@@ -174,6 +174,8 @@ spec:
         # Where possible, we want to have lowercase usernames in PostgreSQL as more complex postgres usernames
         # requiring quoting to be done in certain contexts, which many tools do not do correctly, or even at all.
         # https://patroni.readthedocs.io/en/latest/ENVIRONMENT.html#bootstrap-configuration
+        - name: PATRONICTL_CONFIG_FILE
+          value: "/etc/timescaledb/patroni.yaml"
         - name: PATRONI_admin_OPTIONS
           value: createrole,createdb
         - name: PATRONI_REPLICATION_USERNAME
