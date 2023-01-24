@@ -65,7 +65,7 @@ secrets:
     # PGBACKREST_REPO1_AZURE_CONTAINER: ""
     # PGBACKREST_REPO1_AZURE_KEY: ""
     # PGBACKREST_REPO1_AZURE_KEY_TYPE: ""
-  
+
   # Selector used to provision your own Secret containing pgbackrest configuration details
   # This is mutually exclusive with `pgbackrest` option and takes precedence over it.
   # WARNING: Use this option with caution
