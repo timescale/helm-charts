@@ -17,6 +17,7 @@ required:
   - debug
   - fullnameOverride
   - image
+  - curlImage
   - networkPolicy
   - nodeSelector
   - patroni
@@ -176,8 +177,6 @@ properties:
   affinity:
     type: object
     additionalProperties: true
-  affinityTemplate:
-    type: string
   serviceAccount:
     type: object
     additionalProperties: false
@@ -496,6 +495,22 @@ properties:
           - object
           - "null"
   image:
+    type: object
+    additionalProperties: false
+    properties:
+      repository:
+        type: string
+        minLength: 1
+      tag:
+        type: string
+        minLength: 1
+      pullPolicy:
+        type: string
+        enum:
+          - Always
+          - Never
+          - IfNotPresent
+  curlImage:
     type: object
     additionalProperties: false
     properties:
