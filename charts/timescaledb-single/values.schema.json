@@ -192,6 +192,28 @@
       "maxLength": 30,
       "type": "string"
     },
+    "curlImage": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "enum": [
+            "Always",
+            "Never",
+            "IfNotPresent"
+          ],
+          "type": "string"
+        },
+        "repository": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "tag": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "debug": {
       "additionalProperties": false,
       "properties": {
@@ -571,9 +593,6 @@
     "prometheus": {
       "additionalProperties": false,
       "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
         "args": {
           "items": {
             "type": "string"
@@ -582,6 +601,9 @@
             "array",
             "null"
           ]
+        },
+        "enabled": {
+          "type": "boolean"
         },
         "env": {
           "items": {
@@ -795,6 +817,7 @@
     "debug",
     "fullnameOverride",
     "image",
+    "curlImage",
     "networkPolicy",
     "nodeSelector",
     "patroni",
