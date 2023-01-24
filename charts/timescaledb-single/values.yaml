@@ -23,6 +23,14 @@ image:
   tag: pg14.6-ts2.9.1-p1
   pullPolicy: Always
 
+# There are job and cronjob resources that run during updates or backups that use curl image
+# Users in that want to define their own curl image can set it below
+# Example: https://github.com/timescale/helm-charts/blob/main/charts/timescaledb-single/templates/job-update-patroni.yaml
+curlImage:
+  repository: curlimages/curl
+  tag: "7.87.0"
+  pullPolicy: Always
+
 # By default those secrets are randomly generated.
 # To prevent misconfiguration, modifications from helm upgrade won't be applied to those secrets.
 # As a result changing secrets cannot be done via helm and need manual intervention.
