@@ -11,7 +11,7 @@ Please see the included NOTICE for copyright information and LICENSE for a copy 
   - [Installing from the Timescale Helm Repo](#installing-from-the-timescale-helm-repo)
 - [Connecting to TimescaleDBs](#connecting-to-timescaledbs)
   - [Connecting from inside the Cluster](#connecting-from-inside-the-cluster)
-- [Create backups to S3](#create-backups-to-s3)
+- [Create backups](#create-backups)
 - [Cleanup](#cleanup)
 - [Further reading](#further-reading)
 
@@ -139,8 +139,9 @@ RELEASE=my-release
 kubectl exec -ti $(kubectl get pod -o name -l role=master,release=$RELEASE) psql
 ```
 
-## Create backups to S3
+## Create backups
 The backup is disabled by default, look at the
+
 [Administrator Guide](docs/admin-guide.md#backups) on how to configure backup location, credentials, schedules, etc.
 
 ## Cleanup

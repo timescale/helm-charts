@@ -293,6 +293,9 @@ spec:
         - mountPath: {{ template "scripts_dir" . }}
           name: timescaledb-scripts
           readOnly: true
+        - mountPath: /etc/pgbackrest_secrets
+          name: pgbackrest-secrets
+          readOnly: true
         - mountPath: "/etc/timescaledb/post_init.d"
           name: post-init
           readOnly: true
@@ -392,6 +395,9 @@ spec:
           readOnly: true
         - mountPath: {{ template "scripts_dir" . }}
           name: timescaledb-scripts
+          readOnly: true
+        - mountPath: /etc/pgbackrest_secrets
+          name: pgbackrest-secrets
           readOnly: true
         env:
           - name: PGHOST
@@ -506,6 +512,11 @@ spec:
         configMap:
           name: {{ template "timescaledb.fullname" . }}-pgbackrest
           defaultMode: 416 # 0640 permissions
+          optional: true
+      - name: pgbackrest-secrets
+        secret:
+          secretName: {{ template "timescaledb.fullname" . }}-pgbackrest-secrets
+          defaultMode: 416
           optional: true
       - name: certificate
         secret:
