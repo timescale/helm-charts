@@ -34,7 +34,8 @@ spec:
       restartPolicy: OnFailure
       containers:
       - name: {{ template "timescaledb.fullname" . }}-patch-patroni-config
-        image: curlimages/curl
+        image: "{{ .Values.curlImage.repository }}:{{ .Values.curlImage.tag }}"
+        imagePullPolicy: {{ .Values.curlImage.pullPolicy }}
         command: ["/bin/sh"]
         # Patching the Patroni configuration is good, however it should not block an upgrade from going through
         # Therefore we ensure we always exit with an exitcode 0, so that Helm is satisfied with this upgrade job
