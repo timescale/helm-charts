@@ -24,7 +24,6 @@ For more information, have a look at the [Using Helm](https://helm.sh/docs/intro
 - [Installing TimescaleDB](https://docs.timescale.com/getting-started/installation)
 - [Migrating data to TimescaleDB](https://docs.timescale.com/getting-started/migrating-data)
 - [Tutorials and sample data](https://docs.timescale.com/tutorials)
-- [Installing Promscale](https://docs.timescale.com/promscale/latest/installation/kubernetes/)
 
 # License
 
