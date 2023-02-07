@@ -1,3 +1,11 @@
+> **Warning**
+>
+> Promscale has been discontinued and is deprecated.
+>
+> The Promscale helm chart is no longer maintained.
+>
+> [Learn more](https://github.com/timescale/promscale/issues/1836).
+
 # Promscale Helm chart
 
 This directory contains a Helm chart to deploy the Promscale Connector on Kubernetes.
