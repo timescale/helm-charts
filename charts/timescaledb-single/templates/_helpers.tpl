@@ -91,15 +91,13 @@ Create the name of the service account to use.
 Generate common labels to be used
 */}}
 {{- define "timescaledb.labels" -}}
-app: {{ include "timescaledb.fullname" . }}
-chart: {{ template "timescaledb.chart" . }}
-release: {{ .Release.Name }}
-heritage: {{ .Release.Service }}
+app.kubernetes.io/name: {{ include "timescaledb.fullname" . | quote }}
 cluster-name: {{ template "clusterName" . }}
 {{- end }}
 
 {{- define "timescaledb-helm.labels" -}}
 {{ include "timescaledb.labels" . }}
-app.kubernetes.io/name: {{ include "timescaledb.fullname" . | quote }}
-app.kubernetes.io/version: {{ .Chart.Version }}
+app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+helm.sh/chart: {{ include "ethos.chart" . }}
+helm.sh/release: {{ .Release.Name | quote }}
 {{- end }}
