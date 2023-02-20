@@ -6,6 +6,24 @@
       "mimimum": 0,
       "type": "integer"
     },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "requests": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
     "service": {
       "additionalProperties": false,
       "properties": {
@@ -142,10 +160,7 @@
           ]
         },
         "resources": {
-          "type": [
-            "object",
-            "null"
-          ]
+          "$ref": "#/definitions/resources"
         }
       },
       "required": [
@@ -191,6 +206,15 @@
     "clusterName": {
       "maxLength": 30,
       "type": "string"
+    },
+    "curl": {
+      "additionalProperties": false,
+      "properties": {
+        "resources": {
+          "$ref": "#/definitions/resources"
+        }
+      },
+      "type": "object"
     },
     "curlImage": {
       "additionalProperties": false,
@@ -682,22 +706,7 @@
       "type": "integer"
     },
     "resources": {
-      "additionalProperties": false,
-      "properties": {
-        "limits": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "type": "object"
-        },
-        "requests": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "type": "object"
-        }
-      },
-      "type": "object"
+      "$ref": "#/definitions/resources"
     },
     "schedulerName": {
       "type": "string"
@@ -814,10 +823,11 @@
     "backup",
     "bootstrapFromBackup",
     "callbacks",
+    "curl",
+    "curlImage",
     "debug",
     "fullnameOverride",
     "image",
-    "curlImage",
     "networkPolicy",
     "nodeSelector",
     "patroni",

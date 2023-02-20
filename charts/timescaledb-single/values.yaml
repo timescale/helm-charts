@@ -31,6 +31,19 @@ curlImage:
   tag: "7.87.0"
   pullPolicy: Always
 
+# There are job and cronjob resources that run during updates or backups that use curl image
+# Example: https://github.com/timescale/helm-charts/blob/main/charts/timescaledb-single/templates/job-update-patroni.yaml
+curl:
+  resources: {}
+    # If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
 # By default those secrets are randomly generated.
 # To prevent misconfiguration, modifications from helm upgrade won't be applied to those secrets.
 # As a result changing secrets cannot be done via helm and need manual intervention.

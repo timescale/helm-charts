@@ -30,6 +30,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `backup.resources`                | Any resources you wish to assign to the pgbackrest container                                                       | `{}` |
 | `callbacks.configMap`             | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks). You can use templates in the name. | `nil`                         |
 | `clusterName`                     | Override the name of the PostgreSQL cluster | Equal to the Helm release name                      |
+| `curl.resources`                  | Any resources you wish to assign to the job and cronjob containers which are using the curl image | `{}` |
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)   | `[]`                                                |
 | `envFrom`                         | Extra custom environment variables, expressed as [EnvFrom](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envfromsource-v1-core) | `[]`                                                |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |

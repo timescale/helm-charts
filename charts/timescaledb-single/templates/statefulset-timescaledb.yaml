@@ -93,7 +93,7 @@ spec:
           mountPath: {{ template "scripts_dir" . }}
           readOnly: true
         resources:
-          {{ toYaml .Values.resources | nindent 10 }}
+          {{- toYaml .Values.resources | nindent 10 }}
       {{- end }}
       # Issuing the final checkpoints on a busy database may take considerable time.
       # Unfinished checkpoints will require more time during startup, so the tradeoff
@@ -318,7 +318,7 @@ spec:
           name: pgbackrest-bootstrap
           readOnly: true
         resources:
-          {{ toYaml .Values.resources | nindent 10 }}
+          {{- toYaml .Values.resources | nindent 10 }}
 
       {{- if .Values.pgBouncer.enabled }}
       - name: pgbouncer
@@ -375,7 +375,7 @@ spec:
         - containerPort: 8081
           name: pgbackrest
         resources:
-          {{ toYaml .Values.backup.resources | nindent 10 }}
+          {{- toYaml .Values.backup.resources | nindent 10 }}
         volumeMounts:
         - name: socket-directory
           mountPath: /var/run/postgresql
