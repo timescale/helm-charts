@@ -1,12 +1,13 @@
 #!/bin/sh
-# PGBACKREST_BACKUP_ENABLED variable is passed in StatefulSet template
-[ "${PGBACKREST_BACKUP_ENABLED}" = "true" ] || exit 1
 
 : "${ENV_FILE:=${HOME}/.pod_environment}"
 if [ -f "${ENV_FILE}" ]; then
 echo "Sourcing ${ENV_FILE}"
 . "${ENV_FILE}"
 fi
+
+# PGBACKREST_BACKUP_ENABLED variable is passed in StatefulSet template
+[ "${PGBACKREST_BACKUP_ENABLED}" = "true" ] || exit 1
 
 # PGDATA and WALDIR are set in the StatefulSet template and are sourced from the ENV_FILE
 # PGDATA=
