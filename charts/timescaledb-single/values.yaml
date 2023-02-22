@@ -405,6 +405,14 @@ persistentVolumes:
     #   size: 5Gi
     #   storageClass: gp2
 
+podSecurityContext:
+  # The postgres user inside the TimescaleDB image has uid=1000.
+  # This configuration ensures the permissions of the mounts are suitable
+  fsGroup: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+
 resources: {}
   # If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.

@@ -39,10 +39,6 @@ Create the name of the service account to use.
 {{- end -}}
 {{- end -}}
 
-{{- define "postgres.uid" -}}
-{{- default .Values.uid "1000" -}}
-{{- end -}}
-
 {{- define "data_directory" -}}
 {{ printf "%s/data" .Values.persistentVolumes.data.mountPath }}
 {{- end -}}

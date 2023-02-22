@@ -17,8 +17,9 @@ log() {
 # A missing PGDATA points to Patroni removing a botched PGDATA, or manual
 # intervention. In this scenario, we need to recreate the DATA and WALDIRs
 # to keep pgBackRest happy
-[ -d "${PGDATA}" ] || install -o postgres -g postgres -d -m 0700 "${PGDATA}"
-[ -d "${WALDIR}" ] || install -o postgres -g postgres -d -m 0700 "${WALDIR}"
+uid="$(id -u)"; gid="$(id -g)"
+[ -d "${PGDATA}" ] || install -o "$uid" -g "$gid" -d -m 0700 "${PGDATA}"
+[ -d "${WALDIR}" ] || install -o "$uid" -g "$gid" -d -m 0700 "${WALDIR}"
 
 if [ "${BOOTSTRAP_FROM_BACKUP}" = "1" ]; then
     log "Attempting restore from backup"
@@ -104,7 +105,11 @@ else
 
     log "Invoking initdb"
     # shellcheck disable=SC2086
-    initdb --auth-local=peer --auth-host=md5 --pgdata="${PGDATA}" --waldir="${WALDIR}" ${initdb_args}
+    initdb --username="$POSTGRES_USER" --auth-local=peer --auth-host=md5 --pgdata="${PGDATA}" --waldir="${WALDIR}" ${initdb_args}
+    EXITCODE=$?
+    if [ ${EXITCODE} -ne 0 ]; then
+        exit $EXITCODE
+    fi
 fi
 
 echo "include_if_exists = '${TSTUNE_FILE}'" >> "${PGDATA}/postgresql.conf"

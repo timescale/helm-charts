@@ -16,7 +16,8 @@ fi
 # A missing PGDATA points to Patroni removing a botched PGDATA, or manual
 # intervention. In this scenario, we need to recreate the DATA and WALDIRs
 # to keep pgBackRest happy
-[ -d "${PGDATA}" ] || install -o postgres -g postgres -d -m 0700 "${PGDATA}"
-[ -d "${WALDIR}" ] || install -o postgres -g postgres -d -m 0700 "${WALDIR}"
+uid="$(id -u)"; gid="$(id -g)"
+[ -d "${PGDATA}" ] || install -o "$uid" -g "$gid" -d -m 0700 "${PGDATA}"
+[ -d "${WALDIR}" ] || install -o "$uid" -g "$gid" -d -m 0700 "${WALDIR}"
 
 exec pgbackrest --force --delta --log-level-console=detail restore

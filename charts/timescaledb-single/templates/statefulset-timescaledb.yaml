@@ -38,12 +38,7 @@ spec:
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
-        # The postgres user inside the TimescaleDB image has uid=1000.
-        # This configuration ensures the permissions of the mounts are suitable
-        fsGroup: {{ template "postgres.uid" }}
-        runAsGroup: {{ template "postgres.uid" }}
-        runAsNonRoot: true
-        runAsUser: {{ template "postgres.uid" }}
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
       {{- if .Values.timescaledbTune.enabled }}
       - name: tstune
@@ -133,10 +128,12 @@ spec:
           - "-c"
           - |
             {{ .Values.debug.execStartPre }}
-            install -o postgres -g postgres -d -m 0700 {{ include "data_directory" . | quote }} {{ include "wal_directory" . | quote }} || exit 1
-            TABLESPACES={{ $.Values.persistentVolumes.tablespaces | default dict | keys | join " " | quote }}
-            for tablespace in {{ $.Values.persistentVolumes.tablespaces | default dict | keys | join " " }}; do
-              install -o postgres -g postgres -d -m 0700 "{{ include "tablespaces_dir" . }}/${tablespace}/data"
+            uid="$(id -u)"; gid="$(id -g)"
+            install -o "$uid" -g "$gid" -d -m 0700 {{ include "data_directory" . | quote }} {{ include "wal_directory" . | quote }} || exit 1
+
+            : "${POSTGRES_TABLESPACES:=""}"
+            for tablespace in $POSTGRES_TABLESPACES; do
+              install -o "$uid" -g "$gid" -d -m 0700 "{{ include "tablespaces_dir" . }}/${tablespace}/data"
             done
 
             # Environment variables can be read by regular users of PostgreSQL. Especially in a Kubernetes
@@ -154,7 +151,7 @@ spec:
             export -p > "${HOME}/.pod_environment"
             export -p | grep PGBACKREST > "${HOME}/.pgbackrest_environment"
 
-            for UNKNOWNVAR in $(env | awk -F '=' '!/^(PATRONI_.*|HOME|PGDATA|PGHOST|LC_.*|LANG|PATH|KUBERNETES_SERVICE_.*|AWS_ROLE_ARN|AWS_WEB_IDENTITY_TOKEN_FILE)=/ {print $1}')
+            for UNKNOWNVAR in $(env | awk -F '=' '!/^(PATRONI_.*|HOME|PGDATA|PGHOST|PGUSER|LC_.*|LANG|PATH|KUBERNETES_SERVICE_.*|AWS_ROLE_ARN|AWS_WEB_IDENTITY_TOKEN_FILE)=/ {print $1}')
             do
                 unset "${UNKNOWNVAR}"
             done
@@ -167,6 +164,11 @@ spec:
 
             export PATRONI_POSTGRESQL_PGPASS="${HOME}/.pgpass.patroni"
 
+            # "patroni" does not set the user correctly on connect to postgres and authentication will be rejected
+            # "initdb" is particular about the current user existing in "/etc/passwd"
+            # so we use "nss_wrapper" to fake that
+            . docker-entrypoint.sh && setup_nss_wrapper
+
             exec patroni /etc/timescaledb/patroni.yaml
         env:
         # We use mixed case environment variables for Patroni User management,
@@ -178,6 +180,8 @@ spec:
           value: "/etc/timescaledb/patroni.yaml"
         - name: PATRONI_admin_OPTIONS
           value: createrole,createdb
+        - name: PATRONI_SUPERUSER_USERNAME
+          value: postgres
         - name: PATRONI_REPLICATION_USERNAME
           value: standby
         # To specify the PostgreSQL and Rest API connect addresses we need
@@ -223,6 +227,10 @@ spec:
           value: "/var/run/postgresql"
         - name: WALDIR
           value: {{ include "wal_directory" . | quote }}
+        - name: PGUSER
+          value: postgres
+        - name: POSTGRES_USER
+          value: postgres
         - name: BOOTSTRAP_FROM_BACKUP
           value: {{ .Values.bootstrapFromBackup.enabled | int | quote }}
         {{- if .Values.bootstrapFromBackup.enabled }}
@@ -233,6 +241,8 @@ spec:
           value: {{ .Values.backup.enabled | quote }}
         - name: TSTUNE_FILE
           value: {{ template "tstune_config" . }}
+        - name: HOME
+          value: /home/postgres
         {{- if .Values.env }}{{ .Values.env | default list | toYaml | nindent 8 }}{{- end }}
           # pgBackRest is also called using the archive_command if the backup is enabled.
           # this script will also need access to the environment variables specified for
@@ -304,6 +314,8 @@ spec:
         - mountPath: /etc/certificate
           name: certificate
           readOnly: true
+        - name: home
+          mountPath: /home/postgres
         - name: socket-directory
           mountPath: /var/run/postgresql
         {{ if .Values.callbacks.configMap -}}
@@ -473,6 +485,8 @@ spec:
         {{- .Values.affinity | toYaml | nindent 8 }}
       {{- end }}
       volumes:
+      - name: home
+        emptyDir: {}
       - name: socket-directory
         emptyDir: {}
       - name: patroni-config
