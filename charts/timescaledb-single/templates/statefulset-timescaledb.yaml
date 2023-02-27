@@ -361,6 +361,8 @@ spec:
         - -i
         - /usr/sbin/pgbouncer
         - /etc/pgbouncer/pgbouncer-sidecar.ini
+        resources:
+          {{- toYaml .Values.pgBouncer.resources | nindent 10 }}
       {{- end }}
 
       {{- if or .Values.backup.enabled .Values.backup.enable }}
@@ -451,6 +453,8 @@ spec:
         {{- if .Values.prometheus.env }}
         {{ .Values.prometheus.env | default list | toYaml | nindent 8 }}
         {{- end }}
+        resources:
+          {{- toYaml .Values.prometheus.resources | nindent 10 }}
       {{- end }}
 
     {{- with .Values.nodeSelector }}

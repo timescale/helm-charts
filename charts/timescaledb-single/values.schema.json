@@ -565,6 +565,9 @@
           ],
           "type": "integer"
         },
+        "resources": {
+          "$ref": "#/definitions/resources"
+        },
         "userListSecretName": {
           "description": "A pointer to a SecretName containing user/password pairs in the format expected by pgbouncer\nhttps://www.pgbouncer.org/config.html#authentication-file-format\n",
           "type": [
@@ -640,6 +643,9 @@
         },
         "image": {
           "type": "object"
+        },
+        "resources": {
+          "$ref": "#/definitions/resources"
         },
         "volumeMounts": {
           "items": {
