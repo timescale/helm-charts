@@ -100,6 +100,23 @@ entries:
     version: 0.13.0
   - apiVersion: v1
     created: "2022-06-08T15:13:16.10699266+02:00"
+    created: "2023-03-06T10:39:15.806182-06:00"
+    description: TimescaleDB HA Deployment.
+    digest: 49d8d607a52b9c9481ed969b96023197bca0427a1806387bdc8fc6dd3167a37d
+    home: https://github.com/timescale/timescaledb-kubernetes
+    maintainers:
+    - email: support@timescale.com
+      name: TimescaleDB
+    name: timescaledb-single
+    sources:
+    - https://github.com/timescale/timescaledb-kubernetes
+    - https://github.com/timescale/timescaledb-docker-ha
+    - https://github.com/zalando/patroni
+    urls:
+    - timescaledb-single-0.12.1.tgz
+    version: 0.12.1
+  - apiVersion: v1
+    created: "2023-03-06T10:39:15.804568-06:00"
     description: TimescaleDB HA Deployment.
     digest: bdf5be184cbcbc3072ef5eac692ba995bd2bc0d4682e639edd88246e943e90aa
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -131,7 +148,39 @@ entries:
     - timescaledb-single-0.11.0.tgz
     version: 0.11.0
   - apiVersion: v1
-    created: "2022-06-08T15:13:16.096268006+02:00"
+    created: "2023-03-02T10:35:36.166437-06:00"
+    description: TimescaleDB HA Deployment.
+    digest: 1380c55005e22eaae6a898bd8f1182c9fb01282b36c93a20542d6905452ee958
+    home: https://github.com/timescale/timescaledb-kubernetes
+    maintainers:
+    - email: support@timescale.com
+      name: TimescaleDB
+    name: timescaledb-single
+    sources:
+    - https://github.com/timescale/timescaledb-kubernetes
+    - https://github.com/timescale/timescaledb-docker-ha
+    - https://github.com/zalando/patroni
+    urls:
+    - timescaledb-single-0.10.2.tgz
+    version: 0.10.2
+  - apiVersion: v1
+    created: "2023-03-06T10:39:15.801033-06:00"
+    description: TimescaleDB HA Deployment.
+    digest: 04a3b3b7da6c2cfaa3795fe69a8341d7599e1b5473273d7017da0940b6dd8872
+    home: https://github.com/timescale/timescaledb-kubernetes
+    maintainers:
+    - email: support@timescale.com
+      name: TimescaleDB
+    name: timescaledb-single
+    sources:
+    - https://github.com/timescale/timescaledb-kubernetes
+    - https://github.com/timescale/timescaledb-docker-ha
+    - https://github.com/zalando/patroni
+    urls:
+    - timescaledb-single-0.10.1.tgz
+    version: 0.10.1
+  - apiVersion: v1
+    created: "2023-03-06T10:39:15.799443-06:00"
     description: TimescaleDB HA Deployment.
     digest: 43583cf0bbce0986328f51633d3a53ec0e5927b288f386f52082e5cdab1e5092
     home: https://github.com/timescale/timescaledb-kubernetes
