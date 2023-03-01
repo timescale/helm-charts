@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   timescaledb-multinode:
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.118859-05:00"
+    created: "2023-03-01T10:15:42.610336-06:00"
     description: TimescaleDB Multinode Deployment.
     digest: 101d72220765f49e6b081c134c1f793bbe90d7f67a4f4c36c794be989e34623d
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -18,7 +18,7 @@ entries:
     - timescaledb-multinode-0.8.0.tgz
     version: 0.8.0
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.115955-05:00"
+    created: "2023-03-01T10:15:42.609933-06:00"
     description: TimescaleDB Multinode Deployment.
     digest: db2bea7290cd265835e11859a39e72562c7e21f1a90df0401e14e05d7adea1d6
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -34,7 +34,7 @@ entries:
     - timescaledb-multinode-0.7.0.tgz
     version: 0.7.0
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.114537-05:00"
+    created: "2023-03-01T10:15:42.609531-06:00"
     description: TimescaleDB Multinode Deployment.
     digest: d537d361eb0f72bce12d8e4f993dbc980f7850a22bb1a7bcd8825a7a4a00d38f
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -50,7 +50,7 @@ entries:
     - timescaledb-multinode-0.6.3.tgz
     version: 0.6.3
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.112828-05:00"
+    created: "2023-03-01T10:15:42.609101-06:00"
     description: TimescaleDB Multinode Deployment.
     digest: a6c664a75489e069cdd2d36dff87ca6d2b3a38a3edf16de4234418b354e40eea
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -67,7 +67,23 @@ entries:
     version: 0.3.0
   timescaledb-single:
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.12348-05:00"
+    created: "2023-03-01T10:15:42.613428-06:00"
+    description: TimescaleDB HA Deployment.
+    digest: 04a3b3b7da6c2cfaa3795fe69a8341d7599e1b5473273d7017da0940b6dd8872
+    home: https://github.com/timescale/timescaledb-kubernetes
+    maintainers:
+    - email: support@timescale.com
+      name: TimescaleDB
+    name: timescaledb-single
+    sources:
+    - https://github.com/timescale/timescaledb-kubernetes
+    - https://github.com/timescale/timescaledb-docker-ha
+    - https://github.com/zalando/patroni
+    urls:
+    - timescaledb-single-0.10.1.tgz
+    version: 0.10.1
+  - apiVersion: v1
+    created: "2023-03-01T10:15:42.611888-06:00"
     description: TimescaleDB HA Deployment.
     digest: 43583cf0bbce0986328f51633d3a53ec0e5927b288f386f52082e5cdab1e5092
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -83,7 +99,7 @@ entries:
     - timescaledb-single-0.10.0.tgz
     version: 0.10.0
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.17999-05:00"
+    created: "2023-03-01T10:15:42.638313-06:00"
     description: TimescaleDB HA Deployment.
     digest: 8bb26c938538e767a0da086f7535e1b81fa03af292becf44d406d7a8d8da9321
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -99,7 +115,7 @@ entries:
     - timescaledb-single-0.9.0.tgz
     version: 0.9.0
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.176664-05:00"
+    created: "2023-03-01T10:15:42.636748-06:00"
     description: TimescaleDB HA Deployment.
     digest: a976fc399539e012942a3e55dce1d735c5c36bb4678e57a66ac7d280c8bfceb9
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -115,7 +131,7 @@ entries:
     - timescaledb-single-0.8.2.tgz
     version: 0.8.2
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.173958-05:00"
+    created: "2023-03-01T10:15:42.635158-06:00"
     description: TimescaleDB HA Deployment.
     digest: d047ac65b447b75f748c6fe94cec7ed208e91c20b42eb912baa7aa4f4131518c
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -131,7 +147,7 @@ entries:
     - timescaledb-single-0.8.1.tgz
     version: 0.8.1
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.170694-05:00"
+    created: "2023-03-01T10:15:42.632819-06:00"
     description: TimescaleDB HA Deployment.
     digest: 63a9d362ea53efbe6103b8fd0cf07400aa2ccb090740eda213f862d588320c79
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -147,7 +163,7 @@ entries:
     - timescaledb-single-0.8.0.tgz
     version: 0.8.0
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.166486-05:00"
+    created: "2023-03-01T10:15:42.631265-06:00"
     description: TimescaleDB HA Deployment.
     digest: 1948357489eff42eb81bcb59a465615e20b791dc54178d1bbaf1a650b7f46de1
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -163,7 +179,7 @@ entries:
     - timescaledb-single-0.7.1.tgz
     version: 0.7.1
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.163522-05:00"
+    created: "2023-03-01T10:15:42.629844-06:00"
     description: TimescaleDB HA Deployment.
     digest: 39e270f51713dd0f2be64c8a80d747bc1e78173fd3e2c6172ff993f9a7dacd1b
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -179,7 +195,7 @@ entries:
     - timescaledb-single-0.7.0.tgz
     version: 0.7.0
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.160372-05:00"
+    created: "2023-03-01T10:15:42.628508-06:00"
     description: TimescaleDB HA Deployment.
     digest: 463bf4eca84cbefbd2e4a88928fe1ccc59a69fb95a4952ce15ca746adb479a29
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -195,7 +211,7 @@ entries:
     - timescaledb-single-0.6.2.tgz
     version: 0.6.2
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.157035-05:00"
+    created: "2023-03-01T10:15:42.627234-06:00"
     description: TimescaleDB HA Deployment.
     digest: 8ad82438d3fc818e6729afa77607521b7510b68fa4e0b4e7d0836f33990f0a63
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -211,7 +227,7 @@ entries:
     - timescaledb-single-0.6.1.tgz
     version: 0.6.1
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.153536-05:00"
+    created: "2023-03-01T10:15:42.625631-06:00"
     description: TimescaleDB HA Deployment.
     digest: b1c985faf6852aea91e6931230d19656f126fb7eabff004e92ffa2fb411cfbe2
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -227,7 +243,7 @@ entries:
     - timescaledb-single-0.6.0.tgz
     version: 0.6.0
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.150318-05:00"
+    created: "2023-03-01T10:15:42.624399-06:00"
     description: TimescaleDB HA Deployment.
     digest: 977ccd3dfe52e84a18e9ecf8c4138a937621910f743071fff58b497c357afb7c
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -243,7 +259,7 @@ entries:
     - timescaledb-single-0.5.8.tgz
     version: 0.5.8
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.147058-05:00"
+    created: "2023-03-01T10:15:42.623211-06:00"
     description: TimescaleDB HA Deployment.
     digest: 069c515c7055289ecf8189962e648e033053e8e7bdb47c39f9ec058e99911183
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -259,7 +275,7 @@ entries:
     - timescaledb-single-0.5.7.tgz
     version: 0.5.7
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.144339-05:00"
+    created: "2023-03-01T10:15:42.622052-06:00"
     description: TimescaleDB HA Deployment.
     digest: f0c9b30a4bf3d3e9c221efa37946bef05bad7fe79eb1808a7c8088c2d24e1075
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -275,7 +291,7 @@ entries:
     - timescaledb-single-0.5.6.tgz
     version: 0.5.6
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.14137-05:00"
+    created: "2023-03-01T10:15:42.620133-06:00"
     description: TimescaleDB HA Deployment.
     digest: 27098601d61f727ac71c2bfb67a1240c99188fc56ab4d0a0375cf5abc09547dc
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -291,7 +307,7 @@ entries:
     - timescaledb-single-0.5.5.tgz
     version: 0.5.5
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.137514-05:00"
+    created: "2023-03-01T10:15:42.619079-06:00"
     description: TimescaleDB HA Deployment.
     digest: 5bd289b789c7fae00b98ae9d1ce0b86e6b8463fbe4fbdaf20d59b60aca137580
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -307,7 +323,7 @@ entries:
     - timescaledb-single-0.5.4.tgz
     version: 0.5.4
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.134758-05:00"
+    created: "2023-03-01T10:15:42.618117-06:00"
     description: TimescaleDB HA Deployment.
     digest: 6cd19bcb822c9610ad13fbe49b03c3bd9d5f4655920b44e41f937487ecf86d9d
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -323,7 +339,7 @@ entries:
     - timescaledb-single-0.5.3.tgz
     version: 0.5.3
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.132618-05:00"
+    created: "2023-03-01T10:15:42.617291-06:00"
     description: TimescaleDB HA Deployment.
     digest: 9e2570426e0445a2e4f079fe757bbaadbc95a764c12ce10903f426d3b69cfde9
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -339,7 +355,7 @@ entries:
     - timescaledb-single-0.5.2.tgz
     version: 0.5.2
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.130223-05:00"
+    created: "2023-03-01T10:15:42.616459-06:00"
     description: TimescaleDB HA Deployment.
     digest: 128a7f0738f176a2abe6b7e1c3a1173ac6c4a77f7816704add3f0664609915aa
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -355,7 +371,7 @@ entries:
     - timescaledb-single-0.5.1.tgz
     version: 0.5.1
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.127878-05:00"
+    created: "2023-03-01T10:15:42.615634-06:00"
     description: TimescaleDB HA Deployment.
     digest: f4e0e05c989f04c78d9bd0a5b7ab2c6e1d2227af72ad05f7451a3e01b462bba0
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -371,7 +387,7 @@ entries:
     - timescaledb-single-0.5.0.tgz
     version: 0.5.0
   - apiVersion: v1
-    created: "2021-09-29T10:57:30.125622-05:00"
+    created: "2023-03-01T10:15:42.614777-06:00"
     description: TimescaleDB HA Deployment.
     digest: 2ae9d4a4ba25caf626e837244bf092721439e822d486f2c17f238b479012dedb
     home: https://github.com/timescale/timescaledb-kubernetes
@@ -386,4 +402,4 @@ entries:
     urls:
     - timescaledb-single-0.4.0.tgz
     version: 0.4.0
-generated: "2021-09-29T10:57:30.110499-05:00"
+generated: "2023-03-01T10:15:42.608302-06:00"
