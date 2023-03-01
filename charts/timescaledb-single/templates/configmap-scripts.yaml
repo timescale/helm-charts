@@ -454,4 +454,5 @@ data:
         SELECT 'We are a primary: Successfully invoked checkpoints, now issuing a switchover.';
         \! curl -s http://localhost:8008/switchover -XPOST -d '{"leader": "$(hostname)"}'
     \endif
-...
+    -- If running with a linkerd-proxy, call /shutdown.
+    \! curl -m 10 --retry 3 -X POST http://localhost:4191/shutdown || /bin/true
