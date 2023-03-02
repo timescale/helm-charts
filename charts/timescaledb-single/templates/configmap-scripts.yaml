@@ -451,8 +451,20 @@ data:
     \if :in_recovery
         SELECT 'We are a replica: Successfully invoked checkpoints at the primary and locally.';
     \else
-        SELECT 'We are a primary: Successfully invoked checkpoints, now issuing a switchover.';
-        \! curl -s http://localhost:8008/switchover -XPOST -d '{"leader": "$(hostname)"}'
+        SELECT 'We are a primary: Successfully invoked checkpoints.';
     \endif
-    -- If running with a linkerd-proxy, call /shutdown.
-    \! curl -m 10 --retry 3 -X POST http://localhost:4191/shutdown || /bin/true
+  lifecycle_preStop.sh: |
+    #!/bin/bash
+
+    # Issue checkpoints before shutdown.
+    isInRecovery=`psql -Atc 'select pg_is_in_recovery();'` # A decent indicator if we are primary.
+    psql -X --file "{{ template "scripts_dir" . }}/lifecycle_preStop.psql"
+    if [ "${isInRecovery}" = 'f' ]; then
+      echo "We are primary: now issuing a switchover."
+      curl -s http://localhost:8008/switchover -XPOST -d "{\"leader\": \"$(hostname)\"}"
+    fi
+
+    # If running with a linkerd-proxy, call /shutdown.
+    echo "Calling /shutdown on linkerd proxy."
+    curl -s -m 5 -X POST http://localhost:4191/shutdown
+    echo "Finished calling /shutdown on linkerd proxy."
