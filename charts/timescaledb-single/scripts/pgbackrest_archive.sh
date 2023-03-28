@@ -17,6 +17,7 @@ if [ -f "${ENV_FILE}" ]; then
     . "${ENV_FILE}"
 fi
 
+
 # PGBACKREST_BACKUP_ENABLED variable is passed in StatefulSet template
 [ "${PGBACKREST_BACKUP_ENABLED}" = "true" ] || exit 0
 
