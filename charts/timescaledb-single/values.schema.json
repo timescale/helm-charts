@@ -590,6 +590,10 @@
         "null"
       ]
     },
+    "priorityClass": {
+      "maxLength": 63,
+      "type": "string"
+    },
     "prometheus": {
       "additionalProperties": false,
       "properties": {
