@@ -10,18 +10,6 @@ on:
     - cron: '13 2 * * MON' # Run every Monday at 2:13 UTC
 
 jobs:
-  assign_issue:
-    runs-on: ubuntu-latest
-    name: Assign Issue to a Project
-    if: github.event_name == 'issues' || github.event_name == 'pull_request_target'
-    steps:
-    - name: Assign NEW issues/PRs to project O11y Applications
-      uses: actions/add-to-project@main
-      with:
-        project-url: 'https://github.com/orgs/timescale/projects/54'
-        # github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-        github-token: ${{ secrets.ORG_PROJECT_PAT }}
-
   stale-issues-handler:
     runs-on: ubuntu-latest
     steps:

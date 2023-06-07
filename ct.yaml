@@ -5,7 +5,11 @@
 remote: origin
 target-branch: main
 chart-dirs:
-- charts
+  - charts/avalanche
+  - charts/parca-agent
+  - charts/parca-server
+  - charts/timescaledb-single
+
 chart-repos: []
 # Some of tests require longer than default timeout
 helm-extra-args: --timeout 15m --debug
