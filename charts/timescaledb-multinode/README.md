@@ -2,7 +2,7 @@
 This file and its contents are licensed under the Apache License 2.0.
 Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 -->
-
+## DEPRECATED
 # Call for Maintainers
 
 This Helm chart will no longer maintained by the Timescale team going forward.
