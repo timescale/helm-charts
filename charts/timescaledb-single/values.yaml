@@ -1,11 +1,11 @@
 # This file and its contents are licensed under the Apache License 2.0.
 # Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 
-replicaCount: 3
+replicaCount: 2
 
 # To prevent very long names, we override the name, otherwise it would default to
 # timescaledb-single (the name of the chart). This field is always truncated to 63 characters.
-fullnameOverride: "{{ .Release.Name }}"
+fullnameOverride: timescaledb
 
 # The default Patroni name of the cluster ("scope") is derived from the name of the release,
 # but you can override this behaviour here
@@ -20,7 +20,7 @@ image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescale/timescaledb-ha
-  tag: pg14.6-ts2.9.1-p1
+  tag: pg14.9-ts2.11.2-all
   pullPolicy: Always
 
 # There are job and cronjob resources that run during updates or backups that use curl image
@@ -288,8 +288,8 @@ patroni:
     pg_hba:
     - local     all             postgres                              peer
     - local     all             all                                   md5
-    - hostnossl all,replication all                all                reject
-    - hostssl   all             all                127.0.0.1/32       md5
+    - hostnossl all,replication all                0.0.0.0/0          md5
+    - hostnossl all             all                127.0.0.1/32       md5
     - hostssl   all             all                ::1/128            md5
     - hostssl   replication     standby            all                md5
     - hostssl   all             all                all                md5
@@ -318,15 +318,17 @@ postInit:
 service:
   primary:
     # One of (ClusterIP | LoadBalancer | NodePort). Headless services are not supported.
-    type: ClusterIP
+    type: LoadBalancer
     # The port used by the service.
     port: 5432
     # Optional NodePort, only used for type `NodePort`.
-    nodePort: null
+    nodePort: 5432
     # Additional labels to be added to the Service.
     labels: {}
     # Additional annotations to be added to the Service.
-    annotations: {}
+    annotations:
+      cloud.google.com/neg: '{"ingress":true}'
+      cloud.google.com/load-balancer-type: "Internal"
     # Define extra fields to be interpolated into the Service spec.
     #
     # This allows for adding support for new features and functionality which may not yet
@@ -341,7 +343,7 @@ service:
     # The port used by the service.
     port: 5432
     # Optional NodePort, only used for type `NodePort`.
-    nodePort: null
+    nodePort: 5432
     # Additional labels to be added to the Service.
     labels: {}
     # Additional annotations to be added to the Service.
@@ -356,10 +358,10 @@ service:
 
 readinessProbe:
   enabled: true
-  initialDelaySeconds: 5
-  periodSeconds: 30
-  timeoutSeconds: 5
-  failureThreshold: 6
+  initialDelaySeconds: 4
+  periodSeconds: 5
+  timeoutSeconds: 4
+  failureThreshold: 3
   successThreshold: 1
 
 persistentVolumes:
@@ -369,7 +371,7 @@ persistentVolumes:
   # https://www.postgresql.org/docs/current/creating-cluster.html#CREATING-CLUSTER-MOUNT-POINTS
   data:
     enabled: true
-    size: 2Gi
+    size: 10Gi
     ## database data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -387,7 +389,7 @@ persistentVolumes:
   # volume for the WAL files should just work for new pods.
   wal:
     enabled: true
-    size: 1Gi
+    size: 10Gi
     subPath: ""
     storageClass:
     # When changing this mountPath ensure you also change the following key to reflect this:
@@ -405,15 +407,15 @@ persistentVolumes:
     #   size: 5Gi
     #   storageClass: gp2
 
-resources: {}
+resources:
   # If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+   limits:
+     cpu: 200m
+     memory: 2Gi
+   requests:
+     cpu: 100m
+     memory: 1Gi
 
 sharedMemory:
   # By default Kubernetes only provides 64MB to /dev/shm
@@ -497,12 +499,13 @@ networkPolicy:
   #       port: 11111
 
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-nodeSelector: {}
+nodeSelector:
+  nodetype: timescaledb
 
 # Prometheus exporter for PostgreSQL server metrics.
 # https://github.com/prometheus-community/postgres_exporter
 prometheus:
-  enabled: false
+  enabled: true
   image:
     repository: quay.io/prometheuscommunity/postgres-exporter
     tag: v0.11.1
@@ -540,14 +543,15 @@ prometheus:
 
 podMonitor:
   # Specifies whether PodMonitor for Prometheus operator should be created
-  enabled: false
+  enabled: true
   path: /metrics
   interval: 10s
   # scrapeTimeout: 30s
   # Specifies namespace, where PodMonitor should be installed
-  # namespace: monitoring
-  # labels:
-  #   release: prometheus
+  namespace: monitoring
+  matchlabel: prometheus-grafana
+  labels:
+    release: kube-prometheus
   # honorLabels: true
   # metricRelabelings: []
   # podTargetLabels:
