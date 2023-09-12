@@ -1,0 +1,53 @@
+# This file and its contents are licensed under the Apache License 2.0.
+# Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "clusterName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    role: master
+{{ include "timescaledb-helm.labels" . | indent 4 }}
+    app.kubernetes.io/component: timescaledb
+{{- if .Values.service.primary.labels }}
+{{ .Values.service.primary.labels | toYaml | indent 4 }}
+{{- end }}
+{{- if and .Values.loadBalancer.enabled .Values.loadBalancer.annotations }}
+  annotations:
+{{ .Values.loadBalancer.annotations | toYaml | indent 4 }}
+{{- else if .Values.service.primary.annotations }}
+  annotations:
+{{ .Values.service.primary.annotations | toYaml | indent 4 }}
+{{- end }}
+spec:
+{{- if .Values.loadBalancer.enabled }}
+  type: LoadBalancer
+{{- else }}
+  type: {{ .Values.service.primary.type }}
+{{- end }}
+  ports:
+{{- if .Values.pgBouncer.enabled }}
+  - name: pgbouncer
+    port: {{ .Values.pgBouncer.port }}
+    targetPort: pgbouncer
+    protocol: TCP
+{{- end }}
+  - name: postgresql
+    # This always defaults to 5432, even if `!loadBalancer.enabled`.
+    port: {{ if .Values.loadBalancer.enabled }}
+      {{- .Values.loadBalancer.port }}
+    {{- else }}
+      {{- .Values.service.primary.port }}
+    {{- end }}
+    targetPort: postgresql
+    protocol: TCP
+    {{- if and (and (not .Values.loadBalancer.enabled) (eq .Values.service.primary.type "NodePort")) .Values.service.primary.nodePort }}
+    # Enabled if `!.Values.loadBalancer.enabled` and `.Values.service.primary.type == "NodePort"` and `.Values.service.primary.nodePort != nil`
+    nodePort: {{ .Values.service.primary.nodePort }}
+    {{- end }}
+{{- if and .Values.loadBalancer.enabled .Values.loadBalancer.spec }}
+{{ .Values.loadBalancer.spec | toYaml | indent 2 }}
+{{- else if .Values.service.primary.spec }}
+{{ .Values.service.primary.spec | toYaml | indent 2 }}
+{{- end }}
