@@ -146,6 +146,8 @@ For example:
     PGBACKREST_REPO1_S3_KEY_SECRET: <base64 encoded examplesecret+D48GXfDdtlnlSdmB>
   ```
 
+These values must be duplicated in the `backup.pgBackRest: {}` section regardless if `backup.enabled=true` otherwise the configuration at `/etc/pgbackrest/pgbackrest.conf` will not be able to bootstrap from backup.
+
 Another example, if you want to include encryption of your backups by pgBackRest, is to include these parameters:
 
 ```yaml
