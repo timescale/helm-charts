@@ -147,6 +147,27 @@ backup:
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
+  # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  #  tolerations:
+  #    - key: node-group
+  #      operator: Equal
+  #      value: spot-job
+  tolerations: []
+  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  #  affinity:
+  #    nodeAffinity:
+  #      requiredDuringSchedulingIgnoredDuringExecution:
+  #        nodeSelectorTerms:
+  #          - matchExpressions:
+  #              - key: node-group
+  #                operator: In
+  #                values:
+  #                  - spot-job
+  affinity: {}
+  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+  #  nodeSelector:
+  #    node-group: spot-job
+  nodeSelector: {}
 
 # When creating a *new* deployment, the default is to initialize (using initdb) the database.
 # If however, you want to initialize the database using an existing backup, you can do so by
