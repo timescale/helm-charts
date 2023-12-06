@@ -597,3 +597,11 @@ debug:
   # This command will be executed *before* the main container starts. In the
   # example below, we can mimick a slow restore by sleeping for 5 minutes before starting
   execStartPre:  # sleep 300
+
+# Support for specific use cases when deploying with the linkerd service mesh.
+linkerd:
+  enabled: false
+  # As part of the statefulset pod's `lifecycle.preStop`, call the local linkerd sidecar
+  # to cleanly terminate the proxy. If this is not performed, then the proxy will remain
+  # alive unnecessarily, blocking pod termination for a period of time.
+  terminateAfterCheckpoint: true

@@ -113,6 +113,7 @@ spec:
               command:
               - psql
               - -X
+              - --set=linkerdShutdown="{{ if and .Values.linkerd.enabled .Values.linkerd.terminateAfterCheckpoint }}1{{else}}0{{end}}"
               - --file
               - "{{ template "scripts_dir" . }}/lifecycle_preStop.sql"
         # When reusing an already existing volume it sometimes happens that the permissions

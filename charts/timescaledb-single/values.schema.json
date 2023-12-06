@@ -226,6 +226,22 @@
       },
       "type": "object"
     },
+    "linkerd": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": [
+            "boolean"
+          ]
+        },
+        "terminateAfterCheckpoint": {
+          "type": [
+            "boolean"
+          ]
+        }
+      },
+      "type": "object"
+    },
     "enabled": {
       "additionalProperties": true
     },
@@ -818,6 +834,7 @@
     "fullnameOverride",
     "image",
     "curlImage",
+    "linkerd",
     "networkPolicy",
     "nodeSelector",
     "patroni",

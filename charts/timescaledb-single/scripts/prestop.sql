@@ -60,3 +60,7 @@ CHECKPOINT;
     SELECT 'We are a primary: Successfully invoked checkpoints, now issuing a switchover.';
     \! curl -s http://localhost:8008/switchover -XPOST -d '{"leader": "$(hostname)"}'
 \endif
+
+\if :linkerdShutdown
+    \! curl -s -m 5 -X POST http://localhost:4191/shutdown
+\endif
