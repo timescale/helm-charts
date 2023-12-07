@@ -229,12 +229,7 @@
     "linkerd": {
       "additionalProperties": false,
       "properties": {
-        "enabled": {
-          "type": [
-            "boolean"
-          ]
-        },
-        "terminateAfterCheckpoint": {
+        "adminShutdownOnExit": {
           "type": [
             "boolean"
           ]

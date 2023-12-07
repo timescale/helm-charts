@@ -113,7 +113,6 @@ spec:
               command:
               - psql
               - -X
-              - --set=linkerdShutdown="{{ if and .Values.linkerd.enabled .Values.linkerd.terminateAfterCheckpoint }}1{{else}}0{{end}}"
               - --file
               - "{{ template "scripts_dir" . }}/lifecycle_preStop.sql"
         # When reusing an already existing volume it sometimes happens that the permissions
@@ -168,7 +167,16 @@ spec:
 
             export PATRONI_POSTGRESQL_PGPASS="${HOME}/.pgpass.patroni"
 
-            exec patroni /etc/timescaledb/patroni.yaml
+            patroni /etc/timescaledb/patroni.yaml
+            rcode=$?
+
+            {{- if .Values.linkerd.adminShutdownOnExit }}
+            # Once Patroni exits, when running with a linkerd-proxy sidecar, we call linkerd-proxy shutdown.
+            curl -s -m 5 -X POST http://localhost:4191/shutdown
+            {{- end }}
+
+            # Ensure we exit with the code which was returned by Patroni.
+            exit $rcode
         env:
         # We use mixed case environment variables for Patroni User management,
         # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.

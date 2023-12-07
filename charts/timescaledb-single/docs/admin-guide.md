@@ -36,8 +36,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `image.repository`                | The image to pull                           | `timescale/timescaledb-ha`                       |
 | `image.tag`                       | The version of the image to pull            | `pg13-ts2.1-latest`
-| `linkerd.enabled`                 | Enabled limited linkerd support.            | `false`
-| `linkerd.shutdownAfterCheckpoint` | When `true`, configures the StatefulSet Pod's `lifecycle.preStop` to issue a shutdown call to the local linkerd-proxy sidecar after checkpointing is complete. | `false`
+| `linkerd.adminShutdownOnExit`     | If `true`, then the main TimescaleDB container will be configured to call the local linkerd-proxy sidecar container's `/shutdown` endpoint as soon as Patroni exits. | `false` |
 | `service.primary.type`        | The service type to use for the primary service | `ClusterIP`                          |
 | `service.primary.port`        | The service port to use for the primary service | `5432`                               |
 | `service.primary.nodePort`    | The service nodePort to use for the primary service when `type` is `NodePort` | `null` |

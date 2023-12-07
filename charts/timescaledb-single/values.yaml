@@ -600,8 +600,6 @@ debug:
 
 # Support for specific use cases when deploying with the linkerd service mesh.
 linkerd:
-  enabled: false
-  # As part of the statefulset pod's `lifecycle.preStop`, call the local linkerd sidecar
-  # to cleanly terminate the proxy. If this is not performed, then the proxy will remain
-  # alive unnecessarily, blocking pod termination for a period of time.
-  terminateAfterCheckpoint: true
+  # If true, then the main TimescaleDB container will be configured to call the local
+  # linkerd-proxy sidecar container's /shutdown endpoint as soon as Patroni exits.
+  adminShutdownOnExit: false

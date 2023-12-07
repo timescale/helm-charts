@@ -437,9 +437,7 @@ properties:
     type: object
     additionalProperties: false
     properties:
-      enabled:
-        type: boolean
-      terminateAfterCheckpoint:
+      adminShutdownOnExit:
         type: boolean
   env:
     type:
