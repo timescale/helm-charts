@@ -102,6 +102,25 @@ spec:
       # we can still serve clients.
       terminationGracePeriodSeconds: 600
       containers:
+      {{- if .Values.linkerd.adminShutdownOnExit }}
+      - name: linkerd-shutdown
+        securityContext:
+          allowPrivilegeEscalation: false
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+          - /bin/bash
+          - "-c"
+          - |
+            while true; do
+              ret=`curl -s -m -X GET http://localhost:8008/liveness`
+              if [ $ret != 0 ]; break; fi
+              sleep 10
+            done
+
+            # Once Patroni exits, when running with a linkerd-proxy sidecar, we call linkerd-proxy shutdown.
+            curl -s -m 5 -X POST http://localhost:4191/shutdown
+      {{- end }}
       - name: timescaledb
         securityContext:
           allowPrivilegeEscalation: false
@@ -167,16 +186,7 @@ spec:
 
             export PATRONI_POSTGRESQL_PGPASS="${HOME}/.pgpass.patroni"
 
-            patroni /etc/timescaledb/patroni.yaml
-            rcode=$?
-
-            {{- if .Values.linkerd.adminShutdownOnExit }}
-            # Once Patroni exits, when running with a linkerd-proxy sidecar, we call linkerd-proxy shutdown.
-            curl -s -m 5 -X POST http://localhost:4191/shutdown
-            {{- end }}
-
-            # Ensure we exit with the code which was returned by Patroni.
-            exit $rcode
+            exec patroni /etc/timescaledb/patroni.yaml
         env:
         # We use mixed case environment variables for Patroni User management,
         # as the variable themselves are documented to be PATRONI_<username>_OPTIONS.
