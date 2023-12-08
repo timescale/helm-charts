@@ -362,14 +362,6 @@ readinessProbe:
   failureThreshold: 6
   successThreshold: 1
 
-livenessProbe:
-  enabled: false
-  initialDelaySeconds: 15
-  periodSeconds: 10
-  timeoutSeconds: 10
-  failureThreshold: 1
-  successThreshold: 1
-
 persistentVolumes:
   # For sanity reasons, the actual PGDATA and wal directory will be subdirectories of the Volume mounts,
   # this allows Patroni/a human/an automated operator to move directories during bootstrap, which cannot

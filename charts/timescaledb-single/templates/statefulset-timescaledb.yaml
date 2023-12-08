@@ -102,6 +102,21 @@ spec:
       # we can still serve clients.
       terminationGracePeriodSeconds: 600
       containers:
+      {{- if .Values.linkerd.adminShutdownOnExit }}
+      - name: linkerd-shutdown
+        securityContext:
+          allowPrivilegeEscalation: false
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+          - "{{ template "scripts_dir" . }}/sidecar_events_monitor.sh"
+          - "{{ $.Release.Namespace }}"
+          - "timescaledb"
+        volumeMounts:
+        - mountPath: {{ template "scripts_dir" . }}
+          name: timescaledb-scripts
+          readOnly: true
+      {{- end }}
       - name: timescaledb
         securityContext:
           allowPrivilegeEscalation: false
@@ -270,18 +285,6 @@ spec:
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-        {{- end }}
-        {{- if .Values.livenessProbe.enabled }}
-        livenessProbe:
-          exec:
-            command:
-              - "{{ template "scripts_dir" . }}/liveness_probe.sh"
-              - "{{ if .Values.linkerd.adminShutdownOnExit }}1{{else}}0{{end}}"
-          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
-          successThreshold: {{ .Values.livenessProbe.successThreshold }}
-          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
         {{- end }}
         volumeMounts:
         - name: storage-volume

@@ -44,4 +44,12 @@ rules:
   - patch
   - update
   - watch
+{{- if .Values.linkerd.adminShutdownOnExit }}
+- apiGroups: [""]
+  resources: ["events"]
+  verbs:
+  - get
+  - list
+  - watch
+{{- end }}
 {{- end }}
