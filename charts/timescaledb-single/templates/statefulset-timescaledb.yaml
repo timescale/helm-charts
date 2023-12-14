@@ -107,6 +107,10 @@ spec:
           allowPrivilegeEscalation: false
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- with .Values.image.pullSecret }}
+        imagePullSecrets:
+        - name: {{ . }}
+        {{- end }}
         lifecycle:
           preStop:
             exec:
