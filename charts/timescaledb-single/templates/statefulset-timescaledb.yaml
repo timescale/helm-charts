@@ -317,6 +317,8 @@ spec:
         - mountPath: /etc/pgbackrest/bootstrap
           name: pgbackrest-bootstrap
           readOnly: true
+        - mountPath: {{ index .Values.backup.pgBackRest "repo1-path" | default (printf "/%s/%s/" .Release.Namespace (include "clusterName" .)) | quote }}
+          name: pgbackrest-repo1-path
         resources:
           {{ toYaml .Values.resources | nindent 10 }}
 
@@ -401,6 +403,9 @@ spec:
         - mountPath: /etc/pgbackrest_secrets
           name: pgbackrest-secrets
           readOnly: true
+        - mountPath: {{ index .Values.backup.pgBackRest "repo1-path" | default (printf "/%s/%s/" .Release.Namespace (include "clusterName" .)) | quote }}
+          name: pgbackrest-repo1-path
+
         env:
           - name: PGHOST
             value: /var/run/postgresql
@@ -528,6 +533,8 @@ spec:
         secret:
           secretName: {{ .Values.bootstrapFromBackup.secretName }}
           optional: True
+      - name: pgbackrest-repo1-path
+        emptyDir: {}
       {{- if not .Values.persistentVolumes.data.enabled }}
       - name: storage-volume
         emptyDir: {}
