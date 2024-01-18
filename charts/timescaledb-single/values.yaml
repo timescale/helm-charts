@@ -22,6 +22,7 @@ image:
   repository: timescale/timescaledb-ha
   tag: pg14.6-ts2.9.1-p1
   pullPolicy: Always
+  pullSecret: ""
 
 # There are job and cronjob resources that run during updates or backups that use curl image
 # Users in that want to define their own curl image can set it below
