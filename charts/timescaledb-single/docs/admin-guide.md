@@ -393,7 +393,7 @@ kubectl create secret generic pgbackrest-bootstrap --from-literal=PGBACKREST_REP
 2. Create a new deployment using the backup of the former deployment
     ```console
     helm upgrade --install test01 --namespace testing ./charts/timescaledb-single \
-      --set bootstrapFromBackup=true \
+      --set bootstrapFromBackup.enabled=true \
       --set bootstrapFromBackup.repo1-path=/testing/test01
     ```
 
