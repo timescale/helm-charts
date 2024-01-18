@@ -574,6 +574,8 @@ affinity: {}
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#topologyspreadconstraints
 topologySpreadConstraints: []
 
+priorityClass: ""
+
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
 ##

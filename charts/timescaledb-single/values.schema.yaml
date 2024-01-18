@@ -424,6 +424,9 @@ properties:
     type: array
   topologySpreadConstraints:
     type: array
+  priorityClass:
+    type: string
+    maxLength: 63
   debug:
     type: object
     additionalProperties: false

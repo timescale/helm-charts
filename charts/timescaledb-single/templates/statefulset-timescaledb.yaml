@@ -472,6 +472,9 @@ spec:
       affinity:
         {{- .Values.affinity | toYaml | nindent 8 }}
       {{- end }}
+    {{- if .Values.priorityClass }}
+      priorityClassName: {{ .Values.priorityClass }}
+    {{- end }}
       volumes:
       - name: socket-directory
         emptyDir: {}
