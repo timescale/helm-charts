@@ -44,4 +44,15 @@ rules:
   - patch
   - update
   - watch
+  # add services to fix issue #599
+- apiGroups: [""]
+  resources: ["services"]
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+  - delete
 {{- end }}
