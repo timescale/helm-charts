@@ -44,6 +44,10 @@ spec:
         runAsGroup: {{ template "postgres.uid" }}
         runAsNonRoot: true
         runAsUser: {{ template "postgres.uid" }}
+{{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.imagePullSecrets | indent 6 }}
+{{- end }}
       initContainers:
       {{- if .Values.timescaledbTune.enabled }}
       - name: tstune
