@@ -120,6 +120,16 @@
             "null"
           ]
         },
+        "affinity": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "tolerations": {
+          "type": "array"
+        },
+        "nodeSelector": {
+          "type": "object"
+        },
         "jobs": {
           "type": "array"
         },

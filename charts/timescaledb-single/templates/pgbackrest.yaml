@@ -71,6 +71,18 @@ spec:
               - |
                   {"type": {{ quote .type }}}
               - "http://{{ template "timescaledb.fullname" $ }}-backup:8081/backups/"
+          {{- with $.Values.backup.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.backup.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if $.Values.backup.affinity }}
+          affinity:
+            {{- $.Values.backup.affinity | toYaml | nindent 12 }}
+          {{- end }}
 ...
 {{- end }}
 {{ end }}
