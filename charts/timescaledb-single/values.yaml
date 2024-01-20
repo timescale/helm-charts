@@ -28,7 +28,7 @@ image:
 # Example: https://github.com/timescale/helm-charts/blob/main/charts/timescaledb-single/templates/job-update-patroni.yaml
 curlImage:
   repository: curlimages/curl
-  tag: "7.87.0"
+  tag: "7.88.1"
   pullPolicy: Always
 
 # By default those secrets are randomly generated.
@@ -505,7 +505,7 @@ prometheus:
   enabled: false
   image:
     repository: quay.io/prometheuscommunity/postgres-exporter
-    tag: v0.11.1
+    tag: v0.15.0
     pullPolicy: Always
   # Extra custom environment variables for prometheus.
   # These should be an EnvVar, as this allows you to inject secrets into the environment
