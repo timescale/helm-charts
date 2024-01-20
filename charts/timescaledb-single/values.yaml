@@ -28,7 +28,7 @@ image:
 # Example: https://github.com/timescale/helm-charts/blob/main/charts/timescaledb-single/templates/job-update-patroni.yaml
 curlImage:
   repository: curlimages/curl
-  tag: "7.87.0"
+  tag: "8.5.0"
   pullPolicy: Always
 
 # By default those secrets are randomly generated.
