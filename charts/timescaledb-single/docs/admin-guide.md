@@ -35,7 +35,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
 | `image.pullPolicy`                | The pull policy                             | `IfNotPresent`                                      |
 | `image.repository`                | The image to pull                           | `timescale/timescaledb-ha`                       |
-| `image.tag`                       | The version of the image to pull            | `pg13-ts2.1-latest`
+| `image.tag`                       | The version of the image to pull            | `pg14.8-ts2.11.1`                                |
 | `service.primary.type`        | The service type to use for the primary service | `ClusterIP`                          |
 | `service.primary.port`        | The service port to use for the primary service | `5432`                               |
 | `service.primary.nodePort`    | The service nodePort to use for the primary service when `type` is `NodePort` | `null` |
