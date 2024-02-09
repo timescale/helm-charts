@@ -59,6 +59,26 @@ spec:
               CREATE TABLE citest.demo(inserted timestamptz not null);
               SELECT * FROM create_hypertable('citest.demo', 'inserted');
               INSERT INTO citest.demo VALUES ('${NOW}') RETURNING *;
+
+              CREATE TABLE citest.compressed(time timestamptz, id bigint, name text);
+              SELECT create_hypertable('citest.compressed', 'time');
+              INSERT INTO citest.compressed VALUES
+                ('2020-09-07', 123, 'abc'),
+                ('2020-08-30', 2, 'abcd'),
+                ('2020-07-15', 3, 'ab');
+              ALTER TABLE citest.compressed SET ( timescaledb.compress, timescaledb.compress_segmentby = 'id');
+              -- Compress a single chunk of this table
+              SELECT
+                  compress_chunk(format('%I.%I', c.schema_name, c.table_name))
+              FROM
+                  _timescaledb_catalog.chunk c
+              join
+                  _timescaledb_catalog.hypertable h ON (hypertable_id=id)
+              WHERE
+                  h.schema_name='citest'
+                  AND h.table_name='compressed'
+              LIMIT 1
+              \gexec
           __SQL__
           EXITCODE=$?
           if [ "${EXITCODE}" -ne 0 ]; then exit "${EXITCODE}"; fi
@@ -85,6 +105,8 @@ spec:
                       SELECT 'Could not find the test record on the replica';
                       SELECT 1/0; -- this will cause the script to exit with a failure
                   \endif
+
+                  SELECT * FROM citest.compressed;
           __SQL__
               EXITCODE=$?
               if [ "${EXITCODE}" -ne 0 ]; then exit "${EXITCODE}"; fi
