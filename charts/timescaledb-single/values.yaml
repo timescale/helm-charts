@@ -383,6 +383,8 @@ persistentVolumes:
     annotations: {}
     accessModes:
       - ReadWriteOnce
+    # Use a existing PVC which must be created manually before bound
+    existingClaim: ""
   # WAL will be a subdirectory of the data volume, which means enabling a separate
   # volume for the WAL files should just work for new pods.
   wal:
@@ -396,13 +398,25 @@ persistentVolumes:
     annotations: {}
     accessModes:
       - ReadWriteOnce
+    # Use a existing PVC which must be created manually before bound
+    existingClaim: ""
   # Any tablespace mentioned here requires a volume that will be associated with it.
   # tablespaces:
     # example1:
+    #   annotations: {}
+    #   accessModes:
+    #     - ReadWriteOnce
+    #   existingClaim: ""
     #   size: 5Gi
+    #   subPath: ""
     #   storageClass: gp2
     # example2:
+    #   annotations: {}
+    #   accessModes:
+    #     - ReadWriteOnce
+    #   existingClaim: ""
     #   size: 5Gi
+    #   subPath: ""
     #   storageClass: gp2
 
 resources: {}

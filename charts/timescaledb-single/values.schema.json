@@ -75,6 +75,9 @@
         "enabled": {
           "type": "boolean"
         },
+        "existingClaim": {
+          "type": "string"
+        },
         "mountPath": {
           "type": "string"
         },

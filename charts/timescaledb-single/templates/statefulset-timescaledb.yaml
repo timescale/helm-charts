@@ -284,9 +284,10 @@ spec:
         - name: shared-memory
           mountPath: /dev/shm
         {{- end }}
-{{- range $tablespaceName := ( .Values.persistentVolumes.tablespaces | default dict | keys ) }}
+{{- range $tablespaceName, $volume := ( .Values.persistentVolumes.tablespaces | default dict ) }}
         - name: {{ $tablespaceName }}
           mountPath: {{ printf "%s/%s" (include "tablespaces_dir" $) $tablespaceName }}
+          subPath: {{ $volume.subPath | quote }}
 {{- end }}
         - mountPath: /etc/timescaledb/patroni.yaml
           subPath: patroni.yaml
@@ -388,9 +389,10 @@ spec:
           mountPath: {{ .Values.persistentVolumes.wal.mountPath | quote }}
           subPath: {{ .Values.persistentVolumes.wal.subPath | quote }}
         {{- end }}
-{{- range $tablespaceName := ( .Values.persistentVolumes.tablespaces | default dict | keys ) }}
+{{- range $tablespaceName, $volume := ( .Values.persistentVolumes.tablespaces | default dict ) }}
         - name: {{ $tablespaceName }}
           mountPath: {{ printf "%s/%s" (include "tablespaces_dir" $) $tablespaceName }}
+          subPath: {{ $volume.subPath | quote }}
 {{- end }}
         - mountPath: /etc/pgbackrest
           name: pgbackrest
@@ -532,11 +534,28 @@ spec:
       - name: storage-volume
         emptyDir: {}
       {{- end }}
+      {{- if and .Values.persistentVolumes.data.enabled .Values.persistentVolumes.data.existingClaim }}
+      - name: storage-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistentVolumes.data.existingClaim }}
+      {{- end }}
+      {{- if and .Values.persistentVolumes.wal.enabled .Values.persistentVolumes.wal.existingClaim }}
+      - name: wal-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistentVolumes.wal.existingClaim }}
+      {{- end }}
+      {{- range $tablespaceName, $volume := ($.Values.persistentVolumes.tablespaces | default dict ) }}
+      {{- if $volume.existingClaim }}
+      - name: {{ $tablespaceName }}
+        persistentVolumeClaim:
+          claimName: {{ $volume.existingClaim }}
+      {{- end }}
+      {{- end }}
       {{- if .Values.prometheus.volumes }}
         {{ .Values.prometheus.volumes | toYaml | nindent 6 }}
       {{- end }}
   volumeClaimTemplates:
-  {{- if .Values.persistentVolumes.data.enabled }}
+  {{- if and .Values.persistentVolumes.data.enabled (not .Values.persistentVolumes.data.existingClaim) }}
     - metadata:
         name: storage-volume
         annotations:
@@ -551,7 +570,7 @@ spec:
           purpose: data-directory
       spec:
         accessModes:
-          {{ toYaml .Values.persistentVolumes.data.accessModes | nindent 8 }}
+          {{- toYaml .Values.persistentVolumes.data.accessModes | nindent 8 }}
         resources:
           requests:
             storage: "{{ .Values.persistentVolumes.data.size }}"
@@ -563,7 +582,7 @@ spec:
       {{- end }}
       {{- end }}
   {{- end }}
-  {{- if .Values.persistentVolumes.wal.enabled }}
+  {{- if and .Values.persistentVolumes.wal.enabled (not .Values.persistentVolumes.wal.existingClaim) }}
     - metadata:
         name: wal-volume
         annotations:
@@ -578,7 +597,7 @@ spec:
           purpose: wal-directory
       spec:
         accessModes:
-          {{ toYaml .Values.persistentVolumes.wal.accessModes | nindent 8 }}
+          {{- toYaml .Values.persistentVolumes.wal.accessModes | nindent 8 }}
         resources:
           requests:
             storage: "{{ .Values.persistentVolumes.wal.size }}"
@@ -591,10 +610,11 @@ spec:
       {{- end }}
   {{- end }}
 {{- range $tablespaceName, $volume := ($.Values.persistentVolumes.tablespaces | default dict ) }}
+{{- if not $volume.existingClaim }}
     - metadata:
         name: {{ $tablespaceName }}
         annotations:
-          {{ $volume.annotations | default dict | toYaml | nindent 10 }}
+          {{- $volume.annotations | default dict | toYaml | nindent 10 }}
         labels:
           app: {{ template "timescaledb.fullname" $ }}
           release: {{ $.Release.Name }}
@@ -604,9 +624,10 @@ spec:
           purpose: tablespace
       spec:
         accessModes:
-          {{ $volume.accessModes | default (list "ReadWriteOnce") | toYaml | nindent 8 }}
+          {{- $volume.accessModes | default (list "ReadWriteOnce") | toYaml | nindent 8 }}
         resources:
           requests:
             storage: "{{ $volume.size }}"
         storageClassName: {{ $volume.storageClass | default "" }}
+{{- end }}
 {{- end }}

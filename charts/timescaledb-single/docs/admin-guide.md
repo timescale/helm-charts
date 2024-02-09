@@ -55,6 +55,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `patroni`                         | Specify your specific [Patroni Configuration](https://patroni.readthedocs.io/en/latest/SETTINGS.html) | A full Patroni configuration |
 | `persistentVolumes.<name>.accessModes` | Persistent Volume access modes         | `[ReadWriteOnce]`                                   |
 | `persistentVolumes.<name>.annotations` | Annotations for Persistent Volume Claim| `{}`                                                |
+| `persistentVolumes.<name>.existingClaim` | Name of an existing pvc to use instead of creating a new Persistent Volume Claim | `""`    |
 | `persistentVolumes.<name>.size`   | Persistent Volume size                      | `2Gi`                                               |
 | `persistentVolumes.<name>.storageClass`| Persistent Volume Storage Class        | `volume.alpha.kubernetes.io/storage-class: default` |
 | `persistentVolumes.<name>.subPath`| Subdirectory of Persistent Volume to mount  | `""`                                                |
