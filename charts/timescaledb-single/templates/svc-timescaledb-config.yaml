@@ -25,9 +25,6 @@ metadata:
     {{ include "timescaledb-helm.labels" . | nindent 4 }}
     app.kubernetes.io/component: patroni
 spec:
-  selector:
-    app: {{ template "timescaledb.fullname" . }}
-    cluster-name: {{ template "clusterName" . }}
   type: ClusterIP
   clusterIP: None
   ports:

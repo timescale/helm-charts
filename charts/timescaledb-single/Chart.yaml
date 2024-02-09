@@ -4,7 +4,7 @@
 apiVersion: v1
 name: timescaledb-single
 description: 'TimescaleDB HA Deployment.'
-version: 0.33.2
+version: 0.33.3
 icon: https://cdn.iconscout.com/icon/free/png-256/timescaledb-1958407-1651618.png
 
 # appVersion specifies the version of the software, which can vary wildly,
