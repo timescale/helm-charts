@@ -26,6 +26,7 @@ required:
   - podAnnotations
   - podLabels
   - podManagementPolicy
+  - podSecurityContext
   - prometheus
   - rbac
   - readinessProbe
@@ -45,6 +46,18 @@ properties:
   podManagementPolicy:
     type:
       - string
+  podSecurityContext:
+    type: object
+    additionalProperties: true
+    properties:
+      fsGroup:
+        type: integer
+      runAsGroup:
+        type: integer
+      runAsNonRoot:
+        type: boolean
+      runAsUser:
+        type: integer
   postInit:
     description: |
       postInit allows you to configure additional scripts that will be run once

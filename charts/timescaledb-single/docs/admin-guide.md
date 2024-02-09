@@ -69,6 +69,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `pgBouncer.pg_hba`                | The `pg_hba` to be used by pgBouncer        | A `pg_hba` allowing non-superuser ssl-only connections |
 | `pgBouncer.userListSecretName`    | If set, a [user authentication file](https://www.pgbouncer.org/config.html#authentication-file-format) to be used by pgBouncer. | `nil` |
 | `podManagementPolicy`             | Either [`OrderedReady` or `Parallel`](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies) | `OrderedReady` |
+| `podSecurityContext`              | Security Context of the timescaledb pod. | `{ fsGroup: 1000, runAsGroup: 1000, runAsNonRoot: true, runAsUser: 1000 }` |
 | `podMonitor.enabled`          | Enable deployment of podMonitor used with prometheus-operator. | `false` |
 | `podMonitor.path`             | Path on which prometheus metrics are exposed. | `/metrics` |
 | `podMonitor.interval`         | Prometheus scrape interval. Lower values increase resolution, higher values reduce prometheus memory consumption. Do not set over 2m. | `10s` |
