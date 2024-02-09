@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/component: rbac
 rules:
 - apiGroups: [""]
-  resources: ["configmaps"]
+  resources: ["configmaps", "services"]
   verbs:
   - create
   - get
