@@ -40,7 +40,7 @@ Create the name of the service account to use.
 {{- end -}}
 
 {{- define "postgres.uid" -}}
-{{- default .Values.uid "1000" -}}
+{{- default "1000" .Values.uid -}}
 {{- end -}}
 
 {{- define "data_directory" -}}
