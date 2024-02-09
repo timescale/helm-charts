@@ -23,10 +23,10 @@ For more information, have a look at the [Using Helm](https://helm.sh/docs/intro
 
 ## Additional documentation
 
-- [Why use TimescaleDB?](https://docs.timescale.com/introduction)
-- [Installing TimescaleDB](https://docs.timescale.com/getting-started/installation)
-- [Migrating data to TimescaleDB](https://docs.timescale.com/getting-started/migrating-data)
-- [Tutorials and sample data](https://docs.timescale.com/tutorials)
+- [Why use TimescaleDB?](https://docs.timescale.com/timescaledb/latest/overview/core-concepts/#why-use-timescaledb)
+- [Installing TimescaleDB](https://docs.timescale.com/timescaledb/latest/how-to-guides/install-timescaledb/self-hosted/)
+- [Migrating data to TimescaleDB](https://docs.timescale.com/timescaledb/latest/how-to-guides/migrate-data/)
+- [Tutorials and sample data](https://docs.timescale.com/timescaledb/latest/tutorials/)
 
 # License
 
