@@ -10,6 +10,13 @@ metadata:
     chart: {{ template "timescaledb.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{- with .Values.labels }}
+{{ toYaml . | indent 4 }}
+    {{- end }}
+  {{- with .Values.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+    {{- end }}
 spec:
   serviceName: {{ template "timescaledb.dataname" . }}
   replicas: {{ .Values.dataNodes }}
@@ -26,6 +33,13 @@ spec:
         app: {{ template "timescaledb.fullname" . }}
         release: {{ .Release.Name }}
         timescaleNodeType: data
+        {{- with .Values.podLabels }}
+{{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+      {{- with .Values.podAnnotations }}
+{{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
@@ -137,12 +151,15 @@ spec:
         name: storage-volume
         annotations:
         {{- if .Values.persistentVolume.annotations }}
-{{ toYaml .Values.persistentVolume.annotations | indent 8 }}
+{{ toYaml .Values.persistentVolume.annotations | indent 10 }}
         {{- end }}
         labels:
           app: {{ template "timescaledb.fullname" . }}
           release: {{ .Release.Name }}
           heritage: {{ .Release.Service }}
+          {{- if .Values.persistentVolume.labels }}
+{{ toYaml .Values.persistentVolume.labels | indent 10 }}
+          {{- end }}
       spec:
         accessModes:
 {{ toYaml .Values.persistentVolume.accessModes | indent 8 }}

@@ -13,8 +13,14 @@ metadata:
     chart: {{ template "timescaledb.chart" $ }}
     release: {{ $.Release.Name }}
     heritage: {{ $.Release.Service }}
+    {{- with $.Values.labels }}
+{{ toYaml . | indent 4 }}
+    {{- end }}
   annotations:
     "helm.sh/hook-delete-policy": hook-succeeded
+    {{- with $.Values.annotations }}
+{{ toYaml . | indent 4 }}
+    {{- end }}
 spec:
   ttlSecondsAfterFinished: 600
   template:
@@ -25,7 +31,15 @@ spec:
         release: {{ $.Release.Name }}
         heritage: {{ $.Release.Service }}
         dataNode: {{ template "timescaledb.dataname" $ }}-{{ $pod }}
+        {{- with $.Values.podLabels }}
+{{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- with $.Values.podAnnotations }}
+{{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
+      serviceAccountName: {{ template "timescaledb.serviceAccountName" $ }}
       containers:
       - name: attachdn-{{ $index }}
         image: postgres:11-alpine # A relatively small official image that can run psql
