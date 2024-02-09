@@ -46,3 +46,5 @@ spec:
           {{ .Values.patroni.bootstrap.dcs | toJson | quote }} \
           "http://{{ template "clusterName" . }}-config:8008/config"
           exit 0
+        resources:
+          {{- toYaml .Values.curl.resources | nindent 10 }}

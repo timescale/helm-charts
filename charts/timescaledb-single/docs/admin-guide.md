@@ -30,6 +30,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `backup.resources`                | Any resources you wish to assign to the pgbackrest container                                                       | `{}` |
 | `callbacks.configMap`             | A kubernetes ConfigMap containing [Patroni callbacks](#callbacks). You can use templates in the name. | `nil`                         |
 | `clusterName`                     | Override the name of the PostgreSQL cluster | Equal to the Helm release name                      |
+| `curl.resources`                  | Any resources you wish to assign to the job and cronjob containers which are using the curl image | `{}` |
 | `env`                             | Extra custom environment variables, expressed as [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envvarsource-v1-core)   | `[]`                                                |
 | `envFrom`                         | Extra custom environment variables, expressed as [EnvFrom](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#envfromsource-v1-core) | `[]`                                                |
 | `fullnameOverride`                | Override the fullname of the chart          | `nil`                                               |
@@ -67,6 +68,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `pgBouncer.enabled`               | If enabled, run a [pgBouncer](https://www.pgbouncer.org/) sidecar | `false`                       |
 | `pgBouncer.port`                  | The port on which the Load Balancer should listen for pgBouncer requests | `6432`                 |
 | `pgBouncer.pg_hba`                | The `pg_hba` to be used by pgBouncer        | A `pg_hba` allowing non-superuser ssl-only connections |
+| `pgBouncer.resources`             | Any resources you wish to assign to the pgBouncer container                                | `{}` |
 | `pgBouncer.userListSecretName`    | If set, a [user authentication file](https://www.pgbouncer.org/config.html#authentication-file-format) to be used by pgBouncer. | `nil` |
 | `podManagementPolicy`             | Either [`OrderedReady` or `Parallel`](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies) | `OrderedReady` |
 | `podMonitor.enabled`          | Enable deployment of podMonitor used with prometheus-operator. | `false` |
@@ -81,6 +83,7 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `prometheus.image.pullPolicy`     | The pull policy for the postgres\_exporter  | `IfNotPresent`                                      |
 | `prometheus.image.repository`     | The postgres\_exporter docker repo          | `quay.io/prometheuscommunity/postgres_exporter`     |
 | `prometheus.image.tag`            | The tag of the postgres\_exporter image     | `v0.11.0`                                           |
+| `prometheus.resources`            | Any resources you wish to assign to the postgres-exporter container                        | `{}` |
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
 | `replicaCount`                    | Amount of pods to spawn                     | `3`                                                 |
 | `resources`                       | Any resources you wish to assign to the timescaledb container | `{}`   |

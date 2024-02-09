@@ -31,6 +31,19 @@ curlImage:
   tag: "7.87.0"
   pullPolicy: Always
 
+# There are job and cronjob resources that run during updates or backups that use curl image
+# Example: https://github.com/timescale/helm-charts/blob/main/charts/timescaledb-single/templates/job-update-patroni.yaml
+curl:
+  resources: {}
+    # If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
 # By default those secrets are randomly generated.
 # To prevent misconfiguration, modifications from helm upgrade won't be applied to those secrets.
 # As a result changing secrets cannot be done via helm and need manual intervention.
@@ -474,6 +487,7 @@ pgBouncer:
   - hostssl   all all              ::0/0     md5
   - hostnossl all all              0.0.0.0/0 reject
   - hostnossl all all              ::0/0     reject
+  resources: {}
   # Secret should contain user/password pairs in the format expected by pgbouncer
   # https://www.pgbouncer.org/config.html#authentication-file-format
   # example:
@@ -518,13 +532,13 @@ prometheus:
   #     secretKeyRef:
   #       name: myapplication-passwords
   #       key: standby
-  # Additional volumes for prometheus, e.g., to support additional queries.
-  # These should be a Volume, as this allows you to inject any kind of Volume
-  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#volume-v1-core
-
+  resources: {}
   # Extra custom CLI arguments for postgres_exporter.
   args: []
   # - --collector.database=disabled
+  # Additional volumes for prometheus, e.g., to support additional queries.
+  # These should be a Volume, as this allows you to inject any kind of Volume
+  # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.16/#volume-v1-core
   volumes:
   # - name: exporter-config
   #   configMap:

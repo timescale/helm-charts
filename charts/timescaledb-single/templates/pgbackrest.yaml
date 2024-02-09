@@ -71,6 +71,8 @@ spec:
               - |
                   {"type": {{ quote .type }}}
               - "http://{{ template "timescaledb.fullname" $ }}-backup:8081/backups/"
+              resources:
+                {{- toYaml $.Values.curl.resources | nindent 16 }}
 ...
 {{- end }}
 {{ end }}
