@@ -207,6 +207,10 @@ spec:
           value: {{ $.Release.Namespace }}
         - name: PATRONI_KUBERNETES_LABELS
           value: {{ printf "{app: %s, cluster-name: %s, release: %s}" (include "timescaledb.fullname" .) (include "clusterName" .) .Release.Name  | quote }}
+        - name: PATRONI_RESTAPI_CERTFILE
+          value: /etc/certificate/tls.crt
+        - name: PATRONI_RESTAPI_KEYFILE
+          value: /etc/certificate/tls.key
         - name: PATRONI_SCOPE
           value: {{ template "clusterName" . }}
         {{- if .Values.persistentVolumes.tablespaces }}
