@@ -11,7 +11,7 @@ image:
   # Image was built from
   # https://github.com/timescale/timescaledb-docker-ha
   repository: timescale/timescaledb-ha
-  tag: pg12-ts2.0.0-p0
+  tag: pg12.5-ts2.0.0-p0
   pullPolicy: IfNotPresent
 
 # Credentials used by PostgreSQL
@@ -121,3 +121,7 @@ serviceAccount:
   # The name of the ServiceAccount to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+
+# Disabling Load Balancer will create a `ClusterIP` type service for the access node
+loadBalancer:
+  enabled: true

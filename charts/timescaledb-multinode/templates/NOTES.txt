@@ -4,25 +4,32 @@
 TimescaleDB can be accessed via port 5432 on the following DNS name from within your cluster:
 {{ template "timescaledb.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
 
-To get your password for superuser run:
+To get your password for superuser on the access node run:
+    # access node superuser password
+    PGPASSWORD_SUPERUSER=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "timescaledb.fullname" . }}-access -o jsonpath="{.data.password-superuser}" | base64 --decode)
 
-    # superuser password
-    PGPASSWORD_SUPERUSER=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "timescaledb.fullname" . }} -o jsonpath="{.data.password-superuser}" | base64 --decode)
-
-    # admin password
-    PGPASSWORD_ADMIN=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "timescaledb.fullname" . }} -o jsonpath="{.data.password-admin}" | base64 --decode)
 
 To connect to your database:
 
-1. Run a postgres pod and connect using the psql cli:
+Run a postgres pod and connect using the psql cli:
+
     # login as superuser
     kubectl run -i --tty --rm psql --image=postgres \
       --env "PGPASSWORD=$PGPASSWORD_SUPERUSER" \
       --command -- psql -U postgres \
       -h {{ template "timescaledb.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local postgres
 
-    # login as admin
-    kubectl run -i -tty --rm psql --image=postgres \
-      --env "PGPASSWORD=$PGPASSWORD_ADMIN" \
-      --command -- psql -U admin \
-      -h {{ template "timescaledb.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local postgres
+Connect to the database from your local machine:
+
+1. Get the password for access node
+    PGPASSWORD_SUPERUSER=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "timescaledb.fullname" . }}-access -o jsonpath="{.data.password-superuser}" | base64 --decode)
+
+2. Get the name of the access node pod
+    ACCESS_NODE_POD=$(kubectl get pod -o name --namespace {{ .Release.Namespace }} -l release={{ .Release.Name }},timescaleNodeType=access)
+
+3. Start a port forward from the access node
+    kubectl port-forward $ACCESS_NODE_POD 7000:5432 -n=default
+
+4. Now you can access the database that’s in your cluster as if it were running locally.
+Use whatever port you’re forwarding to (7000 in this case). The host is localhost, the user 
+is postgres and the password is $PGPASSWORD_SUPERUSER from step one
