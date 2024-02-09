@@ -42,6 +42,13 @@ The following table lists the configurable parameters of the TimescaleDB Helm ch
 | `rbac.create`                     | Create required role and rolebindings       | `true`                                              |
 | `serviceAccount.create`           | If true, create a new service account       | `true`                                              |
 | `serviceAccount.name`             | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the fullname template | `nil` |
+| `service.annotations`             | annotations for the access service          | `{}`                                                |
+| `service.extrLabels`              | extra labels for the access service         | `{}`                                                |
+| `service.externalIPs`             | access service external IP addresses        | `[]`                                                |
+| `service.loadBalancerIP`          | IP address to assign to load balancer (if supported) | `""`                                       |
+| `service.loadBalancerSourceRanges`| list of IP CIDRs allowed access to load balancer (if supported) | `[]`                            |
+| `service.type`                    | type of access service to create            | `ClusterIP`                                         |
+
 
 ### Examples
 - Override value using commandline parameters
